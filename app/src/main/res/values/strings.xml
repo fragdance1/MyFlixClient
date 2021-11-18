@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">MyFlixClient</string>
+    <string name="msg_subtitle_on">Subtitle %1$s enabled.</string>
+    <string name="msg_subtitle_cc">Closed Caption</string>
+    <string name="msg_audio_track">Audio Track %1$s enabled.</string>
+    <string name="msg_no_audio_track">No Audio Track.</string>
+    <string name="msg_audio_track_off">Audio Track Disabled.</string>
+    <string name="msg_subtitle_off">Subtitle Disabled.</string>
+    <string name="title_select_caption">Select Subtitles</string>
+    <string name="title_select_audio">Select Audio Track</string>
+    <string name="button_zoom">Picture Size</string>
+    <string name="button_aspect">Stretch Horizontally</string>
+    <string name="button_speedup">Change Playback Speed</string>
+    <string name="button_audiotrack">Change Audio Track</string>
+    <string name="button_audiosync">Adjust Audio Sync</string>
+    <string name="button_cc">Subtitles</string>
+</resources>
