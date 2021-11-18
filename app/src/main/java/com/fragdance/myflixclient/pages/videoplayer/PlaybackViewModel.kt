@@ -14,7 +14,7 @@ class PlaybackViewModel(application: Application) :
     }
 
     override fun onStateChange(state: VideoPlaybackState) {
-        Timber.tag(Settings.TAG).d("PlaybackViewModel.onStateChange");
+        Timber.tag(Settings.TAG).d("PlaybackViewModel.onStateChange")
         playbackStateListeners.forEach {
             it.onChanged(state)
         }

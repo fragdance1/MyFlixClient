@@ -19,7 +19,6 @@ import com.google.android.exoplayer2.source.*
 import timber.log.Timber
 import java.time.Duration
 import com.google.android.exoplayer2.util.MimeTypes
-import com.google.common.collect.ImmutableList
 import com.google.android.exoplayer2.text.Cue
 
 import com.google.android.exoplayer2.util.EventLogger
@@ -38,7 +37,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     private val uiPlaybackStateListener = object : PlaybackStateListener {
         override fun onChanged(state: VideoPlaybackState) {
             view?.keepScreenOn = state is VideoPlaybackState.Play
-            Timber.tag(Settings.TAG).d("onChanged " + exoplayer?.currentCues?.size);
+
             // Switch/case a'la kotlin
             when (state) {
                 is VideoPlaybackState.Prepare -> startPlaybackFromWatchProgress(state.startPosition)
@@ -69,62 +68,56 @@ class VideoPlayerFragment : VideoSupportFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.addPlaybackStateListener(uiPlaybackStateListener)
-        subtitleView = SubtitleView(requireContext());
-        (view as ViewGroup).addView(subtitleView);
+        subtitleView = SubtitleView(requireContext())
+        (view as ViewGroup).addView(subtitleView)
     }
 
     override fun onDestroyView() {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.onDestroyView")
         super.onDestroyView()
         //viewModel.removePlaybackStateListener(uiPlaybackStateListener)
     }
 
     override fun onStart() {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.onStart")
         super.onStart()
         initializePlayer()
     }
 
     override fun onStop() {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.onStop")
         super.onStop()
         destroyPlayer()
     }
 
     override fun onDestroy() {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.onDestroy")
         super.onDestroy()
         mediaSession.release()
     }
 
     private fun initializePlayer() {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.initializePlayer")
         val dataSourceFactory = DefaultDataSource.Factory(
             requireContext(),
             DefaultHttpDataSource.Factory()
         )
 
         val trackSelector = DefaultTrackSelector(requireContext())
-        //val renderersFactory = DefaultRenderersFactory(requireActivity().applicationContext)
         val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
 
         val url: String = Settings.SERVER + "/api/video/local?id=" + video.video_files[0].id
 
         // Load any external subtitles
-        var subtitles: ArrayList<MediaItem.SubtitleConfiguration> = arrayListOf();
+        val subtitles: ArrayList<MediaItem.SubtitleConfiguration> = arrayListOf()
 
         for (subtitle in video.video_files[0].subtitles) {
-            val sub: String = Settings.SERVER + "/api/subtitle/get?id=" + subtitle.id;
-            val language = subtitle.language;
-            val selectionFlags = C.SELECTION_FLAG_FORCED;
+            val sub: String = Settings.SERVER + "/api/subtitle/get?id=" + subtitle.id
+            val language = subtitle.language
+            val selectionFlags = C.SELECTION_FLAG_FORCED
 
-            val subtitle = MediaItem.SubtitleConfiguration.Builder(Uri.parse(sub))
+            val subtitleItem = MediaItem.SubtitleConfiguration.Builder(Uri.parse(sub))
                 .setMimeType(MimeTypes.APPLICATION_SUBRIP) // The correct MIME type (required).
                 .setLanguage(language) // The subtitle language (optional).
                 .setSelectionFlags(selectionFlags) // Selection flags for the track (optional).
                 .setRoleFlags(C.ROLE_FLAG_CAPTION)
                 .build()
-            subtitles.add(subtitle);
+            subtitles.add(subtitleItem)
         }
 
         val mediaItem = MediaItem.Builder()
@@ -137,9 +130,9 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 .setMediaSourceFactory(mediaSourceFactory)
                 .setTrackSelector(trackSelector)
                 .build()
-        exoplayer!!.setMediaItem(mediaItem);
+        exoplayer!!.setMediaItem(mediaItem)
         exoplayer!!.addListener(PlayerEventListener())
-        exoplayer!!.addAnalyticsListener(EventLogger(trackSelector));
+        exoplayer!!.addAnalyticsListener(EventLogger(trackSelector))
 
         exoplayer?.prepare()
         prepareGlue(exoplayer!!)
@@ -148,7 +141,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
         exoplayer?.playWhenReady = true
 
         viewModel.onStateChange(VideoPlaybackState.Load(video))
-        Timber.tag(Settings.TAG).d("Done preparing");
+        Timber.tag(Settings.TAG).d("Done preparing")
     }
 
     private fun destroyPlayer() {
@@ -184,18 +177,14 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     private fun createMediaSession() {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.createMediaSession");
-        mediaSession = MediaSessionCompat(requireContext(), MEDIA_SESSION_TAG);
+        Timber.tag(Settings.TAG).d("VideoPlayerFragment.createMediaSession")
+        mediaSession = MediaSessionCompat(requireContext(), MEDIA_SESSION_TAG)
 
         // Connect media session to player (exoplayer)
         mediaSessionConnector = MediaSessionConnector(mediaSession).apply {
             // Handle playlist navigation
             //setQueueNavigator(SingleViewQueueNavigator)
 
-        }
-
-        exoplayer?.apply {
-            playWhenReady = true;
         }
     }
 
@@ -208,30 +197,23 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     private val onProgressUpdate: () -> Unit = {
-        Timber.tag(Settings.TAG).d("onProgressUpdate");
+        Timber.tag(Settings.TAG).d("onProgressUpdate")
     }
 
     inner class PlayerEventListener : Player.Listener {
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
-            Timber.tag(Settings.TAG).d("Error occured " + error.errorCodeName);
+            Timber.tag(Settings.TAG).d("Error occured %s", error.errorCodeName)
         }
 
         override fun onCues(cues: MutableList<Cue>) {
             super.onCues(cues)
-            Timber.tag(Settings.TAG).d("onCues " + cues.size)
-            subtitleView.setCues(cues);
+            subtitleView.setCues(cues)
         }
     }
 
     companion object {
         private const val MEDIA_SESSION_TAG = "myflix_token"
-        private const val ARGUMENT_VIDEO = "movie"
         private val PLAYER_UPDATE_INTERVAL_MILLIS = Duration.ofMillis(50).toMillis()
-        fun newInstance(videoItem: IMovie) = VideoPlayerFragment().apply {
-            arguments = bundleOf(
-                ARGUMENT_VIDEO to videoItem
-            )
-        }
     }
 }
