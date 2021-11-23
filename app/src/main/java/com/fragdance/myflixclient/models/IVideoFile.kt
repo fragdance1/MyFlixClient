@@ -12,12 +12,6 @@ data class IVideoFile(
    var coded:String,
    var width:Int,
    var height:Int,
-   /*
-   var audio_tracks:IAudioTrack[],
-   var subtitle_tracks:ISubtitleTrack[],
-
-
-    */
    var subtitles:List<ISubtitle> = emptyList(),
    var movie:IMovie?
 

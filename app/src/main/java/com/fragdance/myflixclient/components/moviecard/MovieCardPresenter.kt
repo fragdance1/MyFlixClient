@@ -6,10 +6,8 @@ import com.fragdance.myflixclient.models.IMovie
 import com.squareup.picasso.Picasso
 
 class MovieCardPresenter: Presenter() {
-
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
-        val context = parent!!.context
-        val card = MovieCard(context,null)
+        val card = MovieCard(parent!!.context,null)
         return ViewHolder(card)
     }
 
@@ -17,11 +15,11 @@ class MovieCardPresenter: Presenter() {
         checkNotNull(viewHolder)
         val v: MovieCard = viewHolder.view as MovieCard
         val movie:IMovie = item as IMovie
-        v.title.text = movie.title
+        v.mTitle.text = movie.title
         Picasso.get()
             .load(movie.poster)
             .fit()
-            .into(v.poster)
+            .into(v.mPoster)
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder?) {

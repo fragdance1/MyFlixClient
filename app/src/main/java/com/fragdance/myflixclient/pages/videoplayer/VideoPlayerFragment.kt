@@ -5,42 +5,46 @@ import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
+import androidx.fragment.app.FragmentTransaction.*
 import androidx.leanback.app.VideoSupportFragment
 import androidx.leanback.app.VideoSupportFragmentGlueHost
+import androidx.leanback.media.PlaybackGlue
 import androidx.navigation.Navigation.findNavController
+import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.models.IMovie
+import com.fragdance.myflixclient.pages.videoplayer.tracks.TrackSelectionMenu
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.*
-import timber.log.Timber
-import java.time.Duration
-import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.text.Cue
-
-import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.SubtitleView
 import com.google.android.exoplayer2.upstream.*
+import com.google.android.exoplayer2.util.MimeTypes
+import java.time.Duration
 
 class VideoPlayerFragment : VideoSupportFragment() {
+    // Change this to video in the future
     private lateinit var video: IMovie
+
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaSessionConnector: MediaSessionConnector
+    private lateinit var trackSelector: DefaultTrackSelector
     private var exoplayer: ExoPlayer? = null
     private val viewModel: PlaybackViewModel by viewModels()
     private lateinit var subtitleView: SubtitleView
+    private var tracksSelection: TrackSelectionMenu? = null
 
     private val uiPlaybackStateListener = object : PlaybackStateListener {
         override fun onChanged(state: VideoPlaybackState) {
             view?.keepScreenOn = state is VideoPlaybackState.Play
 
-            // Switch/case a'la kotlin
             when (state) {
                 is VideoPlaybackState.Prepare -> startPlaybackFromWatchProgress(state.startPosition)
+
                 is VideoPlaybackState.End -> {
                     findNavController(view!!).popBackStack()
                 }
@@ -70,11 +74,35 @@ class VideoPlayerFragment : VideoSupportFragment() {
         viewModel.addPlaybackStateListener(uiPlaybackStateListener)
         subtitleView = SubtitleView(requireContext())
         (view as ViewGroup).addView(subtitleView)
+        if (tracksSelection == null) {
+            tracksSelection = TrackSelectionMenu();
+
+            childFragmentManager.beginTransaction()
+                .replace(R.id.tracks_selection_dock, tracksSelection!!)
+                .hide(tracksSelection!!)
+                .commit()
+        }
+    }
+
+    fun onClosedCaption() {
+        checkNotNull(tracksSelection)
+
+        tracksSelection!!.setTracks(trackSelector)
+        val ft = childFragmentManager.beginTransaction()
+        ft.setCustomAnimations(
+            R.anim.fragment_slide_left_enter,
+            R.anim.fragment_slide_left_exit,
+            R.anim.fragment_slide_left_exit,
+            R.anim.fragment_slide_left_exit
+        )
+        ft.show(tracksSelection!!).addToBackStack("TrackSelection2").commit()
+        tracksSelection?.view?.requestFocus()
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //viewModel.removePlaybackStateListener(uiPlaybackStateListener)
+        viewModel.removePlaybackStateListener(uiPlaybackStateListener)
     }
 
     override fun onStart() {
@@ -98,7 +126,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
             DefaultHttpDataSource.Factory()
         )
 
-        val trackSelector = DefaultTrackSelector(requireContext())
+        trackSelector = DefaultTrackSelector(requireContext())
         val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
 
         val url: String = Settings.SERVER + "/api/video/local?id=" + video.video_files[0].id
@@ -130,22 +158,21 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 .setMediaSourceFactory(mediaSourceFactory)
                 .setTrackSelector(trackSelector)
                 .build()
-        exoplayer!!.setMediaItem(mediaItem)
-        exoplayer!!.addListener(PlayerEventListener())
-        exoplayer!!.addAnalyticsListener(EventLogger(trackSelector))
 
-        exoplayer?.prepare()
-        prepareGlue(exoplayer!!)
-        mediaSessionConnector.setPlayer(exoplayer!!)
-        mediaSession.isActive = true
-        exoplayer?.playWhenReady = true
+        with(exoplayer!!) {
+            setMediaItem(mediaItem)
+            addListener(PlayerEventListener())
+            prepare()
+            prepareGlue(this)
+            mediaSessionConnector.setPlayer(this)
+            mediaSession.isActive = true
+            playWhenReady = true
+        }
 
         viewModel.onStateChange(VideoPlaybackState.Load(video))
-        Timber.tag(Settings.TAG).d("Done preparing")
     }
 
     private fun destroyPlayer() {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.destroyPlayer")
         mediaSession.isActive = false
         mediaSessionConnector.setPlayer(null)
         exoplayer?.let {
@@ -157,39 +184,51 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     private fun prepareGlue(localExoplayer: ExoPlayer) {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.prepareGlue")
-        ProgressTransportControlGlue(
+        val glue = ProgressTransportControlGlue(
             requireContext(),
             LeanbackPlayerAdapter(
                 requireContext(),
                 localExoplayer,
                 PLAYER_UPDATE_INTERVAL_MILLIS.toInt()
             ),
-            onProgressUpdate
+
+            onProgressUpdate,
+            this
         ).apply {
             host = VideoSupportFragmentGlueHost(this@VideoPlayerFragment)
             title = video.title
-            // Enable seek manually since PlaybackTransportControlGlue.getSeekProvider() is null,
-            // so that PlayerAdapter.seekTo(long) will be called during user seeking.
-            // TODO(gargsahil@): Add a PlaybackSeekDataProvider to support video scrubbing.
+
             isSeekEnabled = true
+            addPlayerCallback(object : PlaybackGlue.PlayerCallback() {
+                override fun onPlayCompleted(glue: PlaybackGlue?) {
+                    super.onPlayCompleted(glue)
+                    val navController = findNavController(requireActivity(), R.id.nav_graph)
+                    navController.currentDestination?.id?.let {
+                        navController.popBackStack(
+                            it,
+                            true
+                        )
+                    }
+                }
+            })
         }
+        glue.isControlsOverlayAutoHideEnabled = true
+        glue.host.isControlsOverlayAutoHideEnabled = true
+
+
     }
 
     private fun createMediaSession() {
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.createMediaSession")
         mediaSession = MediaSessionCompat(requireContext(), MEDIA_SESSION_TAG)
 
         // Connect media session to player (exoplayer)
         mediaSessionConnector = MediaSessionConnector(mediaSession).apply {
             // Handle playlist navigation
             //setQueueNavigator(SingleViewQueueNavigator)
-
         }
     }
 
     private fun startPlaybackFromWatchProgress(startPosition: Long) {
-        Timber.v("Starting playback from $startPosition")
         exoplayer?.apply {
             seekTo(startPosition)
             playWhenReady = true
@@ -197,13 +236,15 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     private val onProgressUpdate: () -> Unit = {
-        Timber.tag(Settings.TAG).d("onProgressUpdate")
+        //Timber.tag(Settings.TAG).d("onProgressUpdate")
     }
 
     inner class PlayerEventListener : Player.Listener {
-        override fun onPlayerError(error: PlaybackException) {
-            super.onPlayerError(error)
-            Timber.tag(Settings.TAG).d("Error occured %s", error.errorCodeName)
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            super.onPlaybackStateChanged(playbackState)
+            if (playbackState == Player.STATE_READY) {
+
+            }
         }
 
         override fun onCues(cues: MutableList<Cue>) {
@@ -217,3 +258,4 @@ class VideoPlayerFragment : VideoSupportFragment() {
         private val PLAYER_UPDATE_INTERVAL_MILLIS = Duration.ofMillis(50).toMillis()
     }
 }
+

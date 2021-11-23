@@ -9,10 +9,15 @@ class PlaybackViewModel(application: Application) :
     AndroidViewModel(application),
     PlaybackStateMachine {
     private val playbackStateListeners = arrayListOf<PlaybackStateListener>()
+
     fun addPlaybackStateListener(listener: PlaybackStateListener) {
         playbackStateListeners.add(listener)
     }
 
+    fun removePlaybackStateListener(listener:PlaybackStateListener) {
+        playbackStateListeners.remove(listener)
+
+    }
     override fun onStateChange(state: VideoPlaybackState) {
         Timber.tag(Settings.TAG).d("PlaybackViewModel.onStateChange")
         playbackStateListeners.forEach {

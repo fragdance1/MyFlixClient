@@ -6,10 +6,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
-const val BASE_URL = Settings.SERVER+"/api/";
+const val BASE_URL = Settings.SERVER+"/api/"
 
 object JSONServiceBuilder {
-    private val okHttp = OkHttpClient.Builder();
+    private val okHttp = OkHttpClient.Builder()
 
     private val builder = Retrofit.Builder().baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -23,7 +23,7 @@ object JSONServiceBuilder {
 }
 
 object StringServiceBuilder {
-    private val okHttp = OkHttpClient.Builder();
+    private val okHttp = OkHttpClient.Builder()
 
     private val builder = Retrofit.Builder().baseUrl(BASE_URL)
         .addConverterFactory(ScalarsConverterFactory.create())

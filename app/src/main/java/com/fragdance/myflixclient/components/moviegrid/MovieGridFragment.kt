@@ -12,17 +12,11 @@ import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.Settings
-import timber.log.Timber
 
 
-class MovieGridFragment : VerticalGridSupportFragment(), OnItemViewClickedListener,
-    OnItemViewSelectedListener {
-    lateinit var adapter: ArrayObjectAdapter;
-    var moviesLoadedReceiver:BroadcastReceiver? = null
-
-    init {
-
-    }
+class MovieGridFragment : VerticalGridSupportFragment(){
+    private lateinit var adapter: ArrayObjectAdapter
+    private var moviesLoadedReceiver:BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,19 +27,18 @@ class MovieGridFragment : VerticalGridSupportFragment(), OnItemViewClickedListen
                     findNavController().navigate(
                         MovieGridFragmentDirections.actionBrowseFragmentToPlaybackFragment(item)
                     )
-                //is BrowseCustomMenu.MenuItem -> item.handler()
             }
         }
 
         // See if movies are already loaded
-        if(Settings.movies.size > 0) {
-            setMovies(Settings.movies);
+        if(Settings.movies.isNotEmpty()) {
+            setMovies(Settings.movies)
         } else {
             try {
                 // Let us know when the movies are loaded
                 moviesLoadedReceiver = object:BroadcastReceiver() {
                     override fun onReceive(p0: Context?, p1: Intent?) {
-                        setMovies(Settings.movies);
+                        setMovies(Settings.movies)
                     }
                 }
                 val filter = IntentFilter()
@@ -53,7 +46,6 @@ class MovieGridFragment : VerticalGridSupportFragment(), OnItemViewClickedListen
 
                 requireContext().registerReceiver(moviesLoadedReceiver, filter)
             } catch(e:Exception) {
-                Timber.tag(Settings.TAG).d("Failed "+e.message);
             }
         }
     }
@@ -61,55 +53,23 @@ class MovieGridFragment : VerticalGridSupportFragment(), OnItemViewClickedListen
     override fun onDestroy() {
         super.onDestroy()
         if(moviesLoadedReceiver != null) {
-            requireContext().unregisterReceiver(moviesLoadedReceiver);
-            moviesLoadedReceiver = null;
+            requireContext().unregisterReceiver(moviesLoadedReceiver)
+            moviesLoadedReceiver = null
         }
     }
+
     fun setMovies(movies: List<IMovie>) {
-        adapter.clear();
-        adapter.addAll(0, movies);
-        adapter.notifyItemRangeChanged(0, movies.size);
-
+        adapter.clear()
+        adapter.addAll(0, movies)
+        adapter.notifyItemRangeChanged(0, movies.size)
     }
 
-    fun setupFragment() {
-        var gridPresenter = VerticalGridPresenter(ZOOM_FACTOR_SMALL, false);
-        gridPresenter.numberOfColumns = 4;
-        setGridPresenter(gridPresenter);
-        gridPresenter.onItemViewClickedListener = this;
+    private fun setupFragment() {
+        val gridPresenter = VerticalGridPresenter(ZOOM_FACTOR_SMALL, false)
+        gridPresenter.numberOfColumns = 4
+        setGridPresenter(gridPresenter)
 
-        adapter = ArrayObjectAdapter(MovieCardPresenter());
-        setAdapter(adapter);
+        adapter = ArrayObjectAdapter(MovieCardPresenter())
+        setAdapter(adapter)
     }
-/*
-    override fun onItemClicked(
-        itemViewHolder: Presenter.ViewHolder?,
-        item: Any?,
-        rowViewHolder: RowPresenter.ViewHolder?,
-        row: Row?
-    ) {
-        val intent = VideoPlaybackActivity.newIntent(requireContext(), item as IMovie)
-        startActivity(intent)
-    }
-*/
-
-    override fun onItemSelected(
-        itemViewHolder: Presenter.ViewHolder?,
-        item: Any?,
-        rowViewHolder: RowPresenter.ViewHolder?,
-        row: Row?
-    ) {
-
-    }
-
-    override fun onItemClicked(
-        itemViewHolder: Presenter.ViewHolder?,
-        item: Any?,
-        rowViewHolder: RowPresenter.ViewHolder?,
-        row: Row?
-    ) {
-        TODO("Not yet implemented")
-    }
-
-
 }

@@ -1,7 +1,5 @@
 package com.fragdance.myflixclient.pages.videoplayer
-import java.io.Serializable
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.navigation.NavArgs
 import com.fragdance.myflixclient.models.IMovie
 
