@@ -2,17 +2,30 @@ package com.fragdance.myflixclient.pages.videoplayer.tracks
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
+import androidx.fragment.app.FragmentResultListener
 import androidx.leanback.app.VerticalGridSupportFragment
 import androidx.leanback.widget.*
+import com.fragdance.myflixclient.R
+import com.fragdance.myflixclient.Settings
+import com.fragdance.myflixclient.components.subtitlemodal.SubtitleModalFragment
+import com.fragdance.myflixclient.models.IOpenSubtitle
+import com.fragdance.myflixclient.models.ISubtitle
 import com.fragdance.myflixclient.models.ITrackMenuItem
+import com.fragdance.myflixclient.models.IVideo
+import com.fragdance.myflixclient.pages.videoplayer.VideoPlayerFragment
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
+import com.google.android.exoplayer2.util.MimeTypes
+import com.google.common.collect.ImmutableSet
+import timber.log.Timber
 
 
 class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListener {
@@ -20,6 +33,8 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
     private var subtitles: ArrayList<ITrackMenuItem> = arrayListOf()
     private var audiotracks: ArrayList<ITrackMenuItem> = arrayListOf()
     private var mTrackSelector: TrackSelector? = null
+    private var mPlayerFragment:VideoPlayerFragment? = null
+    private var mVideo:IVideo? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,8 +67,11 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
 
     // Set the selectable tracks for this video (subtitles, audiotracks)
     @SuppressLint("NotifyDataSetChanged")
-    fun setTracks(trackSelector: DefaultTrackSelector) {
+    fun setup(trackSelector: DefaultTrackSelector,video: IVideo,playerFragment:VideoPlayerFragment) {
         mTrackSelector = trackSelector
+        mVideo = video
+        mPlayerFragment = playerFragment
+
         var audioRenderIndex = 0
         var subtitleRenderIndex = 0
         val mappedTracksInfo = trackSelector.currentMappedTrackInfo
@@ -65,8 +83,6 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
         for (rendererIndex in 0 until mappedTracksInfo.rendererCount) {
             if (parameters.getRendererDisabled(rendererIndex))
                 continue
-
-
             val trackType = mappedTracksInfo.getRendererType(rendererIndex)
             val trackGroupArray = mappedTracksInfo.getTrackGroups(rendererIndex)
 
@@ -109,17 +125,21 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
 
                 }
             }
-
-            val items: ArrayList<ITrackMenuItem> = arrayListOf()
-            if (subtitles.size > 0) {
-                items.add(ITrackMenuItem("Subtitles", -1, null, null, null))
-                items.add(ITrackMenuItem("Off", -2, null, subtitleRenderIndex, null))
-                items.addAll(subtitles)
-                items.add(ITrackMenuItem("Download", -3, null, subtitleRenderIndex, null))
+        }
+            Timber.tag(Settings.TAG).d("Count "+mPlayerFragment!!.mExternalSubtitles.size);
+            for((index, sub) in mPlayerFragment!!.mExternalSubtitles.withIndex()) {
+                subtitles.add(ITrackMenuItem(sub.language, EXTERNAL_SUBTITLE,index,null,null))
             }
+            val items: ArrayList<ITrackMenuItem> = arrayListOf()
+
+                items.add(ITrackMenuItem("Subtitles", HEADER, null, null, null))
+                items.add(ITrackMenuItem("Off", DISABLE_SUBTITLE, null, subtitleRenderIndex, null))
+                items.addAll(subtitles)
+                items.add(ITrackMenuItem("Download", DOWNLOAD_SUBTITLE, null, subtitleRenderIndex, null))
+
             if (audiotracks.size > 0) {
-                items.add(ITrackMenuItem("Audio", -1, null, null, null))
-                items.add(ITrackMenuItem("Off", -2, null, audioRenderIndex, null))
+                items.add(ITrackMenuItem("Audio", HEADER, null, null, null))
+                items.add(ITrackMenuItem("Off", DISABLE_SUBTITLE, null, audioRenderIndex, null))
                 items.addAll(audiotracks)
             }
 
@@ -130,9 +150,8 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
             with(gridPresenter as TrackMenuPresenter) {
                 gridView?.adapter?.notifyDataSetChanged()
             }
-        }
-    }
 
+    }
 
     override fun onItemClicked(
         itemViewHolder: Presenter.ViewHolder?,
@@ -141,8 +160,38 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
         row: Row?
     ) {
 
+        parentFragmentManager.beginTransaction().hide(this).commit()
         val menuItem = item as ITrackMenuItem;
-        if (menuItem.trackId >= 0) {
+        if(menuItem.trackId == EXTERNAL_SUBTITLE) {
+            Timber.tag(Settings.TAG).d("Selecting external subtitle")
+            mPlayerFragment!!.selectExternalSubtitle(menuItem.groupIndex!!);
+        } else if(menuItem.trackId == DOWNLOAD_SUBTITLE) {
+            Timber.tag(Settings.TAG).d("Download subtitle");
+            var modal = SubtitleModalFragment(mVideo!!)
+
+            parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.subtitle_search_dock,modal)
+                .addToBackStack("subtitle").commit()
+
+            parentFragmentManager.setFragmentResultListener("Subtitle",modal, FragmentResultListener{key,result->
+                Timber.tag(Settings.TAG).d("Fragment listener "+result);
+                var receivedData = result.get("Item") as ISubtitle
+                if(receivedData!=null) {
+                    Timber.tag(Settings.TAG).d(receivedData.toString())
+                    mPlayerFragment?.downloadSubtitle(receivedData!!)
+                }
+                parentFragmentManager.beginTransaction().remove(modal).commit()
+
+            })
+        } else if(menuItem.trackId == DISABLE_SUBTITLE) {
+            Timber.tag(Settings.TAG).d("Disable subtitle");
+            mPlayerFragment!!.disableSubtitles()
+        } else if(menuItem.trackId == DISABLE_AUDIO) {
+            Timber.tag(Settings.TAG).d("Disable audio")
+
+        } else {
+            Timber.tag(Settings.TAG).d("Selecting internal track")
             val override =
                 DefaultTrackSelector.SelectionOverride(menuItem.groupIndex!!, menuItem.trackId)
             val parametersBuilder = DefaultTrackSelector.ParametersBuilder(requireContext())
@@ -153,7 +202,15 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
             )
             mTrackSelector?.parameters = parametersBuilder.build()
         }
+
     }
 
+    companion object {
+        val HEADER = -1
+        val DOWNLOAD_SUBTITLE = -2
+        val EXTERNAL_SUBTITLE = -3
+        val DISABLE_SUBTITLE = -4
+        val DISABLE_AUDIO = -5
+    }
 }
 

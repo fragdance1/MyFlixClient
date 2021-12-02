@@ -24,4 +24,5 @@
         android:name="com.fragdance.myflixclient.pages.videoplayer.tracks.TrackSelectionMenu"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 </RelativeLayout>

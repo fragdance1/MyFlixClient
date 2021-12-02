@@ -17,7 +17,7 @@
         android:label="PlaybackFragment">
         <argument
             android:name="video"
-            app:argType="com.fragdance.myflixclient.models.IMovie" />
+            app:argType="com.fragdance.myflixclient.models.IPlayList" />
         <action
             android:id="@+id/action_playbackFragment_to_playbackErrorFragment"
             app:destination="@id/playbackErrorFragment" />
@@ -28,7 +28,7 @@
         android:label="PlaybackErrorFragment">
         <argument
             android:name="video"
-            app:argType="com.fragdance.myflixclient.models.IMovie" />
+            app:argType="com.fragdance.myflixclient.models.IPlayList" />
         <argument
             android:name="error"
             app:argType="java.lang.Exception" />
@@ -51,6 +51,4 @@
             android:id="@+id/action_browseFragment_to_playbackFragment"
             app:destination="@id/playbackFragment" />
     </fragment>
-
-
 </navigation>

@@ -17,6 +17,7 @@ class MovieCard(context: Context, attrs: AttributeSet?): BaseCardView(context,at
     var mWidth:Float = 0.0f
     lateinit var mPoster:ImageView
     lateinit var mTitle: TextView
+
     init {
         buildImageCardView()
     }

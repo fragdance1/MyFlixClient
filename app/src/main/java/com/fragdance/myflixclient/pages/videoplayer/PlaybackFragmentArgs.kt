@@ -1,28 +1,29 @@
 package com.fragdance.myflixclient.pages.videoplayer
 import android.os.Bundle
 import androidx.navigation.NavArgs
-import com.fragdance.myflixclient.models.IMovie
+import com.fragdance.myflixclient.models.IPlayList
 
-data class PlaybackFragmentArgs(val video: IMovie) : NavArgs {
+
+data class PlaybackFragmentArgs(val playlist: IPlayList) : NavArgs {
     companion object {
         @JvmStatic
         fun fromBundle(bundle: Bundle): PlaybackFragmentArgs {
             // Simplify since we only have serializable
             bundle.setClassLoader(PlaybackFragmentArgs::class.java.classLoader)
-            val movie: IMovie?
+            val playlist: IPlayList?
             if (bundle.containsKey("video")) {
-                movie = bundle.get("video") as IMovie?
+                playlist = bundle.get("video") as IPlayList?
             } else {
                 throw UnsupportedOperationException(
-                    IMovie::class.java.name +
+                    IPlayList::class.java.name +
                             " must implement Parcelable or Serializable or must be an Enum."
                 )
             }
-            if (movie == null) {
+            if (playlist == null) {
                 throw IllegalArgumentException("Argument \"video\" is marked as non-null but was passed a null value.")
             }
 
-            return PlaybackFragmentArgs(movie)
+            return PlaybackFragmentArgs(playlist)
         }
     }
 }
