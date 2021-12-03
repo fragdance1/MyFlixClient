@@ -13,6 +13,7 @@ data class IMovie(
 
 data class IVideo(
     var id:Int,
+    var extension:String,
     var title:String,
     var poster:String?,
     var overview:String?,
