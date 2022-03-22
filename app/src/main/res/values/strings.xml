@@ -14,4 +14,6 @@
     <string name="button_audiotrack">Change Audio Track</string>
     <string name="button_audiosync">Adjust Audio Sync</string>
     <string name="button_cc">Subtitles</string>
+    <string name="watch_action_title">Watch Now</string>
+    <string name="watch_action_subtitle">For free</string>
 </resources>

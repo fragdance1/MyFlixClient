@@ -19,7 +19,7 @@ import com.fragdance.myflixclient.models.ISubtitle
 class MenuView(context: Context,attrs: AttributeSet): VerticalGridView(context,attrs) {
     override fun onFinishInflate() {
         super.onFinishInflate()
-        requestFocus()
+        //requestFocus()
     }
 }
 
@@ -41,10 +41,11 @@ class MenuItemPresenter: Presenter() {
         label.textSize=24f
         label.setTextColor(Color.WHITE)
         label.setPadding(20, 10, 20, 10)
+        /*
         label.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
             if(b) view.setBackgroundColor(Color.rgb(0.2f,0.2f,0.2f))
             else view.setBackgroundColor(Color.TRANSPARENT)
-        }
+        }*/
         return ViewHolder(label)
     }
 

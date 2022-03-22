@@ -28,6 +28,10 @@ class ProgressTransportControlGlue<T : PlayerAdapter>(
         }
     }
 
+    override fun onPlayCompleted() {
+        super.onPlayCompleted()
+        videoPlayer.onPlayCompleted()
+    }
     override fun onUpdateProgress() {
         super.onUpdateProgress()
         videoPlayer.onProgressUpdate()

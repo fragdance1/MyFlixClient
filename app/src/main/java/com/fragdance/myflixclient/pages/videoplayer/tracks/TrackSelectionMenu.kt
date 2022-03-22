@@ -61,6 +61,7 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
 
         view.layoutParams = lp
         view.setBackgroundColor(Color.argb(0.8f, 0f, 0f, 0f))
+        Timber.tag(Settings.TAG).d("TrackSelectionMenu.onViewCreated")
     }
 
     private fun getEmbeddedTracks(trackSelector:DefaultTrackSelector) {
@@ -112,77 +113,24 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
         }
     }
     // Set the selectable tracks for this video (subtitles, audiotracks)
+
     @SuppressLint("NotifyDataSetChanged")
     fun setup(trackSelector: DefaultTrackSelector?,video: IVideo,playerFragment:VideoPlayerFragment) {
         //mTrackSelector = trackSelector
         mVideo = video
         mPlayerFragment = playerFragment
 
-//        var audioRenderIndex = 0
-//        var subtitleRenderIndex = 0
-  //      val mappedTracksInfo = trackSelector?.currentMappedTrackInfo
         subtitles.clear()
         audiotracks.clear()
         mTrackSelector = trackSelector
         if(trackSelector != null) {
             getEmbeddedTracks(trackSelector)
         }
-        //if (mappedTracksInfo == null) return
-/*
-        val parameters = trackSelector?.parameters
-        for (rendererIndex in 0 until mappedTracksInfo.rendererCount) {
-            if (parameters!!.getRendererDisabled(rendererIndex))
-                continue
-            val trackType = mappedTracksInfo.getRendererType(rendererIndex)
-            val trackGroupArray = mappedTracksInfo.getTrackGroups(rendererIndex)
 
-            if (trackType == C.TRACK_TYPE_TEXT) {
-                subtitleRenderIndex = rendererIndex
-            } else if (trackType == C.TRACK_TYPE_AUDIO) {
-                audioRenderIndex = rendererIndex
-            }
-            for (groupIndex in 0 until trackGroupArray.length) {
-                for (trackIndex in 0 until trackGroupArray[groupIndex].length) {
-                    val isTrackSupported = mappedTracksInfo.getTrackSupport(
-                        rendererIndex,
-                        groupIndex,
-                        trackIndex
-                    ) == C.FORMAT_HANDLED
-
-                    if (!isTrackSupported) continue
-
-                    var label = trackGroupArray[groupIndex].getFormat(trackIndex).label
-                    if (label == null) {
-                        label = DefaultTrackNameProvider(resources).getTrackName(
-                            trackGroupArray[groupIndex].getFormat(trackIndex)
-                        )
-                    }
-
-
-                    val item = ITrackMenuItem(
-                        label,
-                        trackIndex,
-                        groupIndex,
-                        rendererIndex,
-                        trackGroupArray
-                    )
-
-                    if (trackType == C.TRACK_TYPE_TEXT) {
-                        subtitles.add(item)
-                    } else if (trackType == C.TRACK_TYPE_AUDIO) {
-                        audiotracks.add(item)
-                    }
-
-                }
-            }
-        }
-        */
-        Timber.tag(Settings.TAG).d("Count "+mPlayerFragment!!.mExternalSubtitles.size);
         for((index, sub) in mPlayerFragment!!.mExternalSubtitles.withIndex()) {
             subtitles.add(ITrackMenuItem(sub.language, EXTERNAL_SUBTITLE,index,null,null))
         }
         val items: ArrayList<ITrackMenuItem> = arrayListOf()
-
             items.add(ITrackMenuItem("Subtitles", HEADER, null, null, null))
             items.add(ITrackMenuItem("Off", DISABLE_SUBTITLE, null, 0, null))
             items.addAll(subtitles)
@@ -211,6 +159,7 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
         row: Row?
     ) {
 
+        parentFragmentManager.popBackStack()
         parentFragmentManager.beginTransaction().hide(this).commit()
         val menuItem = item as ITrackMenuItem;
         if(menuItem.trackId == EXTERNAL_SUBTITLE) {

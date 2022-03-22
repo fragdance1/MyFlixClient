@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    >
+
+    <com.fragdance.myflixclient.components.side_menu.SideMenuView
+        android:id="@+id/menu"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/menu_icons"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+
+            android:orientation="vertical" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/menu_labels"
+            android:layout_width="160dp"
+            android:layout_height="match_parent"
+            android:background="#2a2a2a"
+            android:visibility="invisible"
+            android:orientation="vertical" />
+    </com.fragdance.myflixclient.components.side_menu.SideMenuView>
+</FrameLayout>

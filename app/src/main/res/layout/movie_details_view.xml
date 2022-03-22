@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:background="#ff0000"
+    android:id="@+id/movie_details_view"
+    android:orientation="vertical"
+    >
+        <androidx.leanback.widget.VerticalGridView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:id="@+id/persons">
+
+        </androidx.leanback.widget.VerticalGridView>
+
+    </LinearLayout>
+
+

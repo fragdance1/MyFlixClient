@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import androidx.core.os.bundleOf
 import androidx.leanback.app.VerticalGridSupportFragment
 import androidx.leanback.widget.*
 import androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_SMALL
@@ -12,11 +13,10 @@ import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.models.IPlayList
-import utils.movieToVideo
+import timber.log.Timber
+import com.fragdance.myflixclient.R;
 
-
-class MovieGridFragment : VerticalGridSupportFragment(){
+open class MovieGridFragment : VerticalGridSupportFragment(){
     private lateinit var mAdapter: ArrayObjectAdapter
     private var mMoviesLoadedReceiver:BroadcastReceiver? = null
 
@@ -26,13 +26,15 @@ class MovieGridFragment : VerticalGridSupportFragment(){
         setOnItemViewClickedListener { _, item, _, _ ->
             when (item) {
                 is IMovie -> {
-                    var playList = IPlayList()
-                    playList.videos.add(movieToVideo(item))
+                    Timber.tag(Settings.TAG).d("Opening playback");
+                    val bundle = bundleOf("id" to item.id.toLong())
+
                     findNavController().navigate(
+                        R.id.action_global_movie_details,bundle)/*
                         MovieGridFragmentDirections.actionBrowseFragmentToPlaybackFragment(
-                            playList
+                            item.id.toLong()
                         )
-                    )
+                    )*/
                 }
             }
         }

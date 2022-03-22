@@ -13,7 +13,6 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.menu.MenuItemBridgeAdapter
 import com.fragdance.myflixclient.components.menu.MenuItemPresenter
-import com.fragdance.myflixclient.models.IOpenSubtitle
 import com.fragdance.myflixclient.models.ISubtitle
 import com.fragdance.myflixclient.models.IVideo
 import com.fragdance.myflixclient.services.subtitleService
@@ -25,13 +24,14 @@ import timber.log.Timber
 interface OnMenuItemViewClickedListener {
     fun onMenuItemClicked(item:Any)
 }
+
 class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedListener {
     var mVideo = video
-    lateinit var mVerticalGridView:VerticalGridView;
+    lateinit var mVerticalGridView:VerticalGridView
     lateinit var mRootView:ViewGroup
     var mBridgeAdapter = MenuItemBridgeAdapter(this)
 
-    var lrp = MenuItemPresenter();
+    var lrp = MenuItemPresenter()
     var mAdapter = ArrayObjectAdapter(lrp)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,19 +42,19 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         mRootView = inflater.inflate(R.layout.subtitle_modal, container, false) as ViewGroup
         mVerticalGridView = mRootView.findViewById(R.id.menu_view) as VerticalGridView
-        mBridgeAdapter.setAdapter(mAdapter);
+        mBridgeAdapter.setAdapter(mAdapter)
 
-        mVerticalGridView.adapter = mBridgeAdapter;
+        mVerticalGridView.adapter = mBridgeAdapter
         mVerticalGridView.adapter
 
-        return mRootView;
+        return mRootView
     }
 
-    fun searchSubtitle() {
+    private fun searchSubtitle() {
         Timber.tag(Settings.TAG).d(mVideo.url)
         val requestCall = subtitleService.searchSubtitle(mVideo.url,null,null)
         requestCall.enqueue(object: Callback<List<ISubtitle>>{
@@ -66,9 +66,6 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
                     val subtitles = response.body() as List<ISubtitle>
                     mAdapter.clear()
                     mAdapter.addAll(0,subtitles)
-
-                } else {
-
                 }
             }
 
@@ -76,14 +73,12 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
 
             }
         })
-
     }
-
-
 
     override fun onMenuItemClicked(item: Any) {
         val result = bundleOf("Item" to item)
         this.parentFragmentManager.setFragmentResult("Subtitle",result)
+        parentFragmentManager.popBackStack()
     }
 
 }

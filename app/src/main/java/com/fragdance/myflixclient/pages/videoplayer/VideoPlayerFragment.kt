@@ -5,6 +5,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.*
 import androidx.fragment.app.FragmentTransaction.*
@@ -17,6 +19,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.Navigation.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
+import com.fragdance.myflixclient.components.side_menu.SideMenu
 import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.models.ISubtitle
 import com.fragdance.myflixclient.models.IVideo
@@ -40,22 +43,30 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-import utils.getNextVideo
+
 import java.lang.Exception
 import java.net.URI
 import java.time.Duration
 
 class VideoPlayerFragment : VideoSupportFragment() {
+    // The video currently playing
     private lateinit var mCurrentVideo: IVideo
+    // The list of videos to play. At least one
     private lateinit var mPlaylist: IPlayList
 
+    // The current video player (MediaPlayer/Exoplayer denpending on format)
     private var mVideoPlayer:IVideoPlayer? = null
     private val mViewModel: PlaybackViewModel by viewModels()
+
+    // The currently active external subtitle
     private var mSubtitle: Subtitle? = null
     private var mTracksSelectionMenu: TrackSelectionMenu? = null
 
+    // View from exoplayer for displaying subtitles
     private lateinit var mSubtitleView: SubtitleView
+    // A list of external subtitles for this video
     var mExternalSubtitles: ArrayList<ISubtitle> = arrayListOf()
+
     private val uiPlaybackStateListener = object : PlaybackStateListener {
         override fun onChanged(state: VideoPlaybackState) {
             view?.keepScreenOn = state is VideoPlaybackState.Play
@@ -82,26 +93,28 @@ class VideoPlayerFragment : VideoSupportFragment() {
         }
     }
 
+    // Update listener for syncing external subtitles
+    val onProgressUpdate: () -> Unit = {
+        if (mSubtitle != null && mVideoPlayer != null) {
+            val cue = mSubtitle!!.getCues(mVideoPlayer!!.currentMs())
+            mSubtitleView.setCues(cue)
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        Timber.tag(Settings.TAG).d("onCreate");
         super.onCreate(savedInstanceState)
         mPlaylist = PlaybackFragmentArgs.fromBundle(requireArguments()).playlist
     }
 
-    val onProgressUpdate: () -> Unit = {
-        if (mSubtitle != null) {
-            val cue = mSubtitle!!.getCues(mVideoPlayer!!.currentMs())
-            mSubtitleView.setCues(cue)
-        }else {
-            Timber.tag(Settings.TAG).d("Got no subtitle")
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.tag(Settings.TAG).d("onViewCreated");
+
         super.onViewCreated(view, savedInstanceState)
+        activity?.findViewById<View>(R.id.side_menu)?.visibility = INVISIBLE;
         mSubtitleView = SubtitleView(requireContext())
         (view as ViewGroup).addView(mSubtitleView)
+
+        // Create the subtitle/audio selection if needed
         if (mTracksSelectionMenu == null) {
             mTracksSelectionMenu = TrackSelectionMenu()
 
@@ -110,11 +123,10 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 .hide(mTracksSelectionMenu!!)
                 .commit()
         }
+
     }
 
     fun onClosedCaption() {
-        checkNotNull(mTracksSelectionMenu)
-        checkNotNull(mVideoPlayer)
         val trackSelector = mVideoPlayer!!.getTrackSelector()
         mTracksSelectionMenu!!.setup(trackSelector, mCurrentVideo, this)
         this.hideControlsOverlay(true)
@@ -125,146 +137,62 @@ class VideoPlayerFragment : VideoSupportFragment() {
             R.anim.fragment_slide_left_exit,
             R.anim.fragment_slide_left_exit
         )
-        ft.show(mTracksSelectionMenu!!).addToBackStack("TrackSelection2").commit()
+        ft.show(mTracksSelectionMenu!!).addToBackStack("TrackSelectionMenu").commit()
         mTracksSelectionMenu?.view?.requestFocus()
-
     }
 
     override fun onDestroyView() {
-        Timber.tag(Settings.TAG).d("onDestroyView");
         super.onDestroyView()
+        activity?.findViewById<View>(R.id.side_menu)?.visibility = VISIBLE;
         mViewModel.removePlaybackStateListener(uiPlaybackStateListener)
     }
 
     override fun onStart() {
-        Timber.tag(Settings.TAG).d("onStart");
         super.onStart()
-
         addVideo(mPlaylist.videos[0])
-        //initializePlayer()
     }
 
     override fun onStop() {
-        Timber.tag(Settings.TAG).d("onStop");
         super.onStop()
         destroyPlayer()
     }
 
     override fun onDestroy() {
-        Timber.tag(Settings.TAG).d("onDestroy");
         destroyPlayer()
         super.onDestroy()
-
     }
 
     fun onPlayCompleted() {
+        Timber.tag(Settings.TAG).d("onPlayCompleted")
         try {
-            val navController =
-                Navigation.findNavController(requireActivity(), R.id.nav_graph)
+            val navController = findNavController(this.view!!)
             navController.currentDestination?.id?.let {
-                navController.popBackStack(
-                    it,
-                    true
-                )
+                navController.popBackStack(it, true)
             }
         } catch(e: Exception) {
-
+            Timber.tag(Settings.TAG).d("Error "+e.message)
         }
     }
 
     private fun initializeExoPlayer() {
         mVideoPlayer = MyFlixExoPlayer();
-        //mVideoPlayer.init(requireContext(),this )
-        /*
-        createMediaSession()
-        mViewModel.addPlaybackStateListener(uiPlaybackStateListener)
-        mSubtitleView = SubtitleView(requireContext())
-        (view as ViewGroup).addView(mSubtitleView)
-        if (mTracksSelectionMenu == null) {
-            mTracksSelectionMenu = TrackSelectionMenu()
-
-            childFragmentManager.beginTransaction()
-                .replace(R.id.tracks_selection_dock, mTracksSelectionMenu!!)
-                .hide(mTracksSelectionMenu!!)
-                .commit()
-        }
-
-         */
-        Timber.tag(Settings.TAG).d("initializePlayer");
-        /*
-        val dataSourceFactory = DefaultDataSource.Factory(
-            requireContext(),
-            DefaultHttpDataSource.Factory()
-        )
-
-        mTrackSelector = DefaultTrackSelector(requireContext())
-        val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
-
-        mExoplayer =
-            ExoPlayer.Builder(requireContext())
-                .setMediaSourceFactory(mediaSourceFactory)
-                .setTrackSelector(mTrackSelector)
-                .build()
-
-        with(mExoplayer!!) {
-            addListener(PlayerEventListener())
-            prepare()
-            prepareGlue(this)
-            mMediaSessionConnector.setPlayer(this)
-            mMediaSession.isActive = true
-            playWhenReady = true
-        }
-        mExoplayer?.prepare()
-        mExoplayer?.seekTo(0)
-        mExoplayer?.play()
-        */
     }
 
-    private fun initializeMediaPlayer(url:String) {
-        Timber.tag(Settings.TAG).d("initializeMediaPlayer");
+    private fun initializeMediaPlayer() {
         mVideoPlayer = MyFlixMediaPlayer()
-        /*
-        try {
-        var glueHost = VideoSupportFragmentGlueHost(this)
-        mMediaPlayerAdapter = MediaPlayerAdapter(requireContext())
-
-        mMediaPlayerGlue = ProgressTransportControlGlue<MediaPlayerAdapter>(requireContext(),mMediaPlayerAdapter,onProgressUpdate,this)
-        mMediaPlayerGlue.setHost(glueHost)
-        mMediaPlayerGlue.playWhenPrepared()
-        mMediaPlayerAdapter.setDataSource(Uri.parse(url))
-        } catch(e:Exception) {
-            Timber.tag(Settings.TAG).d(e.message)
-        }
-
-         */
-        /*
-
-        mPlaybackControlGlue = new PlaybackControlsGlue<MediaPlayerAdapter>(getActivity(), playerAdapter);
-        mPlaybackControlGlue.setHost(glueHost);
-        mPlaybackControlGlue.setTitle(video.getContentName());
-        mPlaybackControlGlue.setSubtitle(video.getContentDesc());
-        mPlaybackControlGlue.playWhenPrepared();
-        try {
-            playerAdapter.setDataSource(Uri.parse(video.getContentVideoUrl()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-         */
     }
+
     private fun destroyPlayer() {
-        Timber.tag(Settings.TAG).d("destroyPlayer");
         if(mVideoPlayer != null) {
             mVideoPlayer!!.destroy()
             mVideoPlayer = null
         }
-
     }
 
     private fun addVideo(video: IVideo) {
-        Timber.tag(Settings.TAG).d("addVideo");
         mCurrentVideo = video;
-        if(video.extension == ".mp4") {
-            initializeMediaPlayer(Settings.SERVER+video.url)
+        if(video.extension == ".avi") {
+            initializeMediaPlayer()
         } else {
             initializeExoPlayer()
 
@@ -273,77 +201,32 @@ class VideoPlayerFragment : VideoSupportFragment() {
         mExternalSubtitles.addAll(0, video.subtitles)
         mVideoPlayer!!.init(requireContext(),this )
         mVideoPlayer!!.loadVideo(video)
+
     }
 
     fun next() {
-        Timber.tag(Settings.TAG).d("next");
-        /*
-        if (mExoplayer?.hasNextMediaItem() == true) {
-            Timber.tag(Settings.TAG).d("Has next media item")
-            mExoplayer?.seekToNextMediaItem()
-        } else {
-            if (mPlaylist.videos.size == 1) {
-                Timber.tag(Settings.TAG).d("Current item %s", mCurrentVideo.title)
-                mCurrentVideo = getNextVideo(mCurrentVideo)!!
-
-                addVideo(mCurrentVideo)
-
-                mExoplayer?.prepare()
-                mExoplayer?.seekToNextMediaItem()
-            }
-        }
-
-         */
+        Timber.tag(Settings.TAG).d("next")
     }
 
     fun prev() {
-        /*
-        mExoplayer?.seekToPreviousMediaItem()
-
-         */
+        Timber.tag(Settings.TAG).d("prev")
     }
 
     private fun startPlaybackFromWatchProgress(startPosition: Long) {
         Timber.tag(Settings.TAG).d("startPlaybakcFromWatchProgress");
-        /*
-        mExoplayer?.apply {
-            seekTo(startPosition)
-            playWhenReady = true
-        }
+    }
 
-         */
-    }
-/*
-    private val onProgressUpdate: () -> Unit = {
-        if (mSubtitle != null) {
-            val cue = mSubtitle!!.getCues(mExoplayer!!.currentPosition * 1000)
-            mSubtitleView.setCues(cue)
-        }
-    }
-*/
     // Disable any internal subtitle. Used both when we're using external subtitles
     // and when we turn of subtitle
     private fun disableInternalSubtitle() {
-    mVideoPlayer!!.disableInternalSubtitle()
-    /*
-        mExoplayer!!.trackSelectionParameters = mExoplayer!!.trackSelectionParameters
-            .buildUpon()
-            .setDisabledTrackTypes(ImmutableSet.of(C.TRACK_TYPE_TEXT))
-            .build()
-        mSubtitleView.setCues(null)
-
-     */
+        mVideoPlayer!!.disableInternalSubtitle()
     }
 
     // Disable all subtitles
     fun disableSubtitles() {
-        mVideoPlayer!!.disableSubtitles()
-        /*
-        disableInternalSubtitle()
-        mSubtitle = null
+        mVideoPlayer!!.disableInternalSubtitle()
+        mSubtitle = null;
         mSubtitleView.setCues(null)
-
-         */
     }
 
     // Convert subtitle to internal CUE

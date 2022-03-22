@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import androidx.leanback.app.VideoSupportFragmentGlueHost
 import androidx.leanback.media.MediaPlayerAdapter
+import androidx.leanback.media.PlaybackGlue
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.models.IVideo
 import com.fragdance.myflixclient.pages.videoplayer.ProgressTransportControlGlue
@@ -47,6 +48,7 @@ class MyFlixMediaPlayer:IVideoPlayer {
             mMediaPlayerGlue.isSeekEnabled = true
             mMediaPlayerGlue.playWhenPrepared()
 
+
         } catch(e: Exception) {
             Timber.tag(Settings.TAG).d(e.message)
         }
@@ -55,14 +57,16 @@ class MyFlixMediaPlayer:IVideoPlayer {
     override fun loadVideo(video: IVideo) {
         try {
             mMediaPlayerAdapter.setDataSource(Uri.parse(Settings.SERVER+video.url))
-            //mMediaPlayer?.prepare()
         } catch(e:Exception) {
             Timber.tag(Settings.TAG).d("Something went wrong "+e.message)
         }
     }
 
     override fun destroy() {
-        TODO("Not yet implemented")
+        /* no-op */
+        //mMediaPlayer?.release()
+        //mMediaPlayer = null;
+        //mMediaPlayerAdapter.release();
     }
 
     override fun currentMs(): Long {

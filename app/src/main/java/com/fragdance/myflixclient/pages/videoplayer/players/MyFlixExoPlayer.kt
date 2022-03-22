@@ -53,7 +53,6 @@ class MyFlixExoPlayer:IVideoPlayer {
                 localExoplayer,
                 VideoPlayerFragment.PLAYER_UPDATE_INTERVAL_MILLIS.toInt()
             ),
-
             mPlayerFragment.onProgressUpdate,
             mPlayerFragment
         ).apply {
@@ -61,14 +60,9 @@ class MyFlixExoPlayer:IVideoPlayer {
             //title = video.title
 
             isSeekEnabled = true
-            addPlayerCallback(object : PlaybackGlue.PlayerCallback() {
-                override fun onPlayCompleted(glue: PlaybackGlue?) {
-                    super.onPlayCompleted(glue)
-                    mPlayerFragment.onPlayCompleted()
 
-                }
-            })
         }
+
         mExoPlayerGlue.host.isControlsOverlayAutoHideEnabled = true
     }
     private fun createMediaSession() {
@@ -128,18 +122,21 @@ class MyFlixExoPlayer:IVideoPlayer {
 
         with(mExoplayer!!) {
             addListener(mPlayerFragment.PlayerEventListener())
-            prepare()
-            prepareGlue(this)
+
             mMediaSessionConnector.setPlayer(this)
             mMediaSession.isActive = true
             playWhenReady = true
         }
+        /*
         mExoplayer?.prepare()
         mExoplayer?.seekTo(0)
         mExoplayer?.play()
+
+         */
     }
 
     override fun loadVideo(video: IVideo) {
+        Timber.tag(Settings.TAG).d("LoadView")
         val url: String = Settings.SERVER + video.url
         //mExternalSubtitles.clear()
         //mExternalSubtitles.addAll(0, video.subtitles)
@@ -151,6 +148,9 @@ class MyFlixExoPlayer:IVideoPlayer {
         with(mExoplayer!!) {
             addMediaItem(mediaItem)
         }
+        mExoplayer!!.prepare()
+        prepareGlue(mExoplayer!!)
+
     }
 
     override fun disableInternalSubtitle() {

@@ -4,13 +4,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/browseFragment"
+    app:startDestination="@id/homePage"
     tools:ignore="UnusedNavigation">
 
-    <action
-        android:id="@+id/action_global_signInFragment"
-        app:destination="@id/browseFragment" />
+    <fragment
+        android:id="@+id/homePage"
+        android:name="com.fragdance.myflixclient.pages.home.HomePageFragment">
 
+    </fragment>
+    <fragment
+        android:id="@+id/moviesPage"
+        android:name="com.fragdance.myflixclient.pages.movies.MoviesPage">
+
+    </fragment>
+    <fragment
+        android:id="@+id/personDetails"
+        android:name="com.fragdance.myflixclient.pages.persondetails.PersonDetailsPage">
+        <argument
+            android:name="id"
+            app:argType="long"
+        />
+        <action
+            android:id="@+id/action_personDetails_to_movieDetailsFragment"
+            app:destination="@id/movieDetailsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/playbackFragment"
         android:name="com.fragdance.myflixclient.pages.videoplayer.VideoPlayerFragment"
@@ -18,9 +35,19 @@
         <argument
             android:name="video"
             app:argType="com.fragdance.myflixclient.models.IPlayList" />
-        <action
+        <action android:id="@+id/action_details_to_playbackFragment" app:destination="@id/playbackFragment" />
             android:id="@+id/action_playbackFragment_to_playbackErrorFragment"
             app:destination="@id/playbackErrorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/movieDetailsFragment"
+        android:name="com.fragdance.myflixclient.pages.moviedetails.MovieDetailsPage"
+        android:label="MovieDetails">
+        <argument android:name="id" app:argType="long"></argument>
+        <action android:id="@+id/action_details_to_playback" app:destination="@id/playbackFragment" />
+        <action
+            android:id="@+id/action_movieDetailsFragment_to_personDetails"
+            app:destination="@id/personDetails" />
     </fragment>
     <fragment
         android:id="@+id/playbackErrorFragment"
@@ -49,6 +76,18 @@
         android:label="BrowseFragment">
         <action
             android:id="@+id/action_browseFragment_to_playbackFragment"
-            app:destination="@id/playbackFragment" />
+            app:destination="@id/movieDetailsFragment" />
     </fragment>
+    <action
+        android:id="@+id/action_global_home"
+        app:popUpTo="@+id/main_nav_graph"
+        app:destination="@id/homePage"/>
+    <action
+        android:id="@+id/action_global_movies"
+        app:popUpTo="@+id/main_nav_graph"
+        app:destination="@id/moviesPage"/>
+    <action
+        android:id="@+id/action_global_movie_details"
+        app:destination="@id/movieDetailsFragment"
+        app:enterAnim="@anim/fragment_slide_left_enter" />
 </navigation>

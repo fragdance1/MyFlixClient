@@ -1,4 +1,8 @@
 <resources>
 
-    <style name="Theme.MyFlixClient" parent="@style/Theme.Leanback" />
+    <style name="Theme.MyFlixClient" parent="@style/Theme.Leanback" >
+    <item name="android:fontFamily">@font/montserrat_medium</item>
+    <item name="fontFamily">@font/montserrat</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
 </resources>
