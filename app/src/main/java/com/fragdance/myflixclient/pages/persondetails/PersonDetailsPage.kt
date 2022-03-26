@@ -44,7 +44,7 @@ class PersonDetailsPage: DetailsSupportFragment() {
             override fun onResponse(call: Call<IPersonDetails>, response: Response<IPersonDetails>) {
                 if (response.isSuccessful) {
                     mDetails = response.body()!!
-                    Timber.tag(Settings.TAG).d("Got person details "+mDetails.toString())
+
                     title = mDetails.name
                     var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!)).apply {
                         add(createDetailsOverviewRow(mDetails!!, this))
@@ -99,7 +99,7 @@ class PersonDetailsPage: DetailsSupportFragment() {
         onItemViewClickedListener = OnItemViewClickedListener{itemViewHolder,item,_,_->
 
             if(item is IPersonCardData) {
-                Timber.tag(Settings.TAG).d("Item clicked "+(item as IPersonCardData).id);
+
                 findNavController().navigate(
                     PersonDetailsPageDirections.actionPersonDetailsToMovieDetailsFragment(item.id.toLong())
                 )
@@ -173,7 +173,7 @@ class PersonDetailsPage: DetailsSupportFragment() {
     }
     class DetailsPresenter(presenter:Presenter,logoPresenter: PosterPresenter):FullWidthDetailsOverviewRowPresenter(presenter,logoPresenter) {
         override fun onLayoutLogo(viewHolder: ViewHolder?, oldState: Int, logoChanged: Boolean) {
-            Timber.tag(Settings.TAG).d("onLayoutLogo")
+
             val resources = viewHolder?.view?.context?.resources;
             if(resources != null) {
                 //super.onLayoutLogo(viewHolder, oldState, logoChanged)

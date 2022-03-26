@@ -8,7 +8,6 @@ data class IMovie(
     var overview:String?,
     var url:String,
     var video_files:List<IVideoFile> = emptyList()
-
 ):Serializable
 
 data class IVideo(

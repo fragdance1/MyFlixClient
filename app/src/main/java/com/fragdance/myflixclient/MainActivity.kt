@@ -3,6 +3,7 @@ package com.fragdance.myflixclient
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.KeyEvent
@@ -27,7 +28,7 @@ import timber.log.Timber
 class MainView(context: Context, attrs:AttributeSet):BrowseFrameLayout(context,attrs) {
 
 }
-class MainActivity: FragmentActivity(){
+class MainActivity: FragmentActivity() {
     private lateinit var navGraph: NavGraph
     private lateinit var navController: NavController
     private lateinit var mRootView:BrowseFrameLayout
@@ -69,29 +70,30 @@ class MainActivity: FragmentActivity(){
 
 
         mRootView.onFocusSearchListener = BrowseFrameLayout.OnFocusSearchListener { focused, direction ->
-            Timber.tag(Settings.TAG).d("OnFocusSearchListener "+direction);
+            Timber.tag(Settings.TAG).d("focused "+focused)
             if(direction == View.FOCUS_LEFT) {
                 findViewById<View>(R.id.side_menu)
             } else {
+                Timber.tag(Settings.TAG).d("focused "+focused)
                 null
             }
         }
-
+//mRootView.onChildFocusListener = this;//BrowseFrameLayout.OnChildFocusListener {focused, direction ->}*/
         loadStartingPage()
     }
 
     @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         var handled = super.dispatchKeyEvent(event)
-        Timber.tag(Settings.TAG).d("Handled "+handled);
+
         return handled;
     }
     private fun loadStartingPage() {
-        Timber.tag(Settings.TAG).d("loadStartingPAge");
+
         navGraph.startDestination = R.id.homePage
         loadMovies()
         navController.graph = navGraph
-        Timber.tag(Settings.TAG).d("Done");
+
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -101,5 +103,17 @@ class MainActivity: FragmentActivity(){
             return
         }
     }
+/*
+    override fun onRequestFocusInDescendants(
+        direction: Int,
+        previouslyFocusedRect: Rect?
+    ): Boolean {
 
+        return false;
+    }
+
+    override fun onRequestChildFocus(child: View?, focused: View?) {
+        Timber.tag(Settings.TAG).d("onRequestChildFocus "+focused)
+    }
+*/
 }

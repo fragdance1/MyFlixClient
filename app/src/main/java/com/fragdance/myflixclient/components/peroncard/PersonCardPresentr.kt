@@ -4,11 +4,12 @@ import android.graphics.Color
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.leanback.widget.Presenter
+import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.moviecard.MovieCard
 import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.models.IPersonCardData
 import com.squareup.picasso.Picasso
-
+import timber.log.Timber
 
 
 class PersonCardPresenter: Presenter() {
@@ -30,6 +31,10 @@ class PersonCardPresenter: Presenter() {
             .load(person.portrait)
             .fit()
             .into(v.mPoster)
+        v.setOnClickListener() {
+            Timber.tag(Settings.TAG).d("Item clicked"+person.title)
+
+        }
         //(viewHolder!!.view as TextView).text = item as String
     }
 

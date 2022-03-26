@@ -2,10 +2,8 @@
 <resources>
     <color name="colorPrimary">#121212</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#c75f00</color>
-    <color name="background_gradient_start">#000000</color>
-    <color name="background_gradient_end">#004012</color>
-    <color name="fastlane_background">@color/colorPrimary</color>
     <color name="selected_background">@color/colorPrimary</color>
-    <color name="default_background">#3d3d3d</color>
+
+    <color name="gray_10">#121212</color>
+    <color name="gray_20">#2a2a2a</color>
 </resources>

@@ -45,7 +45,7 @@ class MyFlixExoPlayer:IVideoPlayer {
     var mExoplayer: ExoPlayer? = null
 
     private fun prepareGlue(localExoplayer: ExoPlayer) {
-        Timber.tag(Settings.TAG).d("prepareGlue");
+        //Timber.tag(Settings.TAG).d("prepareGlue");
         mExoPlayerGlue = ProgressTransportControlGlue(
             mContext,
             LeanbackPlayerAdapter(
@@ -66,7 +66,7 @@ class MyFlixExoPlayer:IVideoPlayer {
         mExoPlayerGlue.host.isControlsOverlayAutoHideEnabled = true
     }
     private fun createMediaSession() {
-        Timber.tag(Settings.TAG).d("createMediaSession");
+        //Timber.tag(Settings.TAG).d("createMediaSession");
         mMediaSession = MediaSessionCompat(mContext, VideoPlayerFragment.MEDIA_SESSION_TAG)
 
         // Connect media session to player (exoplayer)
@@ -105,7 +105,7 @@ class MyFlixExoPlayer:IVideoPlayer {
         }
 
          */
-        Timber.tag(Settings.TAG).d("initializePlayer");
+        //Timber.tag(Settings.TAG).d("initializePlayer");
         val dataSourceFactory = DefaultDataSource.Factory(
             mContext,
             DefaultHttpDataSource.Factory()
@@ -136,7 +136,7 @@ class MyFlixExoPlayer:IVideoPlayer {
     }
 
     override fun loadVideo(video: IVideo) {
-        Timber.tag(Settings.TAG).d("LoadView")
+        //Timber.tag(Settings.TAG).d("LoadView")
         val url: String = Settings.SERVER + video.url
         //mExternalSubtitles.clear()
         //mExternalSubtitles.addAll(0, video.subtitles)

@@ -19,28 +19,9 @@ class MainMenu: HeadersSupportFragment(), HeadersSupportFragment.OnHeaderViewSel
         super.setOnHeaderViewSelectedListener(listener)
     }
 
-    override fun onTransitionPrepare(): Boolean {
-        Timber.tag(Settings.TAG).d("onTransitionPrepare")
-        return super.onTransitionPrepare()
-    }
-    override fun onTransitionStart() {
-        Timber.tag(Settings.TAG).d("onTransitionStart");
-        super.onTransitionStart()
-    }
-/*
-    override fun setAdapterAndSelection() {
-        super.setAdapterAndSelection()
-    }
 
- */
-    fun setupMenu() {
-        var rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-        rowsAdapter.add(ListRow(HeaderItem(0,"Hello"),ArrayObjectAdapter()))
-        rowsAdapter.add(ListRow(HeaderItem(1,"Sven"),ArrayObjectAdapter()))
-        //verticalGridView.adapter = rowsAdapter
-        adapter = rowsAdapter
 
-    }
+
     override fun onHeaderSelected(viewHolder: RowHeaderPresenter.ViewHolder?, row: Row?) {
         Timber.tag(Settings.TAG).d("Header selected")
     }

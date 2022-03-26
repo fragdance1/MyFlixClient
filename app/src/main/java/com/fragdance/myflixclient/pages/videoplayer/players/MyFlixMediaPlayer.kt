@@ -50,7 +50,7 @@ class MyFlixMediaPlayer:IVideoPlayer {
 
 
         } catch(e: Exception) {
-            Timber.tag(Settings.TAG).d(e.message)
+            //Timber.tag(Settings.TAG).d(e.message)
         }
     }
 
@@ -70,7 +70,7 @@ class MyFlixMediaPlayer:IVideoPlayer {
     }
 
     override fun currentMs(): Long {
-        Timber.tag(Settings.TAG).d(mMediaPlayer!!.currentPosition.toString())
+        //Timber.tag(Settings.TAG).d(mMediaPlayer!!.currentPosition.toString())
         return mMediaPlayer!!.currentPosition.toLong()*1000
     }
 

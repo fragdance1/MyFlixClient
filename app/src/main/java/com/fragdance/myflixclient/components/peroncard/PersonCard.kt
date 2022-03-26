@@ -23,7 +23,7 @@ class PersonCard(context: Context): BaseCardView(context) {
         buildImageCardView()
     }
     override fun setSelected(selected:Boolean) {
-        Timber.tag(Settings.TAG).d("onSelected")
+
         if(selected) {
             setBackgroundColor(Color.argb(0.1f,1f,1f,1f))
         } else {

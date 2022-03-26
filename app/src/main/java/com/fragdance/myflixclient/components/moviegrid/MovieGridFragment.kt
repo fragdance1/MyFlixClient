@@ -26,15 +26,10 @@ open class MovieGridFragment : VerticalGridSupportFragment(){
         setOnItemViewClickedListener { _, item, _, _ ->
             when (item) {
                 is IMovie -> {
-                    Timber.tag(Settings.TAG).d("Opening playback");
                     val bundle = bundleOf("id" to item.id.toLong())
 
                     findNavController().navigate(
-                        R.id.action_global_movie_details,bundle)/*
-                        MovieGridFragmentDirections.actionBrowseFragmentToPlaybackFragment(
-                            item.id.toLong()
-                        )
-                    )*/
+                        R.id.action_global_movie_details,bundle)
                 }
             }
         }

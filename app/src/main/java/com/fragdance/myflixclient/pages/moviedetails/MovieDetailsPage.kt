@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.leanback.app.DetailsSupportFragmentBackgroundController
 import androidx.leanback.app.RowsSupportFragment
+import androidx.leanback.app.VerticalGridSupportFragment
 import androidx.leanback.widget.*
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -25,8 +26,6 @@ import com.fragdance.myflixclient.models.IPersonCardData
 import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.pages.utils.loadBitmap
 import com.fragdance.myflixclient.pages.utils.loadDrawable
-import com.fragdance.myflixclient.presenters.PersonRowPresenter
-import com.fragdance.myflixclient.presenters.PosterPresenter
 import com.fragdance.myflixclient.services.movieService
 import com.squareup.picasso.Picasso
 import retrofit2.Call
@@ -35,82 +34,28 @@ import retrofit2.Response
 import timber.log.Timber
 import utils.movieDetailsToVideo
 import androidx.leanback.widget.ItemBridgeAdapter
-import com.fragdance.myflixclient.presenters.MovieDetailsHeroPresenter
+import com.fragdance.myflixclient.components.menu.MenuItemBridgeAdapter
+import com.fragdance.myflixclient.components.subtitlemodal.OnMenuItemViewClickedListener
+import com.fragdance.myflixclient.presenters.*
 
 
-class MovieDetailsPage: Fragment() {
+class MovieDetailsPage : Fragment(),OnMenuItemViewClickedListener {
     lateinit var mContext: Context
     lateinit var mRootView: ViewGroup
     var mDetails: IMovieDetails? = null
-
+    var mThis = this;
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        //super.onCreateView(inflater,container,savedInstanceState)
+        Timber.tag(Settings.TAG).d("MovieDetailsPage.onCreate");
         mRootView = inflater.inflate(R.layout.movie_details_view, container, false) as ViewGroup
         return mRootView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-
-/*
-        hero.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                Settings.HEIGHT.toInt())
-*/
-
-//        var persons:VerticalGridView = view.findViewById(R.id.persons);
-//        var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
-    /*.apply {
-            add(createDetailsOverviewRow(mDetails!!, this))
-        }*/
-        /*
-        val castAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-            for(cast in mDetails!!.cast) {
-                add(IPersonCardData(cast.person.id,cast.person.name,cast.character,cast.person.portrait))
-            }
-
-        }
-
-        var castRow = ListRow(HeaderItem(0, "Cast"), castAdapter)
-
-        rowsAdapter.add(castRow)
-
-        val crewAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-            for(crew in mDetails!!.crew) {
-                add(IPersonCardData(crew.person.id,crew.person.name,crew.job,crew.person.portrait))
-            }
-        }
-        rowsAdapter.add(ListRow(HeaderItem(0, "Crew"), crewAdapter))
-
-         */
-        //var bridgeAdapter = ItemBridgeAdapter();
-        //bridgeAdapter.setAdapter(rowsAdapter)
-        //persons.adapter = bridgeAdapter
-/*
-        var cast:View = view.findViewById(R.id.cast)
-
-        cast.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            Settings.HEIGHT.toInt())
-
-        var crew:View = view.findViewById(R.id.crew)
-
-        crew.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            Settings.HEIGHT.toInt())
-*/
-        /*
-        var scrollView: ScrollView = view.findViewById(R.id.movie_details_view)
-        scrollView.setOnScrollChangeListener { view, i, i2, i3, i4 ->
-            Timber.tag(Settings.TAG).d("On scroll");
-        }
-
-         */
-    }
     private fun createPresenterSelector(movie: IMovieDetails) = ClassPresenterSelector().apply {
         addClassPresenter(
             ListRow::class.java,
@@ -121,92 +66,100 @@ class MovieDetailsPage: Fragment() {
             MovieDetailsHeroPresenter()
         )
     }
-    fun bringToBack(v:View) {
-        var parent:ViewGroup = v.parent as ViewGroup
-        var index:Int = parent.indexOfChild(v);
-        for(i in 0..index) {
-            parent.bringChildToFront(parent.getChildAt(i))
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        Timber.tag(Settings.TAG).d("onSaveInstanceState");
+        super.onSaveInstanceState(outState)
+    }
+/*
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putBoolean("restore", true);
+        outState.putInt("nAndroids", 2);
+        super.onSaveInstanceState(outState);
+    }
+    */
+    fun setupView() {
+    var persons: VerticalGridView = mRootView.findViewById(R.id.persons);
+
+    var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
+    rowsAdapter.add(mDetails)
+
+    val castAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
+        for (cast in mDetails!!.cast) {
+            add(
+                IPersonCardData(
+                    cast.person.id,
+                    cast.person.name,
+                    cast.character,
+                    cast.person.portrait
+                )
+            )
+        }
+
+    }
+    var castRow = ListRow(HeaderItem(0, "Cast"), castAdapter)
+
+    rowsAdapter.add(castRow)
+
+    val crewAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
+        for (crew in mDetails!!.crew) {
+            add(
+                IPersonCardData(
+                    crew.person.id,
+                    crew.person.name,
+                    crew.job,
+                    crew.person.portrait
+                )
+            )
         }
     }
+    rowsAdapter.add(ListRow(HeaderItem(0, "Crew"), crewAdapter))
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    var bridgeAdapter = ItemBridgeAdapter()//MenuItemBridgeAdapter(mThis);
+    bridgeAdapter.setAdapter(rowsAdapter)
+    persons.adapter = bridgeAdapter
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        Timber.tag(Settings.TAG).d("onCreate "+savedInstanceState)
+
         mContext = requireContext()
 
         //
-        val args : MovieDetailsPageArgs by navArgs()
+        val args: MovieDetailsPageArgs by navArgs()
         val requestCall = movieService.getMovieDetails(args.id.toInt())
+        val mThis = this;
+        if(mDetails == null) {
+            requestCall.enqueue(object : Callback<IMovieDetails> {
+                override fun onResponse(
+                    call: Call<IMovieDetails>,
+                    response: Response<IMovieDetails>
+                ) {
+                    if (response.isSuccessful) {
 
-        requestCall.enqueue(object: Callback<IMovieDetails> {
-            override fun onResponse(call: Call<IMovieDetails>, response: Response<IMovieDetails>) {
-                if (response.isSuccessful) {
-                    /*
+                        mDetails = response.body()!!
+                        setupView()
 
-
-                    var backdrop: ImageView = mRootView.findViewById(R.id.backdrop)
-                    Picasso.get()
-                        .load(Settings.SERVER+mDetails!!.backdrop)
-                        .into(backdrop)
-*/
-                    mDetails = response.body()!!
-
-                var persons:VerticalGridView = mRootView.findViewById(R.id.persons);
-
-                var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
-                    rowsAdapter.add(mDetails)
-                val castAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-                    for(cast in mDetails!!.cast) {
-                        add(IPersonCardData(cast.person.id,cast.person.name,cast.character,cast.person.portrait))
-                    }
-
-                }
-                var castRow = ListRow(HeaderItem(0, "Cast"), castAdapter)
-
-
-                rowsAdapter.add(castRow)
-
-                val crewAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-                    for(crew in mDetails!!.crew) {
-                        add(IPersonCardData(crew.person.id,crew.person.name,crew.job,crew.person.portrait))
                     }
                 }
-                rowsAdapter.add(ListRow(HeaderItem(0, "Crew"), crewAdapter))
 
-                var bridgeAdapter = ItemBridgeAdapter();
-                bridgeAdapter.setAdapter(rowsAdapter)
-                persons.adapter = bridgeAdapter
-
-                    persons.bringToFront()
-/*
-                val cast:HorizontalGridView = mRootView.findViewById(R.id.cast);
-                val castAdapter = ItemBridgeAdapter()
-                val castRowAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-                    for(cast in mDetails!!.cast) {
-                        add(IPersonCardData(cast.person.id,cast.person.name,cast.character,cast.person.portrait))
-                    }
-
+                override fun onFailure(call: Call<IMovieDetails>, t: Throwable) {
+                    Toast.makeText(mContext, "Something went wrong $t", Toast.LENGTH_LONG).show()
                 }
-                castAdapter.setAdapter(castRowAdapter)
-                cast.adapter = castAdapter
-
-                val crew:HorizontalGridView = mRootView.findViewById(R.id.crew);
-                val crewAdapter = ItemBridgeAdapter()
-                val crewRowAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-                    for(crew in mDetails!!.crew) {
-                        add(IPersonCardData(crew.person.id,crew.person.name,crew.job,crew.person.portrait))
-                    }
-
-                }
-                crewAdapter.setAdapter(crewRowAdapter)
-                crew.adapter = crewAdapter
-
- */}
-            }
-            override fun onFailure(call: Call<IMovieDetails>, t: Throwable) {
-                Toast.makeText(mContext, "Something went wrong $t", Toast.LENGTH_LONG).show()
-            }
-        })
+            })
+        }
+        else {
+            setupView()
+        }
     }
+
+    override fun onMenuItemClicked(item: Any) {
+        Timber.tag(Settings.TAG).d("onMenuItemClicked "+item);
+    }
+
+
 }
 
 

@@ -61,7 +61,7 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
 
         view.layoutParams = lp
         view.setBackgroundColor(Color.argb(0.8f, 0f, 0f, 0f))
-        Timber.tag(Settings.TAG).d("TrackSelectionMenu.onViewCreated")
+        //Timber.tag(Settings.TAG).d("TrackSelectionMenu.onViewCreated")
     }
 
     private fun getEmbeddedTracks(trackSelector:DefaultTrackSelector) {
@@ -163,10 +163,10 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
         parentFragmentManager.beginTransaction().hide(this).commit()
         val menuItem = item as ITrackMenuItem;
         if(menuItem.trackId == EXTERNAL_SUBTITLE) {
-            Timber.tag(Settings.TAG).d("Selecting external subtitle")
+            //Timber.tag(Settings.TAG).d("Selecting external subtitle")
             mPlayerFragment!!.selectExternalSubtitle(menuItem.groupIndex!!);
         } else if(menuItem.trackId == DOWNLOAD_SUBTITLE) {
-            Timber.tag(Settings.TAG).d("Download subtitle");
+            //Timber.tag(Settings.TAG).d("Download subtitle");
             var modal = SubtitleModalFragment(mVideo!!)
 
             parentFragmentManager
@@ -175,22 +175,22 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
                 .addToBackStack("subtitle").commit()
 
             parentFragmentManager.setFragmentResultListener("Subtitle",modal, FragmentResultListener{key,result->
-                Timber.tag(Settings.TAG).d("Fragment listener "+result);
+                //Timber.tag(Settings.TAG).d("Fragment listener "+result);
                 var receivedData = result.get("Item") as ISubtitle
                 if(receivedData!=null) {
-                    Timber.tag(Settings.TAG).d(receivedData.toString())
+                    //Timber.tag(Settings.TAG).d(receivedData.toString())
                     mPlayerFragment?.downloadSubtitle(receivedData!!)
                 }
                 parentFragmentManager.beginTransaction().remove(modal).commit()
 
             })
         } else if(menuItem.trackId == DISABLE_SUBTITLE) {
-            Timber.tag(Settings.TAG).d("Disable subtitle");
+            //Timber.tag(Settings.TAG).d("Disable subtitle");
             mPlayerFragment!!.disableSubtitles()
         } else if(menuItem.trackId == DISABLE_AUDIO) {
-            Timber.tag(Settings.TAG).d("Disable audio")
+            //Timber.tag(Settings.TAG).d("Disable audio")
         } else {
-            Timber.tag(Settings.TAG).d("Selecting internal track")
+            //Timber.tag(Settings.TAG).d("Selecting internal track")
             val override =
                 DefaultTrackSelector.SelectionOverride(menuItem.groupIndex!!, menuItem.trackId)
             val parametersBuilder = DefaultTrackSelector.ParametersBuilder(requireContext())

@@ -1,7 +1,9 @@
 package com.fragdance.myflixclient.pages.videoplayer
 import android.os.Bundle
 import androidx.navigation.NavArgs
+import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.models.IPlayList
+import timber.log.Timber
 
 
 data class PlaybackFragmentArgs(val playlist: IPlayList) : NavArgs {
@@ -11,8 +13,9 @@ data class PlaybackFragmentArgs(val playlist: IPlayList) : NavArgs {
             // Simplify since we only have serializable
             bundle.setClassLoader(PlaybackFragmentArgs::class.java.classLoader)
             val playlist: IPlayList?
-            if (bundle.containsKey("video")) {
-                playlist = bundle.get("video") as IPlayList?
+            Timber.tag(Settings.TAG).d("fromBundle "+bundle)
+            if (bundle.containsKey("playlist")) {
+                playlist = bundle.get("playlist") as IPlayList?
             } else {
                 throw UnsupportedOperationException(
                     IPlayList::class.java.name +

@@ -1,15 +1,6 @@
 package com.fragdance.myflixclient.pages.moviedetails
 
-import android.view.ViewGroup
-import androidx.leanback.widget.Presenter
-import android.R
-import android.content.Context
-
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.TextView
 import androidx.leanback.widget.AbstractDetailsDescriptionPresenter
-import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.models.IMovieDetails
 import com.fragdance.myflixclient.models.IPersonDetails
 

@@ -20,14 +20,15 @@
             android:layout_width="60dp"
             android:layout_height="match_parent"
 
+            android:background="@color/gray_10"
             android:orientation="vertical" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/menu_labels"
             android:layout_width="160dp"
             android:layout_height="match_parent"
-            android:background="#2a2a2a"
-            android:visibility="invisible"
-            android:orientation="vertical" />
+            android:background="@color/gray_20"
+            android:orientation="vertical"
+            android:visibility="invisible" />
     </com.fragdance.myflixclient.components.side_menu.SideMenuView>
 </FrameLayout>

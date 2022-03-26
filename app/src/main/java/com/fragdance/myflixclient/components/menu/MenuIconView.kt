@@ -12,9 +12,9 @@ import timber.log.Timber
 class MenuIconView:LinearLayout {
         var imageView: ImageView;
         constructor(context: Context):super(context) {
-            Timber.tag(Settings.TAG).d("Width "+ Settings.WIDTH);
+            //Timber.tag(Settings.TAG).d("Width "+ Settings.WIDTH);
             val mHeight = (Settings.WIDTH * 0.036).toInt()
-            Timber.tag(Settings.TAG).d("label height "+mHeight)
+            //Timber.tag(Settings.TAG).d("label height "+mHeight)
             var params = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,mHeight);
 
             layoutParams = params;

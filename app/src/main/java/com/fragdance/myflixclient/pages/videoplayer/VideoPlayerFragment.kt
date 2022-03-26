@@ -1,13 +1,16 @@
 package com.fragdance.myflixclient.pages.videoplayer
 
+import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
+import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.*
 import androidx.fragment.app.FragmentTransaction.*
 import androidx.leanback.app.VideoSupportFragment
@@ -17,6 +20,8 @@ import androidx.leanback.media.PlaybackGlue
 import androidx.leanback.media.PlaybackTransportControlGlue
 import androidx.navigation.Navigation
 import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.side_menu.SideMenu
@@ -101,12 +106,19 @@ class VideoPlayerFragment : VideoSupportFragment() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPlaylist = PlaybackFragmentArgs.fromBundle(requireArguments()).playlist
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return super.onCreateView(inflater, container, savedInstanceState)
+        Timber.tag(Settings.TAG).d("VideoPlayerFragment.onCreateView")
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         super.onViewCreated(view, savedInstanceState)
@@ -143,8 +155,16 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        activity?.findViewById<View>(R.id.side_menu)?.visibility = VISIBLE;
+        //activity?.findViewById<View>(R.id.side_menu)?.visibility = VISIBLE;
+
         mViewModel.removePlaybackStateListener(uiPlaybackStateListener)
+        /*
+        val navController = findNavController(this.view!!)
+        navController.currentDestination?.id?.let {
+            navController.popBackStack(it, true)
+        }
+
+         */
     }
 
     override fun onStart() {
@@ -163,7 +183,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     fun onPlayCompleted() {
-        Timber.tag(Settings.TAG).d("onPlayCompleted")
+        //Timber.tag(Settings.TAG).d("onPlayCompleted")
         try {
             val navController = findNavController(this.view!!)
             navController.currentDestination?.id?.let {
@@ -213,7 +233,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     private fun startPlaybackFromWatchProgress(startPosition: Long) {
-        Timber.tag(Settings.TAG).d("startPlaybakcFromWatchProgress");
+        //Timber.tag(Settings.TAG).d("startPlaybakcFromWatchProgress");
     }
 
     // Disable any internal subtitle. Used both when we're using external subtitles
@@ -253,7 +273,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                         mExternalSubtitles[index].subtitle =
                             prepareSrt(mExternalSubtitles[index].srt!!)
                         mSubtitle = mExternalSubtitles[index].subtitle
-                        Timber.tag(Settings.TAG).d("Done")
+                        //Timber.tag(Settings.TAG).d("Done")
                     } else {
                         Timber.tag(Settings.TAG).d("Failed")
                     }
@@ -265,7 +285,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 }
             })
         } else {
-            Timber.tag(Settings.TAG).d("Testing")
+            //Timber.tag(Settings.TAG).d("Testing")
             mSubtitle = mExternalSubtitles[index].subtitle
             mVideoPlayer!!.play()
         }
@@ -298,7 +318,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                             mSubtitle
                         )
                     )
-                    Timber.tag(Settings.TAG).d("Got my subtitle")
+                    //Timber.tag(Settings.TAG).d("Got my subtitle")
                 }
             }
 
