@@ -8,5 +8,5 @@ import timber.log.Timber
 
 fun movieDetailsToVideo(movie: IMovieDetails): IVideo {
 
-    return IVideo(movie.id,movie.video_files[0].extension,movie.title,movie.poster,movie.overview,movie.url,movie.video_files[0].subtitles)
+    return IVideo(movie.id,movie.video_files[0].extension,movie.title,movie.poster,movie.overview,movie.url,null,movie.video_files[0].subtitles)
 }

@@ -13,6 +13,8 @@ interface MovieService {
 
     @GET("movie/details")
     fun getMovieDetails(@Query("id") id:Int):Call<IMovieDetails>
+
+
 }
 
 val movieService  = JSONServiceBuilder.buildService(MovieService::class.java)

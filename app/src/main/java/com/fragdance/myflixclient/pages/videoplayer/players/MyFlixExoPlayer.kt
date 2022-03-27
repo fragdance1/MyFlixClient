@@ -26,6 +26,7 @@ import com.google.android.exoplayer2.ui.SubtitleView
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.common.collect.ImmutableSet
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -113,6 +114,10 @@ class MyFlixExoPlayer:IVideoPlayer {
 
         mTrackSelector = DefaultTrackSelector(mContext)
         val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
+
+        val builder = OkHttpClient.Builder()
+        val client = builder.build()
+
 
         mExoplayer =
             ExoPlayer.Builder(mContext)

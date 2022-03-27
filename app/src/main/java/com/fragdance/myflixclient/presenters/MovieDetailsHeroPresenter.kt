@@ -2,22 +2,27 @@ package com.fragdance.myflixclient.presenters
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsoluteLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.leanback.widget.*
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.action_bar.ActionBar
 import com.fragdance.myflixclient.components.action_bar.ActionBarButtonPresenter
 import com.fragdance.myflixclient.models.IMovieDetails
+import com.fragdance.myflixclient.models.IMovieTorrent
+import com.fragdance.myflixclient.models.IVideo
+import com.fragdance.myflixclient.services.torrentService
 import com.fragdance.myflixclient.views.MovieDetailsHeroView
 import com.squareup.picasso.Picasso
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import timber.log.Timber
+import utils.movieDetailsToVideo
+
 data class IAction(
     val name:String,
-    val details:IMovieDetails // Can be -1 for not downloaded yet
+    val video: IVideo // Can be -1 for not downloaded yet
 
 )
 
@@ -25,9 +30,6 @@ data class IAction(
 class MovieDetailsHeroPresenter:Presenter() {
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
         val card = MovieDetailsHeroView(parent!!.context)
-        val a = 1
-        val b = 2
-        val max = if(a > b) a else b
         return ViewHolder(card)
     }
 
@@ -83,7 +85,8 @@ class MovieDetailsHeroPresenter:Presenter() {
 
         var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
 
-        val actionsAdapter = ArrayObjectAdapter(ActionBarButtonPresenter()).apply {
+
+        val actionsAdapter = ArrayObjectAdapter(ActionBarButtonPresenter())/*.apply {
             add(IAction("Play",mDetails))
             add(IAction("720p",mDetails))
             add(IAction("1080p", mDetails))
@@ -95,9 +98,11 @@ class MovieDetailsHeroPresenter:Presenter() {
             add(IAction("Play again", mDetails))
             add(IAction("Play", mDetails))
             add(IAction("Play again", mDetails))
+        }*/
+
+        if(mDetails.url != null) {
+            actionsAdapter.add(IAction("Play",movieDetailsToVideo(mDetails)));
         }
-
-
         var actionsRow = ListRow( actionsAdapter)
 
         rowsAdapter.add(actionsRow)
@@ -105,6 +110,39 @@ class MovieDetailsHeroPresenter:Presenter() {
         var bridgeAdapter = ItemBridgeAdapter();
         bridgeAdapter.setAdapter(rowsAdapter)
         actions.adapter = bridgeAdapter
+        val getMovieTorrents = torrentService.getMovieTorrents(mDetails!!.imdb_id)
+        getMovieTorrents.enqueue(object : Callback<IMovieTorrent> {
+            override fun onResponse(
+                call: Call<IMovieTorrent>,
+                response: Response<IMovieTorrent>
+            ) {
+                if (response.isSuccessful) {
+                    Timber.tag(Settings.TAG).d("Torrents " + response.body()!!)
+                    val torrents:IMovieTorrent = response.body()!!
+                    Timber.tag(Settings.TAG).d("torrents "+torrents)
+                    for(item in torrents.torrents) {
+                        actionsAdapter.add(IAction(item.quality,IVideo(
+                            mDetails.id,
+                            "mkv",
+                            torrents.title,
+                            null,
+                            null,
+
+                            item.url,
+                            item.hash
+
+                        )))
+                    }
+
+                }
+            }
+
+            override fun onFailure(call: Call<IMovieTorrent>, t: Throwable) {
+                Toast.makeText(v.context, "Something went wrong $t", Toast.LENGTH_LONG).show()
+            }
+
+        })
+
     }
     private fun createPresenterSelector(movie: IMovieDetails) = ClassPresenterSelector().apply {
         addClassPresenter(

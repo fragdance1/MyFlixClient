@@ -21,9 +21,6 @@ import androidx.navigation.fragment.navArgs
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.peroncard.PersonCardPresenter
-import com.fragdance.myflixclient.models.IMovieDetails
-import com.fragdance.myflixclient.models.IPersonCardData
-import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.pages.utils.loadBitmap
 import com.fragdance.myflixclient.pages.utils.loadDrawable
 import com.fragdance.myflixclient.services.movieService
@@ -36,10 +33,12 @@ import utils.movieDetailsToVideo
 import androidx.leanback.widget.ItemBridgeAdapter
 import com.fragdance.myflixclient.components.menu.MenuItemBridgeAdapter
 import com.fragdance.myflixclient.components.subtitlemodal.OnMenuItemViewClickedListener
+import com.fragdance.myflixclient.models.*
 import com.fragdance.myflixclient.presenters.*
+import com.fragdance.myflixclient.services.torrentService
 
 
-class MovieDetailsPage : Fragment(),OnMenuItemViewClickedListener {
+class MovieDetailsPage : Fragment(), OnMenuItemViewClickedListener {
     lateinit var mContext: Context
     lateinit var mRootView: ViewGroup
     var mDetails: IMovieDetails? = null
@@ -71,68 +70,72 @@ class MovieDetailsPage : Fragment(),OnMenuItemViewClickedListener {
         Timber.tag(Settings.TAG).d("onSaveInstanceState");
         super.onSaveInstanceState(outState)
     }
-/*
-    public void onSaveInstanceState(Bundle outState) {
 
-        outState.putBoolean("restore", true);
-        outState.putInt("nAndroids", 2);
-        super.onSaveInstanceState(outState);
-    }
-    */
+    /*
+        public void onSaveInstanceState(Bundle outState) {
+
+            outState.putBoolean("restore", true);
+            outState.putInt("nAndroids", 2);
+            super.onSaveInstanceState(outState);
+        }
+        */
     fun setupView() {
-    var persons: VerticalGridView = mRootView.findViewById(R.id.persons);
+        var persons: VerticalGridView = mRootView.findViewById(R.id.persons);
 
-    var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
-    rowsAdapter.add(mDetails)
+        var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
+        rowsAdapter.add(mDetails)
 
-    val castAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-        for (cast in mDetails!!.cast) {
-            add(
-                IPersonCardData(
-                    cast.person.id,
-                    cast.person.name,
-                    cast.character,
-                    cast.person.portrait
+        val castAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
+            for (cast in mDetails!!.cast) {
+                add(
+                    IPersonCardData(
+                        cast.person.id,
+                        cast.person.name,
+                        cast.character,
+                        cast.person.portrait
+                    )
                 )
-            )
+            }
+
         }
+        var castRow = ListRow(HeaderItem(0, "Cast"), castAdapter)
 
-    }
-    var castRow = ListRow(HeaderItem(0, "Cast"), castAdapter)
+        rowsAdapter.add(castRow)
 
-    rowsAdapter.add(castRow)
-
-    val crewAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-        for (crew in mDetails!!.crew) {
-            add(
-                IPersonCardData(
-                    crew.person.id,
-                    crew.person.name,
-                    crew.job,
-                    crew.person.portrait
+        val crewAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
+            for (crew in mDetails!!.crew) {
+                add(
+                    IPersonCardData(
+                        crew.person.id,
+                        crew.person.name,
+                        crew.job,
+                        crew.person.portrait
+                    )
                 )
-            )
+            }
         }
-    }
-    rowsAdapter.add(ListRow(HeaderItem(0, "Crew"), crewAdapter))
+        rowsAdapter.add(ListRow(HeaderItem(0, "Crew"), crewAdapter))
 
-    var bridgeAdapter = ItemBridgeAdapter()//MenuItemBridgeAdapter(mThis);
-    bridgeAdapter.setAdapter(rowsAdapter)
-    persons.adapter = bridgeAdapter
+        var bridgeAdapter = ItemBridgeAdapter()//MenuItemBridgeAdapter(mThis);
+        bridgeAdapter.setAdapter(rowsAdapter)
+        persons.adapter = bridgeAdapter
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Timber.tag(Settings.TAG).d("onCreate "+savedInstanceState)
+        Timber.tag(Settings.TAG).d("onCreate " + savedInstanceState)
 
         mContext = requireContext()
 
         //
         val args: MovieDetailsPageArgs by navArgs()
-        val requestCall = movieService.getMovieDetails(args.id.toInt())
+        val getMovieDetails = movieService.getMovieDetails(args.id.toInt())
+
+
         val mThis = this;
-        if(mDetails == null) {
-            requestCall.enqueue(object : Callback<IMovieDetails> {
+        if (mDetails == null) {
+            getMovieDetails.enqueue(object : Callback<IMovieDetails> {
                 override fun onResponse(
                     call: Call<IMovieDetails>,
                     response: Response<IMovieDetails>
@@ -142,6 +145,7 @@ class MovieDetailsPage : Fragment(),OnMenuItemViewClickedListener {
                         mDetails = response.body()!!
                         setupView()
 
+
                     }
                 }
 
@@ -149,14 +153,14 @@ class MovieDetailsPage : Fragment(),OnMenuItemViewClickedListener {
                     Toast.makeText(mContext, "Something went wrong $t", Toast.LENGTH_LONG).show()
                 }
             })
-        }
-        else {
+
+        } else {
             setupView()
         }
     }
 
     override fun onMenuItemClicked(item: Any) {
-        Timber.tag(Settings.TAG).d("onMenuItemClicked "+item);
+        Timber.tag(Settings.TAG).d("onMenuItemClicked " + item);
     }
 
 

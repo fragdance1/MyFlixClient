@@ -10,10 +10,17 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
+import com.fragdance.myflixclient.models.IMovieTorrent
 import com.fragdance.myflixclient.models.IPlayList
+import com.fragdance.myflixclient.models.ITorrentDetails
+import com.fragdance.myflixclient.models.IVideo
 import com.fragdance.myflixclient.pages.moviedetails.MovieDetailsPageDirections
 
 import com.fragdance.myflixclient.presenters.IAction
+import com.fragdance.myflixclient.services.torrentService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import timber.log.Timber
 import utils.movieDetailsToVideo
 
@@ -34,14 +41,56 @@ class ActionBarButtonPresenter: Presenter() {
         v.setText(data.name)
 
         v.setOnClickListener() {
-
             var playList = IPlayList()
-            //val bundle = bundleOf("playList" to playList)
-            playList.videos.add(movieDetailsToVideo(item.details))
-            val bundle = bundleOf("playlist" to playList)
+            if(item.video.hash != null) {
+                val addMovieTorrent= torrentService.addMovieTorrent(item.video.url!!,item.video.id)
+                addMovieTorrent.enqueue(object : Callback<ITorrentDetails> {
+                    override fun onResponse(
+                        call: Call<ITorrentDetails>,
+                        response: Response<ITorrentDetails>
+                    ) {
 
-            v.findNavController().navigate(
-                R.id.action_global_video_player,bundle)
+                        var details:ITorrentDetails = response.body()!!
+                        var files = details.files.sortedBy { it.length }.reversed()
+                        Timber.tag(Settings.TAG).d("Torrent details "+files)
+                        val url = "/api/torrent/stream?hash="+details.hash+"&file="+files[0].name
+                        var video = IVideo(
+                            item.video.id,
+                            "mp4",
+                            item.video.title,
+                            item.video.poster,
+                            item.video.overview,
+                            url,
+                            details.hash
+
+                        )
+                        Timber.tag(Settings.TAG).d("Opening "+url);
+                        playList.videos.add(video)
+                        val bundle = bundleOf("playlist" to playList)
+
+                        v.findNavController().navigate(
+                            R.id.action_global_video_player,bundle)
+                        // Sort files according to size
+
+                    }
+
+                    override fun onFailure(call: Call<ITorrentDetails>, t: Throwable) {
+                        Timber.tag(Settings.TAG).d("ActionButton exception "+t)
+                    }
+
+                })
+
+            } else {
+                Timber.tag("Video "+item.video)
+                playList.videos.add(item.video)
+                val bundle = bundleOf("playlist" to playList)
+
+                v.findNavController().navigate(
+                    R.id.action_global_video_player,bundle)
+            }
+
+            //val bundle = bundleOf("playList" to playLi
+
             //v.findNavController().navigate(MovieDetailsPageDirections.actionDetailsToPlayback(playList)
 
 

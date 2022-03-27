@@ -17,7 +17,9 @@ data class IVideo(
     var poster:String?,
     var overview:String?,
     var url:String?,
-    var subtitles:List<ISubtitle> = emptyList()
+    var hash:String?,
+    var subtitles:List<ISubtitle> = emptyList(),
+
 ):Serializable
 
 data class IPlayList(
@@ -33,5 +35,6 @@ data class IMovieDetails(
     var backdrop:String,
     var cast:List<ICast>,
     var crew:List<ICrew>,
+    var imdb_id:String,
     var video_files:List<IVideoFile> = emptyList()
 ):Serializable
