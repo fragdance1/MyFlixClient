@@ -25,6 +25,9 @@
             android:id="@+id/menu_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:descendantFocusability="afterDescendants"
             android:background="#191919" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>

@@ -1,41 +1,26 @@
 package com.fragdance.myflixclient.pages.moviedetails
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.leanback.app.DetailsSupportFragmentBackgroundController
-import androidx.leanback.app.RowsSupportFragment
-import androidx.leanback.app.VerticalGridSupportFragment
 import androidx.leanback.widget.*
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.components.peroncard.PersonCardPresenter
-import com.fragdance.myflixclient.pages.utils.loadBitmap
-import com.fragdance.myflixclient.pages.utils.loadDrawable
+import com.fragdance.myflixclient.components.personcard.PersonCardPresenter
 import com.fragdance.myflixclient.services.movieService
-import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-import utils.movieDetailsToVideo
 import androidx.leanback.widget.ItemBridgeAdapter
-import com.fragdance.myflixclient.components.menu.MenuItemBridgeAdapter
 import com.fragdance.myflixclient.components.subtitlemodal.OnMenuItemViewClickedListener
 import com.fragdance.myflixclient.models.*
 import com.fragdance.myflixclient.presenters.*
-import com.fragdance.myflixclient.services.torrentService
 
 
 class MovieDetailsPage : Fragment(), OnMenuItemViewClickedListener {
@@ -43,6 +28,7 @@ class MovieDetailsPage : Fragment(), OnMenuItemViewClickedListener {
     lateinit var mRootView: ViewGroup
     var mDetails: IMovieDetails? = null
     var mThis = this;
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -80,6 +66,7 @@ class MovieDetailsPage : Fragment(), OnMenuItemViewClickedListener {
         }
         */
     fun setupView() {
+
         var persons: VerticalGridView = mRootView.findViewById(R.id.persons);
 
         var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
@@ -89,14 +76,13 @@ class MovieDetailsPage : Fragment(), OnMenuItemViewClickedListener {
             for (cast in mDetails!!.cast) {
                 add(
                     IPersonCardData(
-                        cast.person.id,
+                        cast.person.id.toString(),
                         cast.person.name,
                         cast.character,
                         cast.person.portrait
                     )
                 )
             }
-
         }
         var castRow = ListRow(HeaderItem(0, "Cast"), castAdapter)
 
@@ -106,7 +92,7 @@ class MovieDetailsPage : Fragment(), OnMenuItemViewClickedListener {
             for (crew in mDetails!!.crew) {
                 add(
                     IPersonCardData(
-                        crew.person.id,
+                        crew.person.id.toString(),
                         crew.person.name,
                         crew.job,
                         crew.person.portrait
@@ -124,13 +110,13 @@ class MovieDetailsPage : Fragment(), OnMenuItemViewClickedListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Timber.tag(Settings.TAG).d("onCreate " + savedInstanceState)
+
 
         mContext = requireContext()
 
         //
         val args: MovieDetailsPageArgs by navArgs()
-        val getMovieDetails = movieService.getMovieDetails(args.id.toInt())
+        val getMovieDetails = movieService.getMovieDetails(args.id)
 
 
         val mThis = this;

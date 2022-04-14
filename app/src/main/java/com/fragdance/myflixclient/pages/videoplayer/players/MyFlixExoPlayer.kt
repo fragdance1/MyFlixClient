@@ -14,12 +14,11 @@ import com.fragdance.myflixclient.pages.videoplayer.ProgressTransportControlGlue
 import com.fragdance.myflixclient.pages.videoplayer.VideoPlayerFragment
 import com.fragdance.myflixclient.pages.videoplayer.tracks.TrackSelectionMenu
 import com.fragdance.myflixclient.services.subtitleStringService
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.text.Subtitle
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.SubtitleView
@@ -76,51 +75,35 @@ class MyFlixExoPlayer:IVideoPlayer {
             //setQueueNavigator(PlaylistQueueNavigation(mediaSession,video))
         }
     }
+    fun buildRenderersFactory():RenderersFactory {
+        return DefaultRenderersFactory(mContext).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
+    }
     override fun init(
         context: Context,
         playerFragment: VideoPlayerFragment,
     ) {
         mContext = context
         mPlayerFragment = playerFragment
-        //mOnProgressUpdate = onProgressUpdate
-/*
-        mSubtitleView = SubtitleView(mContext)
-        (playerFragment.view as ViewGroup).addView(mSubtitleView)
 
- */
         createMediaSession()
         //mViewModel.addPlaybackStateListener(uiPlaybackStateListener)
-        /*
-        mSubtitleView = SubtitleView(mContext)
-        (view as ViewGroup).addView(mSubtitleView)
 
-         */
-        /*
-        if (mTracksSelectionMenu == null) {
-            mTracksSelectionMenu = TrackSelectionMenu()
-
-            childFragmentManager.beginTransaction()
-                .replace(R.id.tracks_selection_dock, mTracksSelectionMenu!!)
-                .hide(mTracksSelectionMenu!!)
-                .commit()
-        }
-
-         */
-        //Timber.tag(Settings.TAG).d("initializePlayer");
         val dataSourceFactory = DefaultDataSource.Factory(
             mContext,
             DefaultHttpDataSource.Factory()
         )
 
         mTrackSelector = DefaultTrackSelector(mContext)
-        val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
+        val mediaSourceFactory = ProgressiveMediaSource.Factory(dataSourceFactory)
 
         val builder = OkHttpClient.Builder()
         val client = builder.build()
 
+        val renderersFactory: RenderersFactory = buildRenderersFactory()
 
         mExoplayer =
             ExoPlayer.Builder(mContext)
+                .setRenderersFactory(renderersFactory)
                 .setMediaSourceFactory(mediaSourceFactory)
                 .setTrackSelector(mTrackSelector)
                 .build()
@@ -132,19 +115,11 @@ class MyFlixExoPlayer:IVideoPlayer {
             mMediaSession.isActive = true
             playWhenReady = true
         }
-        /*
-        mExoplayer?.prepare()
-        mExoplayer?.seekTo(0)
-        mExoplayer?.play()
 
-         */
     }
 
     override fun loadVideo(video: IVideo) {
-        //Timber.tag(Settings.TAG).d("LoadView")
         val url: String = Settings.SERVER + video.url
-        //mExternalSubtitles.clear()
-        //mExternalSubtitles.addAll(0, video.subtitles)
 
         val mediaItem = MediaItem.Builder()
             .setUri(Uri.parse(url))
@@ -163,7 +138,7 @@ class MyFlixExoPlayer:IVideoPlayer {
             .buildUpon()
             .setDisabledTrackTypes(ImmutableSet.of(C.TRACK_TYPE_TEXT))
             .build()
-        //mSubtitleView.setCues(null)
+
     }
 
     override fun play() {
@@ -174,15 +149,6 @@ class MyFlixExoPlayer:IVideoPlayer {
         mExoplayer!!.pause()
     }
 
-/*
-    private val onProgressUpdate: () -> Unit = {
-        if (mSubtitle != null) {
-            val cue = mSubtitle!!.getCues(mExoplayer!!.currentPosition * 1000)
-            mSubtitleView.setCues(cue)
-        }
-    }
-
- */
     override fun disableSubtitles() {
         disableInternalSubtitle()
         mSubtitle = null
@@ -191,39 +157,6 @@ class MyFlixExoPlayer:IVideoPlayer {
 
     override fun selectExternalSubtitle(index: Int) {
         disableInternalSubtitle()
-        /*
-        if (mExternalSubtitles[index].subtitle == null) {
-            mExoplayer!!.pause()
-            // Download external subtitle
-            val requestCall = subtitleStringService.get(mExternalSubtitles[index].id)
-            requestCall.enqueue(object : Callback<String> {
-                override fun onResponse(
-                    call: Call<String>,
-                    response: Response<String>
-                ) {
-                    if (response.isSuccessful) {
-                        mExternalSubtitles[index].srt = response.body() as String
-                        mExternalSubtitles[index].subtitle =
-                            prepareSrt(mExternalSubtitles[index].srt!!)
-                        mSubtitle = mExternalSubtitles[index].subtitle
-                        Timber.tag(Settings.TAG).d("Done")
-                    } else {
-                        Timber.tag(Settings.TAG).d("Failed")
-                    }
-                    mExoplayer!!.play()
-                }
-
-                override fun onFailure(call: Call<String>, t: Throwable) {
-                    mExoplayer!!.play()
-                }
-            })
-        } else {
-            Timber.tag(Settings.TAG).d("Testing")
-            mSubtitle = mExternalSubtitles[index].subtitle
-            mExoplayer!!.play()
-        }
-
-         */
     }
 
     override fun destroy() {

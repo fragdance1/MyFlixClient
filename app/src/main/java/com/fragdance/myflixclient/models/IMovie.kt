@@ -1,17 +1,18 @@
 package com.fragdance.myflixclient.models
 
 import java.io.Serializable
-data class IMovie(
-    var id:Int,
+
+class IMovie(
+    var id:String,
     var title:String,
     var poster:String?,
     var overview:String?,
-    var url:String,
+    var url:String?,
     var video_files:List<IVideoFile> = emptyList()
 ):Serializable
 
 data class IVideo(
-    var id:Int,
+    var id:Long,
     var extension:String,
     var title:String,
     var poster:String?,

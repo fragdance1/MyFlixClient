@@ -4,17 +4,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.leanback.widget.Presenter
-import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
 
-import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.models.IMovieTorrent
 import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.models.ITorrentDetails
 import com.fragdance.myflixclient.models.IVideo
-import com.fragdance.myflixclient.pages.moviedetails.MovieDetailsPageDirections
 
 import com.fragdance.myflixclient.presenters.IAction
 import com.fragdance.myflixclient.services.torrentService
@@ -22,7 +18,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-import utils.movieDetailsToVideo
+import java.io.File
 
 class ActionBarButtonPresenter: Presenter() {
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
@@ -52,11 +48,13 @@ class ActionBarButtonPresenter: Presenter() {
 
                         var details:ITorrentDetails = response.body()!!
                         var files = details.files.sortedBy { it.length }.reversed()
-                        Timber.tag(Settings.TAG).d("Torrent details "+files)
+                        var filename = files[0].name
+                        val ext = File(filename).extension
+                        Timber.tag(Settings.TAG).d("Extension "+ext)
                         val url = "/api/torrent/stream?hash="+details.hash+"&file="+files[0].name
                         var video = IVideo(
                             item.video.id,
-                            "mp4",
+                            ext,
                             item.video.title,
                             item.video.poster,
                             item.video.overview,

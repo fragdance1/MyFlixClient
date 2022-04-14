@@ -12,8 +12,10 @@ import android.widget.TextView
 import androidx.leanback.widget.ItemBridgeAdapter
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.VerticalGridView
+import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.subtitlemodal.OnMenuItemViewClickedListener
 import com.fragdance.myflixclient.models.ISubtitle
+import timber.log.Timber
 
 
 class MenuView(context: Context,attrs: AttributeSet): VerticalGridView(context,attrs) {
@@ -26,37 +28,34 @@ class MenuView(context: Context,attrs: AttributeSet): VerticalGridView(context,a
 class MenuItemPresenter: Presenter() {
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
         checkNotNull(parent)
-        var label = TextView(parent.context);
+        var label = MenuLabelView(parent.context);
 
         label.focusable = FOCUSABLE;
         label.isFocusableInTouchMode = true;
         label.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT)
-        label.setTextColor(Color.WHITE)
+        //label.setTextColor(Color.WHITE)
         val lp = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         lp.gravity = Gravity.START
         label.layoutParams = lp
-        label.textSize=24f
-        label.setTextColor(Color.WHITE)
+
+        //label.setTextColor(Color.WHITE)
         label.setPadding(20, 10, 20, 10)
-        /*
-        label.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-            if(b) view.setBackgroundColor(Color.rgb(0.2f,0.2f,0.2f))
-            else view.setBackgroundColor(Color.TRANSPARENT)
-        }*/
+
         return ViewHolder(label)
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder?, item: Any?) {
         checkNotNull(viewHolder)
-        var label = viewHolder.view as TextView;
-        label.text = (item as ISubtitle).filename
+        var label = viewHolder.view as MenuLabelView;
+        label.setText((item as ISubtitle).filename)
         label.focusable = FOCUSABLE
         label.isFocusableInTouchMode = true;
 
     }
+
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder?) {
 
@@ -77,6 +76,12 @@ class MenuItemBridgeAdapter(onItemClickListener: OnMenuItemViewClickedListener):
                 mOnItemClickListener.onMenuItemClicked(viewHolder.item)
             }
         })
+        view.setOnFocusChangeListener { view, b ->
+
+            if(view is MenuLabelView) {
+                view.setSelected(b)
+            }
+        }
     }
 
     override fun onUnbind(viewHolder: ViewHolder?) {

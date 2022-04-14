@@ -4,21 +4,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homePage"
+    app:startDestination="@id/splash"
     tools:ignore="UnusedNavigation">
 
-    <fragment
-        android:id="@+id/homePage"
+    <fragment android:id="@+id/homePage"
         android:name="com.fragdance.myflixclient.pages.home.HomePageFragment">
+    </fragment>
+    <fragment android:id="@+id/settingsPage"
+        android:name="com.fragdance.myflixclient.pages.settings.SettingsPage">
 
     </fragment>
-    <fragment
-        android:id="@+id/moviesPage"
+    <fragment android:id="@id/splash"
+        android:name="com.fragdance.myflixclient.pages.splash.SplashFragment">
+
+    </fragment>
+    <fragment android:id="@+id/moviesPage"
         android:name="com.fragdance.myflixclient.pages.movies.MoviesPage">
 
     </fragment>
-    <fragment
-        android:id="@+id/personDetails"
+    <fragment android:id="@+id/tvshowsPage"
+        android:name="com.fragdance.myflixclient.pages.movies.TVShowsPage"></fragment>
+
+    <fragment android:id="@+id/personDetails"
         android:name="com.fragdance.myflixclient.pages.persondetails.PersonDetailsPage">
         <argument
             android:name="id"
@@ -28,19 +35,23 @@
             android:id="@+id/action_personDetails_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/movieDetailsFragment"
+    <fragment android:id="@+id/movieDetailsFragment"
         android:name="com.fragdance.myflixclient.pages.moviedetails.MovieDetailsPage"
         android:label="MovieDetails">
-        <argument android:name="id" app:argType="long"></argument>
+        <argument android:name="id" app:argType="string"></argument>
         <action android:id="@+id/action_details_to_playback" app:destination="@id/playbackFragment" />
         <action
             android:id="@+id/action_movieDetailsFragment_to_personDetails"
             app:destination="@id/personDetails" />
     </fragment>
-    <fragment
-        android:id="@+id/playbackErrorFragment"
+    <fragment android:id="@+id/tvshowDetailsFragment"
+        android:name="com.fragdance.myflixclient.pages.tvshowdetails.TVShowDetailsPage">
+        <argument
+            android:name="show"
+            app:argType="com.fragdance.myflixclient.models.ITVShow"
+            />
+    </fragment>
+    <fragment android:id="@+id/playbackErrorFragment"
         android:name="com.fragdance.myflixclient.pages.videoplayer.PlaybackErrorFragment"
         android:label="PlaybackErrorFragment">
         <argument
@@ -60,31 +71,38 @@
             android:id="@+id/action_playbackErrorFragment_to_browseFragment"
             app:destination="@id/browseFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/browseFragment"
+    <fragment android:id="@+id/browseFragment"
         android:name="com.fragdance.myflixclient.components.moviegrid.MovieGridFragment"
         android:label="BrowseFragment">
         <action
             android:id="@+id/action_browseFragment_to_playbackFragment"
             app:destination="@id/movieDetailsFragment" />
     </fragment>
-    <action
-        android:id="@+id/action_global_home"
+
+    <action android:id="@+id/action_global_home"
         app:popUpTo="@+id/main_nav_graph"
         app:destination="@id/homePage"/>
-    <action
-        android:id="@+id/action_global_movies"
+    <action android:id="@+id/action_global_movies"
         app:popUpTo="@+id/main_nav_graph"
         app:destination="@id/moviesPage"/>
-    <action
-        android:id="@+id/action_global_movie_details"
+
+    <action android:id="@+id/action_global_tvshows"
+        app:popUpTo="@+id/main_nav_graph"
+        app:destination="@id/tvshowsPage"/>
+
+    <action android:id="@+id/action_global_movie_details"
         app:destination="@id/movieDetailsFragment"
         app:enterAnim="@anim/fragment_slide_left_enter" />
-    <action
-        android:id="@+id/action_global_video_player"
+    <action android:id="@+id/action_global_video_player"
         app:destination="@id/playbackFragment"
         app:enterAnim="@anim/fragment_slide_left_enter" />
-
+    <action android:id="@+id/action_global_settings"
+        app:destination="@id/settingsPage"
+        app:enterAnim="@anim/fragment_slide_left_enter"/>
+    <action
+        android:id="@+id/action_global_tvshow_details"
+        app:destination="@id/tvshowDetailsFragment"
+        app:enterAnim="@anim/fragment_slide_left_enter"/>
     <fragment
         android:id="@+id/playbackFragment"
         android:name="com.fragdance.myflixclient.pages.videoplayer.VideoPlayerFragment"

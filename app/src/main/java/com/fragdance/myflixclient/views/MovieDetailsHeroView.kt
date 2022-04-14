@@ -14,6 +14,8 @@ class MovieDetailsHeroView(context: Context) : LinearLayout(context) {
         val inflater: LayoutInflater = LayoutInflater.from(context)
         inflater.inflate(R.layout.movie_details_hero, this)
         val view = findViewById<ViewGroup>(R.id.movie_details_hero)
+
+        // Fill the screen
         view.layoutParams =
             LinearLayout.LayoutParams(Settings.WIDTH.toInt(), Settings.HEIGHT.toInt())
     }

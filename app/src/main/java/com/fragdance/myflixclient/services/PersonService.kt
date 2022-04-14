@@ -8,8 +8,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface PersonService {
-
-
     @GET("person/details")
     fun getPersonDetails(@Query("id") id:Int):Call<IPersonDetails>
 }

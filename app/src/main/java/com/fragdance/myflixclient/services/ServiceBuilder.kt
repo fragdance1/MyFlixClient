@@ -5,10 +5,12 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import timber.log.Timber
 
-val BASE_URL = Settings.SERVER+"/api/"
+
 
 object JSONServiceBuilder {
+    var BASE_URL = Settings.SERVER+"/api/"
     private val okHttp = OkHttpClient.Builder()
 
     private val builder = Retrofit.Builder().baseUrl(BASE_URL)
@@ -24,7 +26,7 @@ object JSONServiceBuilder {
 
 object StringServiceBuilder {
     private val okHttp = OkHttpClient.Builder()
-
+    var BASE_URL = Settings.SERVER+"/api/"
     private val builder = Retrofit.Builder().baseUrl(BASE_URL)
         .addConverterFactory(ScalarsConverterFactory.create())
         .client(okHttp.build())

@@ -15,40 +15,41 @@ import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.Settings
 import timber.log.Timber
 import com.fragdance.myflixclient.R;
+import com.fragdance.myflixclient.models.ITVShow
 
-open class MovieGridFragment : VerticalGridSupportFragment(){
+open class TvShowGridFragment : VerticalGridSupportFragment(){
     private lateinit var mAdapter: ArrayObjectAdapter
-    private var mMoviesLoadedReceiver:BroadcastReceiver? = null
+    private var mTVShowsLoadedReceiver:BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupFragment()
         setOnItemViewClickedListener { _, item, _, _ ->
             when (item) {
-                is IMovie -> {
-                    val bundle = bundleOf("id" to item.id.toString())
+                is ITVShow -> {
+                    val bundle = bundleOf("show" to item)
 
                     findNavController().navigate(
-                        R.id.action_global_movie_details,bundle)
+                        R.id.action_global_tvshow_details,bundle)
                 }
             }
         }
 
         // See if movies are already loaded
-        if(Settings.movies.isNotEmpty()) {
-            setMovies(Settings.movies)
+        if(Settings.tvshows.isNotEmpty()) {
+            setTVShows(Settings.tvshows)
         } else {
             try {
                 // Let us know when the movies are loaded
-                mMoviesLoadedReceiver = object:BroadcastReceiver() {
+                mTVShowsLoadedReceiver = object:BroadcastReceiver() {
                     override fun onReceive(p0: Context?, p1: Intent?) {
-                        setMovies(Settings.movies)
+                        setTVShows(Settings.tvshows)
                     }
                 }
                 val filter = IntentFilter()
-                filter.addAction("movies_loaded")
+                filter.addAction("tvshows_loaded")
 
-                requireContext().registerReceiver(mMoviesLoadedReceiver, filter)
+                requireContext().registerReceiver(mTVShowsLoadedReceiver, filter)
             } catch(e:Exception) {
             }
         }
@@ -56,16 +57,16 @@ open class MovieGridFragment : VerticalGridSupportFragment(){
 
     override fun onDestroy() {
         super.onDestroy()
-        if(mMoviesLoadedReceiver != null) {
-            requireContext().unregisterReceiver(mMoviesLoadedReceiver)
-            mMoviesLoadedReceiver = null
+        if(mTVShowsLoadedReceiver != null) {
+            requireContext().unregisterReceiver(mTVShowsLoadedReceiver)
+            mTVShowsLoadedReceiver = null
         }
     }
 
-    fun setMovies(movies: List<IMovie>) {
+    fun setTVShows(tvshows: List<ITVShow>) {
         mAdapter.clear()
-        mAdapter.addAll(0, movies)
-        mAdapter.notifyItemRangeChanged(0, movies.size)
+        mAdapter.addAll(0, tvshows)
+        mAdapter.notifyItemRangeChanged(0, tvshows.size)
     }
 
     private fun setupFragment() {

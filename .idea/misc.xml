@@ -11,6 +11,7 @@
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/activity_video.xml" value="0.1" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/activity_video_playback.xml" value="0.33" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/details_movie_poster.xml" value="0.20625" />
+        <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/episode_card.xml" value="0.5119887165021156" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/home_page.xml" value="0.1495570609692548" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/lb_browse_fragment.xml" value="0.23293381969775925" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/lb_details_fragment.xml" value="0.19583333333333333" />
@@ -24,8 +25,10 @@
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/movie_details_view.xml" value="0.228125" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/person_card.xml" value="0.468" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/side_menu.xml" value="0.14947916666666666" />
+        <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/splash.xml" value="0.2359375" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/subtitle_modal.xml" value="0.2203125" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/track_selection.xml" value="0.23958333333333334" />
+        <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/tvshow_details_hero.xml" value="0.2669138090824838" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/layout/video_fragment.xml" value="0.20520833333333333" />
         <entry key="..\:/git/MyFlixClient/app/src/main/res/xml/prefs.xml" value="0.21979166666666666" />
       </map>

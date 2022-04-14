@@ -9,25 +9,22 @@ import com.fragdance.myflixclient.Settings
 import timber.log.Timber
 
 class ActionBarButton : LinearLayout {
-    var textView: TextView
+    var mTextView: TextView
 
     constructor(context: Context) : super(context) {
         setPadding(32, 24, 32, 24)
-        textView = TextView(context);
-        textView.textSize = (Settings.WIDTH * 0.015f) / resources.displayMetrics.scaledDensity;
-        addView(textView)
-
+        mTextView = TextView(context);
+        mTextView.textSize = (Settings.WIDTH * 0.015f) / resources.displayMetrics.scaledDensity;
+        addView(mTextView)
     }
 
     override fun setSelected(selected: Boolean) {
-        if (selected) setBackgroundColor(Color.rgb(0.2f, 0.2f, 0.2f))
+        if (selected) setBackgroundColor(Color.argb(0.1f, 1f, 1f,1f))
         else setBackgroundColor(Color.TRANSPARENT)
     }
 
 
     fun setText(text: String) {
-        textView.text = text;
+        mTextView.text = text;
     }
-
-
 }

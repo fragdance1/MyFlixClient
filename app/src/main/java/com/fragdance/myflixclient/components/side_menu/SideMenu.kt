@@ -32,13 +32,14 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
     lateinit var labelsView:ViewGroup
     var childIndex = 0;
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+        Timber.tag(Settings.TAG).d("Dispatch "+event?.keyCode)
         if(event?.action == KeyEvent.ACTION_DOWN) {
             when (event?.keyCode) {
                 KEYCODE_DPAD_LEFT -> Timber.tag(Settings.TAG).d("Left")
                 KEYCODE_DPAD_RIGHT -> return closeSidePanel()
                 KEYCODE_DPAD_UP -> goUp()
                 KEYCODE_DPAD_DOWN -> goDown()
-                KEYCODE_ENTER -> activateMenuItem(childIndex)
+                KEYCODE_ENTER,KEYCODE_DPAD_CENTER -> activateMenuItem(childIndex)
             }
         }
         return super.dispatchKeyEvent(event)
@@ -63,9 +64,12 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
     }
 
     fun activateMenuItem(index:Int) {
+        Timber.tag(Settings.TAG).d("Index is "+index)
         when(index) {
             0 -> findNavController(findFragment()).navigate(R.id.action_global_home)
             1 -> findNavController(findFragment()).navigate(R.id.action_global_movies);
+            2 -> findNavController(findFragment()).navigate(R.id.action_global_tvshows);
+            4-> findNavController(findFragment()).navigate(R.id.action_global_settings)
         }
         closeSidePanel()
     }

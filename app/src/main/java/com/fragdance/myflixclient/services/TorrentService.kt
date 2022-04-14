@@ -13,7 +13,7 @@ interface TorrentService {
     fun getMovieTorrents(@Query("id") id:String): Call<IMovieTorrent>
 
     @GET("torrent/add")
-    fun addMovieTorrent(@Query("url")  url:String, @Query("id") id:Int):Call<ITorrentDetails>
+    fun addMovieTorrent(@Query("url")  url:String, @Query("id") id:Long):Call<ITorrentDetails>
 }
 
 val torrentService  = JSONServiceBuilder.buildService(TorrentService::class.java)

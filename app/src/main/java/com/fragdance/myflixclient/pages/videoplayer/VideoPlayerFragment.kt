@@ -58,7 +58,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
     private lateinit var mCurrentVideo: IVideo
     // The list of videos to play. At least one
     private lateinit var mPlaylist: IPlayList
-
     // The current video player (MediaPlayer/Exoplayer denpending on format)
     private var mVideoPlayer:IVideoPlayer? = null
     private val mViewModel: PlaybackViewModel by viewModels()
@@ -84,13 +83,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 }
                 is VideoPlaybackState.Error -> {
                 }
-                /* findNavController(view!!).navigate(
-                     PlaybackFragmentDirections
-                         .actionPlaybackFragmentToPlaybackErrorFragment(
-                             state.video,
-                             state.exception
-                         )
-                 )*/
                 else -> {
                     // Do nothing.
                 }
@@ -111,16 +103,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
         mPlaylist = PlaybackFragmentArgs.fromBundle(requireArguments()).playlist
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-        Timber.tag(Settings.TAG).d("VideoPlayerFragment.onCreateView")
-    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         super.onViewCreated(view, savedInstanceState)
         activity?.findViewById<View>(R.id.side_menu)?.visibility = INVISIBLE;
         mSubtitleView = SubtitleView(requireContext())
@@ -155,16 +138,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //activity?.findViewById<View>(R.id.side_menu)?.visibility = VISIBLE;
-
+        activity?.findViewById<View>(R.id.side_menu)?.visibility = VISIBLE;
         mViewModel.removePlaybackStateListener(uiPlaybackStateListener)
-        /*
-        val navController = findNavController(this.view!!)
-        navController.currentDestination?.id?.let {
-            navController.popBackStack(it, true)
-        }
-
-         */
     }
 
     override fun onStart() {
@@ -183,7 +158,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     fun onPlayCompleted() {
-        //Timber.tag(Settings.TAG).d("onPlayCompleted")
         try {
             val navController = findNavController(this.view!!)
             navController.currentDestination?.id?.let {
@@ -210,6 +184,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     private fun addVideo(video: IVideo) {
+        Timber.tag(Settings.TAG).d("Adding video "+video)
         mCurrentVideo = video;
         if(video.extension == ".avi") {
             initializeMediaPlayer()
@@ -308,6 +283,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
                     val decoder = OpenSubtitleDecoder()
                     mSubtitle = decoder.my_decode(sub.toByteArray(), sub.length, true)
+
                     mExternalSubtitles.add(
                         ISubtitle(
                             -1,

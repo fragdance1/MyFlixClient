@@ -1,12 +1,9 @@
-package com.fragdance.myflixclient.components.peroncard
+package com.fragdance.myflixclient.components.personcard
 
-import android.graphics.Color
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.leanback.widget.Presenter
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.components.moviecard.MovieCard
-import com.fragdance.myflixclient.models.IMovie
+import com.fragdance.myflixclient.components.personcard.PersonCard
 import com.fragdance.myflixclient.models.IPersonCardData
 import com.squareup.picasso.Picasso
 import timber.log.Timber

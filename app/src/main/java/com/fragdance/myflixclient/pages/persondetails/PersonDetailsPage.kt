@@ -12,20 +12,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.components.peroncard.PersonCardPresenter
+import com.fragdance.myflixclient.components.personcard.PersonCardPresenter
 import com.fragdance.myflixclient.models.IPersonCardData
 import com.fragdance.myflixclient.models.IPersonDetails
 import com.fragdance.myflixclient.pages.moviedetails.DetailsDescriptionPresenter
-import com.fragdance.myflixclient.pages.moviedetails.MovieDetailsPage
-import com.fragdance.myflixclient.pages.moviedetails.MovieDetailsPageDirections
-import com.fragdance.myflixclient.pages.utils.loadDrawable
+import com.fragdance.myflixclient.utils.loadDrawable
 import com.fragdance.myflixclient.presenters.PersonRowPresenter
 import com.fragdance.myflixclient.presenters.PosterPresenter
 import com.fragdance.myflixclient.services.personService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import timber.log.Timber
 
 class PersonDetailsPage: DetailsSupportFragment() {
     lateinit var mPerson:IPersonCardData
@@ -101,7 +98,7 @@ class PersonDetailsPage: DetailsSupportFragment() {
             if(item is IPersonCardData) {
 
                 findNavController().navigate(
-                    PersonDetailsPageDirections.actionPersonDetailsToMovieDetailsFragment(item.id.toLong())
+                    PersonDetailsPageDirections.actionPersonDetailsToMovieDetailsFragment(item.id)
                 )
             }
         }

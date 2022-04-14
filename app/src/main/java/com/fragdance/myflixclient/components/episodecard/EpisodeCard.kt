@@ -1,4 +1,4 @@
-package com.fragdance.myflixclient.components.peroncard
+package com.fragdance.myflixclient.components.episodecard
 
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -13,7 +13,7 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import timber.log.Timber
 
-class PersonCard(context: Context): BaseCardView(context) {
+class EpisodeCard(context: Context): BaseCardView(context) {
     var mHeight:Float = 0.0f
     var mWidth:Float = 0.0f
     lateinit var mPoster: ImageView
@@ -23,9 +23,8 @@ class PersonCard(context: Context): BaseCardView(context) {
         buildImageCardView()
     }
     override fun setSelected(selected:Boolean) {
-
         if(selected) {
-            setBackgroundColor(Color.argb(0.1f,1f,1f,1f))
+            setBackgroundColor(Color.argb(0.01f,1f,1f,1f))
         } else {
             setBackgroundColor(Color.TRANSPARENT)
         }
@@ -37,7 +36,7 @@ class PersonCard(context: Context): BaseCardView(context) {
         setBackgroundColor(Color.TRANSPARENT)
 
         val inflater: LayoutInflater = LayoutInflater.from(context)
-        inflater.inflate(R.layout.person_card,this)
+        inflater.inflate(R.layout.episode_card,this)
 
 
         mPoster = findViewById(R.id.portrait)

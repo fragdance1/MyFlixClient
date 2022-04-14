@@ -49,14 +49,13 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
         mBridgeAdapter.setAdapter(mAdapter)
 
         mVerticalGridView.adapter = mBridgeAdapter
-        mVerticalGridView.adapter
 
         return mRootView
     }
 
     private fun searchSubtitle() {
-        Timber.tag(Settings.TAG).d(mVideo.url)
-        val requestCall = subtitleService.searchSubtitle(mVideo.url,null,null)
+        Timber.tag(Settings.TAG).d("Subtitle "+mVideo)
+        val requestCall = subtitleService.searchSubtitle(mVideo.url,mVideo.title,null)
         requestCall.enqueue(object: Callback<List<ISubtitle>>{
             override fun onResponse(
                 call: Call<List<ISubtitle>>,
@@ -66,6 +65,7 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
                     val subtitles = response.body() as List<ISubtitle>
                     mAdapter.clear()
                     mAdapter.addAll(0,subtitles)
+                    mVerticalGridView.requestFocus()
                 }
             }
 

@@ -6,31 +6,45 @@ import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
+import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
-import com.fragdance.myflixclient.models.IMovie
+import com.fragdance.myflixclient.utils.MovieLoaders
 
 
 class HomePageFragment: RowsSupportFragment() {
-    fun loadData() {
-        val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-        val movieCardPresenter = MovieCardPresenter()
-        var videos = arrayListOf<IMovie>()
+    val movieCardPresenter = MovieCardPresenter()
+    val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
+    fun loadHomePageMovies(type:String) {
+        when(type) {
+            "Latest" -> {
+                val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
+                MovieLoaders.loadMovies(type,listRowAdapter)
+                val header = HeaderItem(rowsAdapter.size().toLong(), type)
+                rowsAdapter.add(ListRow(header, listRowAdapter))
+            }
+            "Recommended" -> {
+                val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
+                MovieLoaders.loadMovies(type,listRowAdapter)
+                val header = HeaderItem(rowsAdapter.size().toLong(), type)
+                rowsAdapter.add(ListRow(header, listRowAdapter))
+            }
+            else -> {
+                val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
+                MovieLoaders.loadMovies(type,listRowAdapter)
+                val header = HeaderItem(rowsAdapter.size().toLong(), type)
+                rowsAdapter.add(ListRow(header, listRowAdapter))
+            }
+        }
 
-        val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        listRowAdapter.add(IMovie(-1,"Loading",null,null,"fail"))
-        val header = HeaderItem(rowsAdapter.size().toLong(), "Test")
-        rowsAdapter.add(ListRow(header, listRowAdapter))
-        val header2 = HeaderItem(rowsAdapter.size().toLong(), "Test")
-        rowsAdapter.add(ListRow(header2, listRowAdapter))
+    }
+    fun loadData() {
+        loadHomePageMovies("Latest")
+        loadHomePageMovies("Recommended")
+        loadHomePageMovies("Boxoffice")
+        for(genre in Settings.MOVIE_GENRES) {
+            loadHomePageMovies(genre)
+        }
+
         adapter = rowsAdapter
     }
 
