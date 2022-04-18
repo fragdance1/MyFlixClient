@@ -21,14 +21,13 @@ import timber.log.Timber
 import java.io.File
 
 class ActionBarButtonPresenter: Presenter() {
+
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
         val card = ActionBarButton(parent!!.context)
         card.focusable = View.FOCUSABLE
         card.isFocusableInTouchMode = true;
         return ViewHolder(card)
     }
-
-
 
     override fun onBindViewHolder(viewHolder: ViewHolder?, item: Any?) {
         checkNotNull(viewHolder)
@@ -39,20 +38,22 @@ class ActionBarButtonPresenter: Presenter() {
         v.setOnClickListener() {
             var playList = IPlayList()
             if(item.video.hash != null) {
-                val addMovieTorrent= torrentService.addMovieTorrent(item.video.url!!,item.video.id)
-                addMovieTorrent.enqueue(object : Callback<ITorrentDetails> {
+                // Clicked a torrent
+                val addMovieTorrentCall = torrentService.addMovieTorrent(item.video.url!!,item.video.id)
+
+                addMovieTorrentCall.enqueue(object : Callback<ITorrentDetails> {
                     override fun onResponse(
                         call: Call<ITorrentDetails>,
                         response: Response<ITorrentDetails>
                     ) {
-
-                        var details:ITorrentDetails = response.body()!!
-                        var files = details.files.sortedBy { it.length }.reversed()
-                        var filename = files[0].name
+                        val details:ITorrentDetails = response.body()!!
+                        val files = details.files.sortedBy { it.length }.reversed()
+                        val filename = files[0].name
                         val ext = File(filename).extension
-                        Timber.tag(Settings.TAG).d("Extension "+ext)
+
                         val url = "/api/torrent/stream?hash="+details.hash+"&file="+files[0].name
-                        var video = IVideo(
+
+                        val video = IVideo(
                             item.video.id,
                             ext,
                             item.video.title,
@@ -60,15 +61,13 @@ class ActionBarButtonPresenter: Presenter() {
                             item.video.overview,
                             url,
                             details.hash
-
                         )
-                        Timber.tag(Settings.TAG).d("Opening "+url);
+
                         playList.videos.add(video)
                         val bundle = bundleOf("playlist" to playList)
 
                         v.findNavController().navigate(
                             R.id.action_global_video_player,bundle)
-                        // Sort files according to size
 
                     }
 
@@ -77,24 +76,13 @@ class ActionBarButtonPresenter: Presenter() {
                     }
 
                 })
-
             } else {
-                Timber.tag("Video "+item.video)
+                // Regular (local) video
                 playList.videos.add(item.video)
                 val bundle = bundleOf("playlist" to playList)
-
-                v.findNavController().navigate(
-                    R.id.action_global_video_player,bundle)
+                v.findNavController().navigate(R.id.action_global_video_player,bundle)
             }
-
-            //val bundle = bundleOf("playList" to playLi
-
-            //v.findNavController().navigate(MovieDetailsPageDirections.actionDetailsToPlayback(playList)
-
-
         }
-
-
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder?) {

@@ -1,7 +1,6 @@
 package com.fragdance.myflixclient.pages.movies
 
-import com.fragdance.myflixclient.components.moviegrid.MovieGridFragment
-import com.fragdance.myflixclient.components.moviegrid.TvShowGridFragment
+import com.fragdance.myflixclient.components.tvshowgrid.TvShowGridFragment
 
 class TVShowsPage: TvShowGridFragment() {
 

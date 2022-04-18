@@ -11,7 +11,7 @@ import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import com.fragdance.myflixclient.utils.MovieLoaders
 
 
-class HomePageFragment: RowsSupportFragment() {
+class HomePage: RowsSupportFragment() {
     val movieCardPresenter = MovieCardPresenter()
     val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
     fun loadHomePageMovies(type:String) {

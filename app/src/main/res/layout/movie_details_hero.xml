@@ -71,5 +71,5 @@
         android:layout_height="120dp"
         android:layout_x="100dp"
         android:layout_y="120dp"
-        android:background="#0000ff" />
+         />
 </AbsoluteLayout>

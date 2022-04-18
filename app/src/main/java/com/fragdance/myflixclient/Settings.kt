@@ -1,5 +1,7 @@
 package com.fragdance.myflixclient
 
+import android.os.Handler
+import android.os.Looper
 import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.models.ITVShow
 
@@ -44,5 +46,7 @@ class Settings {
             "War",
             "Western"
         )
+
+        val mainThreadHandler = Handler(Looper.getMainLooper())
     }
 }

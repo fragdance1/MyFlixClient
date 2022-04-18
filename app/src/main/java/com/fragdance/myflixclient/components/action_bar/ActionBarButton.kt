@@ -2,11 +2,9 @@ package com.fragdance.myflixclient.components.action_bar
 
 import android.content.Context
 import android.graphics.Color
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.fragdance.myflixclient.Settings
-import timber.log.Timber
 
 class ActionBarButton : LinearLayout {
     var mTextView: TextView
@@ -22,7 +20,6 @@ class ActionBarButton : LinearLayout {
         if (selected) setBackgroundColor(Color.argb(0.1f, 1f, 1f,1f))
         else setBackgroundColor(Color.TRANSPARENT)
     }
-
 
     fun setText(text: String) {
         mTextView.text = text;

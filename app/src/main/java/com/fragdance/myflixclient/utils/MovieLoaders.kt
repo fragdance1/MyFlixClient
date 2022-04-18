@@ -19,7 +19,7 @@ class MovieLoaders {
                 Timber.tag(Settings.TAG).d("Movies already loaded")
                 adapter.addAll(0, movies)
             } else {
-                val requestCall = movieService.getTrendingMovies()
+                val requestCall = movieService.getLatestMovies()
                 requestCall.enqueue(object : Callback<List<IMovie>> {
                     override fun onResponse(
                         call: Call<List<IMovie>>,

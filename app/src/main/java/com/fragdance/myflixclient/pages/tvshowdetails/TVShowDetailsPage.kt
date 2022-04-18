@@ -51,7 +51,7 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
 
     fun setupView() {
 
-        mSeasons = mRootView.findViewById(R.id.persons);
+        mSeasons = mRootView.findViewById(R.id.content);
 
         var rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
         rowsAdapter.add(mDetails)

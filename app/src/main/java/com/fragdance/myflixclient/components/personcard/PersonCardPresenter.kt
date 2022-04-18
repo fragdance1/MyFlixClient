@@ -1,7 +1,10 @@
 package com.fragdance.myflixclient.components.personcard
 
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.leanback.widget.Presenter
+import androidx.navigation.findNavController
+import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.personcard.PersonCard
 import com.fragdance.myflixclient.models.IPersonCardData
@@ -30,6 +33,11 @@ class PersonCardPresenter: Presenter() {
             .into(v.mPoster)
         v.setOnClickListener() {
             Timber.tag(Settings.TAG).d("Item clicked"+person.title)
+            val bundle = bundleOf("id" to item.id)
+
+            v.findNavController().navigate(
+                R.id.action_global_person_details, bundle
+            )
 
         }
         //(viewHolder!!.view as TextView).text = item as String

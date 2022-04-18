@@ -1,27 +1,71 @@
 package com.fragdance.myflixclient.services
 
+import android.widget.Toast
+import com.fragdance.myflixclient.MainActivity
+import com.fragdance.myflixclient.MyFlixApplication
 import com.fragdance.myflixclient.Settings
 import okhttp3.OkHttpClient
+import org.cometd.bayeux.Message
+import org.cometd.bayeux.client.ClientSession
+import org.cometd.bayeux.client.ClientSessionChannel
 import org.cometd.client.BayeuxClient
+import org.cometd.client.http.okhttp.OkHttpClientTransport
 import org.cometd.client.transport.ClientTransport
-
 import org.cometd.client.websocket.okhttp.OkHttpWebSocketTransport
+import org.cometd.common.JacksonJSONContextClient
 
-class FayeService {
-    companion object {
-        private var client:BayeuxClient? = null
+import timber.log.Timber
 
-        fun get(): BayeuxClient {
-            if(FayeService.client == null) {
 
+class FayeService: ClientSession.MessageListener {
+    var httpClient = OkHttpClient()
+
+    var transportOptions = HashMap<String,JacksonJSONContextClient>()
+    var jsonContext = JacksonJSONContextClient()
+    init {
+        transportOptions.put(ClientTransport.JSON_CONTEXT_OPTION, jsonContext);
+    }
+
+    var wsTransport = OkHttpWebSocketTransport(transportOptions as Map<String, Any>?,httpClient)
+    var httpTransport = OkHttpClientTransport(transportOptions as Map<String, Any>?,httpClient)
+
+    var client = BayeuxClient("http://192.168.1.80:5001/api/faye",wsTransport,httpTransport)
+
+    init {
+        client.handshake(this)
+    }
+
+    public fun subscribe(channel:String, callback: (message:Message?)->Unit):Boolean {
+        val c = client.getChannel(channel)
+        val listener = ClientSessionChannel.MessageListener{channel,message -> run {callback(message)}}
+        return c.subscribe(listener)
+    }
+
+
+    override fun onMessage(message: Message?) {
+        Timber.tag(Settings.TAG).d("message "+message)
 /*
-                // Configure BayeuxClient, with the websocket transport listed before the long-polling transport.
-                FayeService.client = BayeuxClient(Settings.SERVER+"/faye", OkHttpWebSocketTransport())
-                client?.handshake();
-                client?.waitFor(1000, BayeuxClient.State.CONNECTED);
-*/
+        var channel:ClientSessionChannel = client.getChannel("/test/toaster");
+        Timber.tag(Settings.TAG).d("channel "+channel)
+        var listener =
+            ClientSessionChannel.MessageListener { channel, message -> run {
+                Timber.tag(Settings.TAG).d("Got message "+message)
+
+                val context = MyFlixApplication.instance.applicationContext
+                val toast = Toast.makeText(MainActivity.mInstance,"Testar hallo",Toast.LENGTH_LONG)
+                toast.show()
+
+
             }
-            return client!!
+            }
+
+        // Send the subscription to the server.
+        if(channel.subscribe(
+            listener
+        )) {
+            Timber.tag(Settings.TAG).d("Sent")
         }
+        */
+
     }
 }

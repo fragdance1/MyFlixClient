@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.leanback.app.VerticalGridSupportFragment
@@ -22,6 +23,7 @@ open class MovieGridFragment : VerticalGridSupportFragment(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setupFragment()
         setOnItemViewClickedListener { _, item, _, _ ->
             when (item) {
@@ -69,6 +71,7 @@ open class MovieGridFragment : VerticalGridSupportFragment(){
     }
 
     private fun setupFragment() {
+        view?.setBackgroundColor(Color.parseColor("#121212"))
         val gridPresenter = VerticalGridPresenter(ZOOM_FACTOR_SMALL, false)
         gridPresenter.numberOfColumns = 4
         setGridPresenter(gridPresenter)

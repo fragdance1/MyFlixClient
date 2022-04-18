@@ -8,28 +8,30 @@
     tools:ignore="UnusedNavigation">
 
     <fragment android:id="@+id/homePage"
-        android:name="com.fragdance.myflixclient.pages.home.HomePageFragment">
+        android:name="com.fragdance.myflixclient.pages.home.HomePage">
     </fragment>
+
     <fragment android:id="@+id/settingsPage"
         android:name="com.fragdance.myflixclient.pages.settings.SettingsPage">
-
     </fragment>
+
     <fragment android:id="@id/splash"
         android:name="com.fragdance.myflixclient.pages.splash.SplashFragment">
-
     </fragment>
+
     <fragment android:id="@+id/moviesPage"
         android:name="com.fragdance.myflixclient.pages.movies.MoviesPage">
-
     </fragment>
+
     <fragment android:id="@+id/tvshowsPage"
-        android:name="com.fragdance.myflixclient.pages.movies.TVShowsPage"></fragment>
+        android:name="com.fragdance.myflixclient.pages.movies.TVShowsPage">
+    </fragment>
 
     <fragment android:id="@+id/personDetails"
         android:name="com.fragdance.myflixclient.pages.persondetails.PersonDetailsPage">
         <argument
             android:name="id"
-            app:argType="long"
+            app:argType="string"
         />
         <action
             android:id="@+id/action_personDetails_to_movieDetailsFragment"
@@ -90,6 +92,9 @@
         app:popUpTo="@+id/main_nav_graph"
         app:destination="@id/tvshowsPage"/>
 
+    <action android:id="@+id/action_global_person_details"
+        app:destination="@id/personDetails"
+        app:enterAnim="@anim/fragment_slide_left_enter"/>
     <action android:id="@+id/action_global_movie_details"
         app:destination="@id/movieDetailsFragment"
         app:enterAnim="@anim/fragment_slide_left_enter" />

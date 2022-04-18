@@ -1,4 +1,4 @@
-package com.fragdance.myflixclient.components.moviegrid
+package com.fragdance.myflixclient.components.tvshowgrid
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -9,11 +9,9 @@ import androidx.core.os.bundleOf
 import androidx.leanback.app.VerticalGridSupportFragment
 import androidx.leanback.widget.*
 import androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_SMALL
-import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.Settings
-import timber.log.Timber
 import com.fragdance.myflixclient.R;
 import com.fragdance.myflixclient.models.ITVShow
 

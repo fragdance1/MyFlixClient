@@ -12,9 +12,6 @@ import com.fragdance.myflixclient.Settings
 class ActionBar(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
     private val mGridView: HorizontalGridView
 
-    /**
-     * Returns the HorizontalGridView.
-     */
     fun getGridView(): HorizontalGridView {
         return mGridView
     }
@@ -39,8 +36,9 @@ class ActionBar(context: Context, attrs: AttributeSet?) : LinearLayout(context, 
         ((mGridView.getChildAt(0) as ViewGroup?)?.getChildAt(1) as ViewGroup?)?.getChildAt(0)
             ?.setPadding(0, 0, 56, 0)
         lp.leftMargin = (Settings.WIDTH * 0.35).toInt()
+
         var lp2 = mGridView.getChildAt(0).layoutParams;
 
-        lp2.width = (Settings.WIDTH * 0.65).toInt()//ViewGroup.LayoutParams.MATCH_PARENT;
+        lp2.width = (Settings.WIDTH * 0.65).toInt()
     }
 }

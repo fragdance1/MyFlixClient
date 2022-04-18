@@ -12,9 +12,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 
-
-
-
 fun loadDrawable(
     activity: Activity,
     imageUrl: String?,
