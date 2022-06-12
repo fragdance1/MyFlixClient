@@ -1,5 +1,6 @@
 package com.fragdance.myflixclient.presenters
 
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -12,6 +13,7 @@ import com.fragdance.myflixclient.models.IMovieDetails
 import com.fragdance.myflixclient.models.IMovieTorrent
 import com.fragdance.myflixclient.models.ITVShow
 import com.fragdance.myflixclient.models.IVideo
+import com.fragdance.myflixclient.pages.persondetails.IAction
 import com.fragdance.myflixclient.services.torrentService
 import com.fragdance.myflixclient.views.MovieDetailsHeroView
 import com.squareup.picasso.Picasso
@@ -75,7 +77,13 @@ class MovieDetailsHeroPresenter:Presenter() {
         if (backdropUrl != null) {
             Picasso.get()
                 .load(backdropUrl)
+                .fit()
+                .centerCrop(Gravity.TOP)
                 .into(backdropView)
+
+
+
+
         }
 
         // Load poster
@@ -133,6 +141,7 @@ class MovieDetailsHeroPresenter:Presenter() {
         actions.adapter = bridgeAdapter
 
         if (item is IMovieDetails) {
+            //Timber.tag(Settings.TAG).d("details "+item)
             if (item.url != null) {
                 actionsAdapter.add(IAction("Play", movieDetailsToVideo(item)));
             }
@@ -156,8 +165,12 @@ class MovieDetailsHeroPresenter:Presenter() {
                                         null,
 
                                         torrent.url,
-                                        torrent.hash
+                                        torrent.hash,
 
+                                        emptyList(),
+                                        null,
+                                        null,
+                                        null
                                     )
                                 )
                             )

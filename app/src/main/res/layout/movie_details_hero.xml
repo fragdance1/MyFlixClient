@@ -26,6 +26,7 @@
             android:descendantFocusability="afterDescendants"
             android:focusable="false"
             android:focusableInTouchMode="false"
+            android:adjustViewBounds="true"
             android:scaleType="centerCrop" />
 
         <com.fragdance.myflixclient.components.action_bar.ActionBar

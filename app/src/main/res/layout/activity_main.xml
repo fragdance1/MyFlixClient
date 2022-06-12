@@ -19,12 +19,19 @@
 
     </androidx.fragment.app.FragmentContainerView>
 
-    <fragment
-        android:id="@+id/side_menu"
+    <TextClock
+        android:id="@+id/clock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:textSize="24sp" />
 
+    <fragment
+        android:id="@+id/side_menu"
         android:name="com.fragdance.myflixclient.components.side_menu.SideMenu"
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
         android:background="#ff0000" />
 
 </com.fragdance.myflixclient.MainView>

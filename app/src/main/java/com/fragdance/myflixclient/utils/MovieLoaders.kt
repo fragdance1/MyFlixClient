@@ -16,7 +16,7 @@ class MovieLoaders {
             // Check if already downloaded
             val movies = Settings.startMovies["Latest"];
             if(movies!=null) {
-                Timber.tag(Settings.TAG).d("Movies already loaded")
+
                 adapter.addAll(0, movies)
             } else {
                 val requestCall = movieService.getLatestMovies()
@@ -32,7 +32,7 @@ class MovieLoaders {
                     }
 
                     override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Genre failed " + t);
+                        Timber.tag(Settings.TAG).d("Get latest movies failes " + t);
                     }
 
                 })
@@ -42,7 +42,7 @@ class MovieLoaders {
             // Check if already downloaded
             val movies = Settings.startMovies["Recommended"];
             if(movies!=null) {
-                Timber.tag(Settings.TAG).d("Movies already loaded")
+
                 adapter.addAll(0, movies)
             } else {
                 val requestCall = movieService.getRecommendedMovies()
@@ -58,7 +58,7 @@ class MovieLoaders {
                     }
 
                     override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Genre failed " + t);
+                        Timber.tag(Settings.TAG).d("Recommended movies " + t);
                     }
 
                 })
@@ -68,7 +68,7 @@ class MovieLoaders {
             // Check if already downloaded
             val movies = Settings.startMovies["BoxOffice"];
             if(movies!=null) {
-                Timber.tag(Settings.TAG).d("Movies already loaded")
+
                 adapter.addAll(0, movies)
             } else {
                 val requestCall = movieService.getBoxOfficeMovies()
@@ -84,7 +84,7 @@ class MovieLoaders {
                     }
 
                     override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Genre failed " + t);
+                        Timber.tag(Settings.TAG).d("Boxoffice movies failed " + t);
                     }
 
                 })
@@ -94,7 +94,7 @@ class MovieLoaders {
             // Check if already downloaded
             val movies = Settings.startMovies[genre];
             if(movies!=null) {
-                Timber.tag(Settings.TAG).d("Movies already loaded")
+
                 adapter.addAll(0, movies)
             } else {
                 val requestCall = movieService.getMoviesByGenre(genre)
@@ -110,7 +110,7 @@ class MovieLoaders {
                     }
 
                     override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Genre failed " + t);
+                        Timber.tag(Settings.TAG).d("Genre "+genre+" failed " + t);
                     }
 
                 })

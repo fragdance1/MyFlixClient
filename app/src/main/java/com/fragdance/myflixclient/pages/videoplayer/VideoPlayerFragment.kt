@@ -10,6 +10,7 @@ import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.*
 import androidx.fragment.app.FragmentTransaction.*
@@ -33,6 +34,7 @@ import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixExoPlayer
 import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixMediaPlayer
 import com.fragdance.myflixclient.pages.videoplayer.tracks.TrackSelectionMenu
 import com.fragdance.myflixclient.services.subtitleStringService
+import com.fragdance.myflixclient.services.trakttvService
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -52,6 +54,7 @@ import timber.log.Timber
 import java.lang.Exception
 import java.net.URI
 import java.time.Duration
+import java.time.LocalDateTime
 
 class VideoPlayerFragment : VideoSupportFragment() {
     // The video currently playing
@@ -60,7 +63,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     private lateinit var mPlaylist: IPlayList
     // The current video player (MediaPlayer/Exoplayer denpending on format)
     private var mVideoPlayer:IVideoPlayer? = null
-    private val mViewModel: PlaybackViewModel by viewModels()
+    //private val mViewModel: PlaybackViewModel by viewModels()
 
     // The currently active external subtitle
     private var mSubtitle: Subtitle? = null
@@ -70,25 +73,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
     private lateinit var mSubtitleView: SubtitleView
     // A list of external subtitles for this video
     var mExternalSubtitles: ArrayList<ISubtitle> = arrayListOf()
-
-    private val uiPlaybackStateListener = object : PlaybackStateListener {
-        override fun onChanged(state: VideoPlaybackState) {
-            view?.keepScreenOn = state is VideoPlaybackState.Play
-
-            when (state) {
-                is VideoPlaybackState.Prepare -> startPlaybackFromWatchProgress(state.startPosition)
-
-                is VideoPlaybackState.End -> {
-                    findNavController(view!!).popBackStack()
-                }
-                is VideoPlaybackState.Error -> {
-                }
-                else -> {
-                    // Do nothing.
-                }
-            }
-        }
-    }
 
     // Update listener for syncing external subtitles
     val onProgressUpdate: () -> Unit = {
@@ -118,7 +102,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 .hide(mTracksSelectionMenu!!)
                 .commit()
         }
-
     }
 
     fun onClosedCaption() {
@@ -138,13 +121,15 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         activity?.findViewById<View>(R.id.side_menu)?.visibility = VISIBLE;
-        mViewModel.removePlaybackStateListener(uiPlaybackStateListener)
+        activity?.findViewById<View>(R.id.side_menu)?.clearFocus()
     }
 
     override fun onStart() {
         super.onStart()
-        addVideo(mPlaylist.videos[0])
+        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        addVideo(mPlaylist.videos[mPlaylist.position.toInt()])
     }
 
     override fun onStop() {
@@ -158,13 +143,38 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     fun onPlayCompleted() {
-        try {
-            val navController = findNavController(this.view!!)
-            navController.currentDestination?.id?.let {
-                navController.popBackStack(it, true)
+        destroyPlayer()
+        val date = LocalDateTime.now().toString()
+        val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
+        val tmdbId = mCurrentVideo.tmdbId.toString()
+
+        var watchedCall = if(mCurrentVideo.type == "movie") trakttvService.setMovieWatched(access_token,tmdbId,date) else trakttvService.setEpisodeWatched(access_token,tmdbId,date)
+        watchedCall.enqueue(object:Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                Timber.tag(Settings.TAG).d("TraktTV started")
+                //TODO("Not yet implemented")
             }
-        } catch(e: Exception) {
-            Timber.tag(Settings.TAG).d("Error "+e.message)
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                //TODO("Not yet implemented")
+                Timber.tag(Settings.TAG).d("TraktTV failed")
+            }
+        })
+
+        mPlaylist.position++;
+
+        if(mPlaylist.videos.size > mPlaylist.position) {
+            addVideo(mPlaylist.videos[mPlaylist.position.toInt()])
+        } else {
+            try {
+                val navController = findNavController(this.view!!)
+                activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                navController.currentDestination?.id?.let {
+                    navController.popBackStack(it, true)
+                }
+            } catch (e: Exception) {
+                Timber.tag(Settings.TAG).d("Error " + e.message)
+            }
         }
     }
 
@@ -177,38 +187,63 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     private fun destroyPlayer() {
+
         if(mVideoPlayer != null) {
+            val progress = mVideoPlayer!!.getProgress();
+            val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
+            val tmdbId = mCurrentVideo.tmdbId.toString()
+            val imdbId = mCurrentVideo.imdbId.toString()
+            Timber.tag(Settings.TAG).d("Progress is "+progress);
+            val startCall = if(mCurrentVideo.type == "movie")
+                trakttvService.stopMovie(access_token,imdbId,progress)
+            else
+                trakttvService.stopEpisode(access_token,tmdbId,progress)
+            startCall.enqueue(object:Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    Timber.tag(Settings.TAG).d("TraktTV stopped")
+                }
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    Timber.tag(Settings.TAG).d("TraktTV failed")
+                }
+            })
             mVideoPlayer!!.destroy()
             mVideoPlayer = null
+
         }
     }
 
     private fun addVideo(video: IVideo) {
-        Timber.tag(Settings.TAG).d("Adding video "+video)
         mCurrentVideo = video;
+
         if(video.extension == ".avi") {
             initializeMediaPlayer()
         } else {
             initializeExoPlayer()
-
         }
         mExternalSubtitles.clear()
-        mExternalSubtitles.addAll(0, video.subtitles)
-        mVideoPlayer!!.init(requireContext(),this )
-        mVideoPlayer!!.loadVideo(video)
+        if(video?.subtitles != null) {
+            mExternalSubtitles.addAll(0, video.subtitles)
 
+        }
+        mVideoPlayer!!.init(requireContext(),this )
+
+        mVideoPlayer!!.loadVideo(video)
+        if(video!!.subtitles.count() > 0) {
+            selectExternalSubtitle(0)
+        } else {
+            disableSubtitles();
+        }
     }
 
     fun next() {
-        Timber.tag(Settings.TAG).d("next")
+        mPlaylist.position++;
+        if(mPlaylist.videos.size > mPlaylist.position) {
+            addVideo(mPlaylist.videos[mPlaylist.position.toInt()])
+        }
     }
 
     fun prev() {
         Timber.tag(Settings.TAG).d("prev")
-    }
-
-    private fun startPlaybackFromWatchProgress(startPosition: Long) {
-        //Timber.tag(Settings.TAG).d("startPlaybakcFromWatchProgress");
     }
 
     // Disable any internal subtitle. Used both when we're using external subtitles
@@ -267,10 +302,10 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     }
 
-    fun downloadSubtitle(subtitle: ISubtitle) {
+    fun downloadSubtitle(subtitle: ISubtitle,videoId:Long) {
 
         val url: String = subtitle.url
-        val requestCall = subtitleStringService.downloadSubtitle(url)
+        val requestCall = subtitleStringService.downloadSubtitle(url,videoId)
 
         requestCall.enqueue(object : Callback<String> {
             override fun onResponse(
@@ -307,24 +342,31 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     inner class PlayerEventListener : Player.Listener {
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            /*
-            Timber.tag(Settings.TAG).d("onMediaItemTransition");
-            if (mediaItem?.localConfiguration != null) {
-                val video: IVideo = mediaItem.localConfiguration!!.tag as IVideo
-                getNextVideo(video)
-                Timber.tag(Settings.TAG).d(video.title)
-                mExoPlayerGlue.title = video.title
-                mCurrentVideo = video
-            }
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
 
-             */
+            super.onIsPlayingChanged(isPlaying)
+            if(isPlaying) {
+                val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
+                val tmdbId = mCurrentVideo.tmdbId.toString()
+                var imdbId = mCurrentVideo.imdbId.toString()
+                val startCall = if(mCurrentVideo.type == "movie")
+                    trakttvService.startMovie(access_token,imdbId,"0")
+                else
+                    trakttvService.startEpisode(access_token,tmdbId,"0")
+                startCall.enqueue(object:Callback<Unit> {
+                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                        Timber.tag(Settings.TAG).d("TraktTV started")
+                    }
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        Timber.tag(Settings.TAG).d("TraktTV failed")
+                    }
+                })
+            }
         }
 
         override fun onCues(cues: MutableList<Cue>) {
             super.onCues(cues)
             mSubtitleView.setCues(cues)
-
         }
 
     }

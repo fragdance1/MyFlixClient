@@ -12,7 +12,7 @@ import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.models.ITorrentDetails
 import com.fragdance.myflixclient.models.IVideo
 
-import com.fragdance.myflixclient.presenters.IAction
+import com.fragdance.myflixclient.pages.persondetails.IAction
 import com.fragdance.myflixclient.services.torrentService
 import retrofit2.Call
 import retrofit2.Callback
@@ -60,7 +60,12 @@ class ActionBarButtonPresenter: Presenter() {
                             item.video.poster,
                             item.video.overview,
                             url,
-                            details.hash
+                            details.hash,
+                        emptyList(),
+
+                            item.video.type,
+                            item.video.tmdbId,
+                            item.video.imdbId
                         )
 
                         playList.videos.add(video)
@@ -78,6 +83,7 @@ class ActionBarButtonPresenter: Presenter() {
                 })
             } else {
                 // Regular (local) video
+                    Timber.tag(Settings.TAG).d("Play video "+item.video)
                 playList.videos.add(item.video)
                 val bundle = bundleOf("playlist" to playList)
                 v.findNavController().navigate(R.id.action_global_video_player,bundle)

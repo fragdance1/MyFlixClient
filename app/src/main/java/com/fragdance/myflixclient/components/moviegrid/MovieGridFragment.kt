@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.Settings
 import timber.log.Timber
 import com.fragdance.myflixclient.R;
+import com.fragdance.myflixclient.presenters.MyFlixVerticalGridPresenter
 
 open class MovieGridFragment : VerticalGridSupportFragment(){
     private lateinit var mAdapter: ArrayObjectAdapter
@@ -72,11 +73,13 @@ open class MovieGridFragment : VerticalGridSupportFragment(){
 
     private fun setupFragment() {
         view?.setBackgroundColor(Color.parseColor("#121212"))
-        val gridPresenter = VerticalGridPresenter(ZOOM_FACTOR_SMALL, false)
+        val gridPresenter = MyFlixVerticalGridPresenter(ZOOM_FACTOR_SMALL, false)
+
         gridPresenter.numberOfColumns = 4
         setGridPresenter(gridPresenter)
 
         mAdapter = ArrayObjectAdapter(MovieCardPresenter())
         setAdapter(mAdapter)
+        gridPresenter.focusZoomFactor
     }
 }

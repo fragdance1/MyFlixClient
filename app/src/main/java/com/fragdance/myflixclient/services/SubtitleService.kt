@@ -13,7 +13,7 @@ interface SubtitleService {
 }
 interface SubtitleStringService {
     @GET("subtitle/download")
-    fun downloadSubtitle(@Query("url") url:String):Call<String>
+    fun downloadSubtitle(@Query("url") url:String,@Query("video_id") vide_if:Long?):Call<String>
     @GET("subtitle/get")
     fun get(@Query("id") id:Int):Call<String>
 }

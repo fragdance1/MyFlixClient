@@ -1,8 +1,6 @@
 package com.fragdance.myflixclient.components.side_menu
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.KeyEvent
@@ -10,16 +8,11 @@ import android.view.KeyEvent.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.findFragment
-import androidx.leanback.widget.VerticalGridView
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.menu.MenuIconView
@@ -32,10 +25,8 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
     lateinit var labelsView:ViewGroup
     var childIndex = 0;
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-        Timber.tag(Settings.TAG).d("Dispatch "+event?.keyCode)
-        if(event?.action == KeyEvent.ACTION_DOWN) {
+        if(event?.action == ACTION_DOWN) {
             when (event?.keyCode) {
-                KEYCODE_DPAD_LEFT -> Timber.tag(Settings.TAG).d("Left")
                 KEYCODE_DPAD_RIGHT -> return closeSidePanel()
                 KEYCODE_DPAD_UP -> goUp()
                 KEYCODE_DPAD_DOWN -> goDown()
@@ -63,7 +54,7 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
         }
     }
 
-    fun activateMenuItem(index:Int) {
+    private fun activateMenuItem(index:Int) {
         Timber.tag(Settings.TAG).d("Index is "+index)
         when(index) {
             0 -> findNavController(findFragment()).navigate(R.id.action_global_home)
@@ -74,24 +65,25 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
         closeSidePanel()
     }
 
-    fun setActiveMenuItem(index:Int) {
+    private fun setActiveMenuItem(index:Int) {
         (labelsView.children.elementAt(childIndex) as MenuLabelView).setActive(false)
         (labelsView.children.elementAt(index) as MenuLabelView).setActive(true)
         (iconsView.children.elementAt(childIndex) as MenuIconView).setActive(false)
         (iconsView.children.elementAt(index) as MenuIconView).setActive(true)
         childIndex = index;
     }
-    fun createMenuItem(label:String):View {
+    private fun createMenuItem(label:String):View {
         var tv = MenuLabelView(context);
         tv.setText(label)
 
         return tv;
     }
-    fun createIconView(id: Int):View {
+    private fun createIconView(id: Int):View {
         var iv = MenuIconView(context)
         iv.setImageResource(id)
         return iv;
     }
+
     override fun onFinishInflate() {
         super.onFinishInflate()
         iconsView = findViewById(R.id.menu_icons)
@@ -126,9 +118,6 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
 class SideMenu(): Fragment() {
     lateinit var mRootView:ViewGroup
     lateinit var mMenuView:ViewGroup
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -142,11 +131,6 @@ class SideMenu(): Fragment() {
         mMenuView?.layoutParams?.height = Settings.HEIGHT.toInt()
 
         return mRootView;
-
-    }
-
-
-    fun addMenuItems(menuItems:ArrayList<IMenuItem>) {
 
     }
 }

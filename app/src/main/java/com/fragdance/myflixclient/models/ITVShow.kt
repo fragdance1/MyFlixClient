@@ -22,7 +22,8 @@ data class IEpisode (
     var overview:String?,
     val still:String?,
     val owned:Boolean,
-    var video_files:List<IVideoFile> = emptyList()
+    var video_files:List<IVideoFile> = emptyList(),
+    var progress:Float = 0.0f
 ):Serializable
 
-data class IEpisodeCardData(val id:String,val title:String,val subtitle:String?,val poster:String?,val video:IVideo?):Serializable
+data class IEpisodeCardData(val id:String,val title:String,val subtitle:String?,val poster:String?,val video:IVideo?,val progress:Float):Serializable

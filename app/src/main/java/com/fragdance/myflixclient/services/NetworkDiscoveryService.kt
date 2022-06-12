@@ -38,7 +38,7 @@ class NetworkDiscoveryService(context:Context) {
                 Timber.tag(Settings.TAG).d("Resolve Succeeded. $serviceInfo")
 
                 if (serviceInfo.serviceName === mServiceName) {
-                    Log.d(Settings.TAG, "Same IP.")
+
                     return
                 }
                 mService = serviceInfo
@@ -60,13 +60,9 @@ class NetworkDiscoveryService(context:Context) {
     private fun initializeDiscoveryListener() {
         discoveryListener = object : NsdManager.DiscoveryListener {
 
-            override fun onDiscoveryStarted(regType: String) {
-                Timber.tag(Settings.TAG).d( "Service discovery started")
-            }
+            override fun onDiscoveryStarted(regType: String) {}
 
             override fun onServiceFound(service: NsdServiceInfo) {
-                Timber.tag(Settings.TAG).d("Service type "+service.serviceType);
-                Timber.tag(Settings.TAG).d("Service name "+service.serviceName)
                 if(service.serviceType == SERVICE_TYPE && service.serviceName != mServiceName) {
                     Timber.tag(Settings.TAG).d("Service discovery success $service")
                     mServiceName = service.serviceName

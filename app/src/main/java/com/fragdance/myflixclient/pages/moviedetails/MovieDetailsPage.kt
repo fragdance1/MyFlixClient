@@ -10,17 +10,22 @@ import androidx.leanback.widget.*
 import androidx.navigation.fragment.navArgs
 import com.fragdance.myflixclient.MainActivity
 import com.fragdance.myflixclient.R
+import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.personcard.PersonCardPresenter
 import com.fragdance.myflixclient.models.ICast
 import com.fragdance.myflixclient.models.ICrew
 import com.fragdance.myflixclient.models.IMovieDetails
 import com.fragdance.myflixclient.models.IPersonCardData
 import com.fragdance.myflixclient.presenters.MovieDetailsHeroPresenter
+
 import com.fragdance.myflixclient.presenters.PersonRowPresenter
 import com.fragdance.myflixclient.services.movieService
+import com.fragdance.myflixclient.utils.castToPersonCard
+import com.fragdance.myflixclient.utils.crewToPersonCard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 
 
 class MovieDetailsPage : Fragment() {
@@ -48,27 +53,11 @@ class MovieDetailsPage : Fragment() {
         )
     }
 
-    private fun castToPersonCard(cast: ICast):IPersonCardData {
-        return IPersonCardData(
-            cast.person.id.toString(),
-            cast.person.name,
-            cast.character,
-            cast.person.portrait
-        )
-    }
 
-    private fun crewToPersonCard(crew: ICrew):IPersonCardData {
-        return IPersonCardData(
-            crew.person.id.toString(),
-            crew.person.name,
-            crew.job,
-            crew.person.portrait
-        )
-    }
 
     private fun setupView() {
         val content: VerticalGridView = mRootView.findViewById(R.id.content);
-
+        Timber.tag(Settings.TAG).d("setupview "+mDetails)
         if(mDetails is IMovieDetails) {
             // Add movie details
             val rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))

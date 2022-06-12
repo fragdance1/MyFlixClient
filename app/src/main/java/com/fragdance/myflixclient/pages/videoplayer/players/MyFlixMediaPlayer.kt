@@ -26,6 +26,8 @@ interface IVideoPlayer {
 
     fun play()
     fun pause()
+
+    fun getProgress():Float
 }
 
 class MyFlixMediaPlayer:IVideoPlayer {
@@ -57,6 +59,7 @@ class MyFlixMediaPlayer:IVideoPlayer {
     override fun loadVideo(video: IVideo) {
         try {
             mMediaPlayerAdapter.setDataSource(Uri.parse(Settings.SERVER+video.url))
+            mMediaPlayerGlue.title = video.title
         } catch(e:Exception) {
             Timber.tag(Settings.TAG).d("Something went wrong "+e.message)
         }
@@ -96,5 +99,12 @@ class MyFlixMediaPlayer:IVideoPlayer {
 
     override fun pause() {
         mMediaPlayer?.pause()
+    }
+
+    override fun getProgress() : Float{
+        if(mMediaPlayer?.currentPosition != null && mMediaPlayer?.duration != null) {
+            return mMediaPlayer?.currentPosition?.toFloat()!! / mMediaPlayer?.duration?.toFloat()!!
+        }
+        return 0.0f;
     }
 }

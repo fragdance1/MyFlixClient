@@ -4,11 +4,12 @@ import android.os.Handler
 import android.os.Looper
 import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.models.ITVShow
+import com.fragdance.myflixclient.models.IVideo
 
 class Settings {
     companion object {
         // Address to the backend server. Should be set in settings later on
-        var SERVER:String = "http://192.168.2.80:5001";//"http://10.10.10.233:5001"
+        var SERVER:String = "http://192.168.1.79:5001";//"http://10.10.10.233:5001"
         // Just for debug logs
         const val TAG:String = "MyFlix"
 
@@ -18,12 +19,12 @@ class Settings {
 
         /* All the local movies */
         var movies:List<IMovie> = listOf()
+        /* All the local tv-shows */
         var tvshows:List<ITVShow> = listOf()
-        var boxoffice:List<IMovie> = listOf()
 
-        var startMovies:MutableMap<String,List<IMovie>> = mutableMapOf<String,List<IMovie>>()
+        var startMovies:MutableMap<String,List<IMovie>> = mutableMapOf()
 
-        val MOVIE_GENRES = arrayOf<String>(
+        val MOVIE_GENRES = arrayOf(
             "Action",
             "Adventure",
             "Animation",
@@ -46,7 +47,6 @@ class Settings {
             "War",
             "Western"
         )
-
-        val mainThreadHandler = Handler(Looper.getMainLooper())
+        var playList:List<IVideo>? = null
     }
 }

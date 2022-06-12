@@ -47,5 +47,15 @@
             android:color="#ffffff"
             android:text="TextView" />
 
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="#ED0F0F"
+        android:backgroundTint="#787878"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#FF0000"
+ />
 </androidx.appcompat.widget.LinearLayoutCompat>

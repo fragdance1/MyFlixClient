@@ -7,7 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.view.setMargins
 
 import androidx.leanback.widget.BaseCardView
 import com.fragdance.myflixclient.R
@@ -17,6 +20,7 @@ class MovieCard(context: Context, attrs: AttributeSet?): BaseCardView(context,at
     var mWidth:Float = 0.0f
     lateinit var mPoster:ImageView
     lateinit var mTitle: TextView
+    lateinit var mProgress: ProgressBar
 
     init {
         buildImageCardView()
@@ -44,8 +48,10 @@ class MovieCard(context: Context, attrs: AttributeSet?): BaseCardView(context,at
         inflater.inflate(R.layout.movie_card,this)
         val overlay:View = findViewById<View>(R.id.movie_card_info)
         val card = findViewById<ViewGroup>(R.id.movie_card)
+        mProgress = findViewById<ProgressBar>(R.id.progressBar)
         card.layoutParams.width =  mWidth.toInt()
         card.layoutParams.height = mHeight.toInt()
+
         mPoster = findViewById(R.id.poster)
         mTitle = findViewById(R.id.movie_card_title)
         overlay.translationY = mHeight

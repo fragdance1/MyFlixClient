@@ -6,9 +6,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.leanback.widget.BrowseFrameLayout
@@ -16,25 +21,17 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import com.fragdance.myflixclient.models.IMovie
-import com.fragdance.myflixclient.services.NetworkDiscoveryService
-import com.fragdance.myflixclient.services.movieService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import android.net.wifi.WifiManager
-import android.os.Handler
-import android.os.Looper
-import android.view.Gravity
-import android.view.ViewGroup
-import android.widget.TextView
 import com.fragdance.myflixclient.models.ITVShow
 import com.fragdance.myflixclient.services.FayeService
+import com.fragdance.myflixclient.services.NetworkDiscoveryService
+import com.fragdance.myflixclient.services.movieService
 import com.fragdance.myflixclient.services.sonarrService
 import com.fragdance.myflixclient.utils.isEmulator
 import org.cometd.bayeux.Message
-import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import timber.log.Timber
-
 
 class MainView(context: Context, attrs: AttributeSet) : BrowseFrameLayout(context, attrs) {
 
@@ -46,7 +43,6 @@ class MainActivity : FragmentActivity() {
     private lateinit var mRootView: BrowseFrameLayout
     private lateinit var mBonjour: NetworkDiscoveryService
     private var mServerFoundReceiver: BroadcastReceiver? = null
-    private var multicastLock: WifiManager.MulticastLock? = null
 
     // Load all the local movies into settings
     private fun loadMovies() {
@@ -54,6 +50,9 @@ class MainActivity : FragmentActivity() {
         requestCall.enqueue(object : Callback<List<IMovie>> {
             override fun onResponse(call: Call<List<IMovie>>, response: Response<List<IMovie>>) {
                 if (response.isSuccessful) {
+                    var editor = getSharedPreferences("myflix",MODE_PRIVATE).edit();
+                    editor.putString("server",Settings.SERVER)
+                    editor.commit()
                     Timber.tag(Settings.TAG).d("Movies loaded");
                     Settings.movies = response.body()!!
                     val intent = Intent()
@@ -76,6 +75,7 @@ class MainActivity : FragmentActivity() {
         })
     }
 
+    // Load all the local tv shows into settings
     private fun loadTVShows() {
         val requestCall = sonarrService.getSeries()
         requestCall.enqueue(object : Callback<List<ITVShow>> {
@@ -102,10 +102,7 @@ class MainActivity : FragmentActivity() {
         })
     }
 
-    fun test(message: Message?): Unit {
-
-    }
-
+    // Show a toast
     private fun showToast(message: String) {
         Handler(Looper.getMainLooper()).post {
             // Code here will run in UI thread
@@ -136,60 +133,62 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var service = FayeService()
-        service.subscribe("/test/toaster") { message ->
+        mInstance = this;
+
+        FayeService.create()
+        FayeService.subscribe("/test/toaster") { message ->
             run {
-                Timber.tag(Settings.TAG).d("Toast inside activity")
+
                 showToast("Toast inside activity")
             }
         }
-        service.subscribe("/torrent/download") { message: Message? ->
+        FayeService.subscribe("/torrent/download") { message: Message? ->
             run {
                 if (message is Message) {
                     val obj = message?.dataAsMap
                     if (obj["msg"] == "finished") {
-                        Timber.tag(Settings.TAG).d("Finished downloading")
                         this.showToast("Finished downloading " + obj["folder"])
                     }
-
-                    // Timber.tag(Settings.TAG).d("Torrent download " + obj)
                 }
             }
         }
-        MainActivity.mInstance = this;
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        // Get window dimensions
+        //window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val displayMetrics = this.resources.displayMetrics
         Settings.WIDTH = displayMetrics.widthPixels.toFloat()
         Settings.HEIGHT = displayMetrics.heightPixels.toFloat()
-
-        if (isEmulator()) { // Bonjour doesn't work on emulator
-            Timber.tag(Settings.TAG).d("Running on emulator");
-            Settings.SERVER = "http://192.168.1.80:5001"
-            loadStartingPage()
+        var preferences = getSharedPreferences("myflix",MODE_PRIVATE)
+        //SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        var server = preferences.getString("server",null);
+        if(server is String) {
+            Timber.tag(Settings.TAG).d("Got server from preferences");
+            Settings.SERVER = server;
+            loadStartingPage();
         } else {
-            mServerFoundReceiver = object : BroadcastReceiver() {
-                override fun onReceive(p0: Context?, p1: Intent?) {
-                    Timber.tag(Settings.TAG).d("Server received " + Settings.SERVER)
-                    loadStartingPage()
+
+            if (isEmulator()) { // Bonjour doesn't work on emulator
+                Timber.tag(Settings.TAG).d("Running on emulator");
+                Settings.SERVER = "http://192.168.1.79:5001"
+                loadStartingPage()
+            } else {
+                mServerFoundReceiver = object : BroadcastReceiver() {
+                    override fun onReceive(p0: Context?, p1: Intent?) {
+                        Timber.tag(Settings.TAG).d("Server received " + Settings.SERVER)
+                        loadStartingPage()
+                    }
                 }
+                val filter = IntentFilter()
+                filter.addAction("server_found")
+                applicationContext.registerReceiver(mServerFoundReceiver, filter)
+                mBonjour = NetworkDiscoveryService(applicationContext)
             }
-            val filter = IntentFilter()
-            filter.addAction("server_found")
-            applicationContext.registerReceiver(mServerFoundReceiver, filter)
-            mBonjour = NetworkDiscoveryService(applicationContext)
         }
-
-
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        /*
-        if(multicastLock is WifiManager.MulticastLock) {
-            multicastLock?.release()
-        }
 
-         */
         if (mServerFoundReceiver != null) {
             applicationContext.unregisterReceiver(mServerFoundReceiver)
             mServerFoundReceiver = null
@@ -220,11 +219,7 @@ class MainActivity : FragmentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (intent == null) {
-            return
-        }
     }
-
 
     companion object {
         lateinit var mInstance: MainActivity

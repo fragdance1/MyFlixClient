@@ -13,7 +13,7 @@ data class PlaybackFragmentArgs(val playlist: IPlayList) : NavArgs {
             // Simplify since we only have serializable
             bundle.setClassLoader(PlaybackFragmentArgs::class.java.classLoader)
             val playlist: IPlayList?
-            Timber.tag(Settings.TAG).d("fromBundle "+bundle)
+            //Timber.tag(Settings.TAG).d("fromBundle "+bundle)
             if (bundle.containsKey("playlist")) {
                 playlist = bundle.get("playlist") as IPlayList?
             } else {

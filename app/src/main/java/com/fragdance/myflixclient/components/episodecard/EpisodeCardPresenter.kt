@@ -8,10 +8,12 @@ import androidx.core.os.bundleOf
 import androidx.leanback.widget.Presenter
 import androidx.navigation.findNavController
 import com.fragdance.myflixclient.R
+import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.models.IEpisodeCardData
 import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.models.IVideo
 import com.squareup.picasso.Picasso
+import timber.log.Timber
 
 
 class EpisodeCardPresenter : Presenter() {
@@ -29,6 +31,7 @@ class EpisodeCardPresenter : Presenter() {
 
             v.mTitle.text = item.title
             v.mSubtitle.text = item.subtitle
+            v.mProgress.setProgress((item.progress * 100).toInt())
             Picasso.get()
                 .load(item.poster)
                 .fit()
@@ -45,10 +48,20 @@ class EpisodeCardPresenter : Presenter() {
 
             v.setOnClickListener() {
                 if (item.video is IVideo) {
-                    var playList = IPlayList()
-                    playList.videos.add(item.video)
-                    val bundle = bundleOf("playlist" to playList)
-
+                    var playlist = IPlayList()
+                    Timber.tag(Settings.TAG).d("Item is "+item.video)
+                    Timber.tag(Settings.TAG).d("Playlist is "+Settings.playList)
+                    if(Settings.playList is ArrayList<IVideo>) {
+                        // Get index of item
+                            var index = (Settings.playList as ArrayList<IVideo>).indexOfFirst { it.id == item.video.id }
+                        Timber.tag(Settings.TAG).d("Index of item is "+index)
+                        playlist.videos = (Settings.playList as ArrayList<IVideo>)!!;
+                        playlist.position = index.toLong()
+                    } else {
+                        playlist.videos.add(item.video)
+                        playlist.position = 0;
+                    }
+                    val bundle = bundleOf("playlist" to playlist)
                     v.findNavController().navigate(R.id.action_global_video_player, bundle)
                 }
 

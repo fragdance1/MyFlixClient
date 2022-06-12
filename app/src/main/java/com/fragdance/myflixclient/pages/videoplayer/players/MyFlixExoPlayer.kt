@@ -44,6 +44,7 @@ class MyFlixExoPlayer:IVideoPlayer {
     private var mSubtitle: Subtitle? = null
     var mExoplayer: ExoPlayer? = null
 
+
     private fun prepareGlue(localExoplayer: ExoPlayer) {
         //Timber.tag(Settings.TAG).d("prepareGlue");
         mExoPlayerGlue = ProgressTransportControlGlue(
@@ -130,7 +131,7 @@ class MyFlixExoPlayer:IVideoPlayer {
         }
         mExoplayer!!.prepare()
         prepareGlue(mExoplayer!!)
-
+        mExoPlayerGlue.title = video.title
     }
 
     override fun disableInternalSubtitle() {
@@ -160,6 +161,7 @@ class MyFlixExoPlayer:IVideoPlayer {
     }
 
     override fun destroy() {
+
         mMediaSession.isActive = false
         mMediaSessionConnector.setPlayer(null)
         mExoplayer?.let {
@@ -178,4 +180,7 @@ class MyFlixExoPlayer:IVideoPlayer {
         return mTrackSelector
     }
 
+    override fun getProgress():Float {
+        return mExoplayer!!.currentPosition.toFloat() /mExoplayer!!.contentDuration.toFloat()
+    }
 }

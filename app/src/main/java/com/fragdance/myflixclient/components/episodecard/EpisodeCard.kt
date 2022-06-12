@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.leanback.widget.BaseCardView
 import com.fragdance.myflixclient.R
@@ -12,7 +13,7 @@ class EpisodeCard(context: Context): BaseCardView(context) {
     lateinit var mPoster: ImageView
     lateinit var mTitle: TextView
     lateinit var mSubtitle:TextView
-
+    lateinit var mProgress:ProgressBar
     init {
         buildEpisodeCardView()
     }
@@ -32,5 +33,6 @@ class EpisodeCard(context: Context): BaseCardView(context) {
         mPoster = findViewById(R.id.portrait)
         mTitle = findViewById(R.id.card_title)
         mSubtitle = findViewById(R.id.card_subtitle)
+        mProgress = findViewById(R.id.progressBar)
     }
 }

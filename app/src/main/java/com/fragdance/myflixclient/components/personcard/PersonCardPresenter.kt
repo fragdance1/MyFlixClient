@@ -32,7 +32,7 @@ class PersonCardPresenter: Presenter() {
             .fit()
             .into(v.mPoster)
         v.setOnClickListener() {
-            Timber.tag(Settings.TAG).d("Item clicked"+person.title)
+
             val bundle = bundleOf("id" to item.id)
 
             v.findNavController().navigate(
