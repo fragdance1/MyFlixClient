@@ -4,6 +4,7 @@ import com.fragdance.myflixclient.models.IOpenSubtitle
 import com.fragdance.myflixclient.models.ISubtitle
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SubtitleService {
@@ -14,8 +15,8 @@ interface SubtitleService {
 interface SubtitleStringService {
     @GET("subtitle/download")
     fun downloadSubtitle(@Query("url") url:String,@Query("video_id") vide_if:Long?):Call<String>
-    @GET("subtitle/get")
-    fun get(@Query("id") id:Int):Call<String>
+    @GET("subtitle/{id}")
+    fun get(@Path("id") id:Int):Call<String>
 }
 val subtitleService = JSONServiceBuilder.buildService(SubtitleService::class.java);
 val subtitleStringService = StringServiceBuilder.buildService(SubtitleStringService::class.java);

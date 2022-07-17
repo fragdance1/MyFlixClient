@@ -8,6 +8,14 @@ data class ITorrent (
     val quality:String
 ): Serializable
 
+data class IStatus (
+    val status:String
+    ):Serializable
+
+data class ITorrentStatus (
+    val status:String
+):Serializable
+
 data class IMovieTorrent(
         val id:String,
         val poster:String,

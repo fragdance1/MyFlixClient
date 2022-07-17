@@ -26,7 +26,7 @@ fun crewToPersonCard(crew: ICrew): IPersonCardData {
 fun crewToMovieCard(crew: ICrew): IMovieCardData {
     return IMovieCardData(
         crew.movie?.id.toString(),
-        crew.movie?.title!!,
+        if(crew.movie?.title != null)crew.movie?.title!! else "No title",
         crew.job,
         crew.movie?.poster,
         crew.movie?.progress

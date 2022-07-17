@@ -6,16 +6,16 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
-
+import java.util.concurrent.TimeUnit
 
 
 object JSONServiceBuilder {
     var BASE_URL = Settings.SERVER+"/api/"
-    private val okHttp = OkHttpClient.Builder()
+    private val okHttp = OkHttpClient.Builder().callTimeout(60,TimeUnit.SECONDS).build()
 
     private val builder = Retrofit.Builder().baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
-        .client(okHttp.build())
+        .client(okHttp)
 
     private val retrofit = builder.build()
 

@@ -27,6 +27,17 @@
         android:name="com.fragdance.myflixclient.pages.movies.TVShowsPage">
     </fragment>
 
+    <fragment android:id="@+id/searchPage"
+        android:name="com.fragdance.myflixclient.pages.search.SearchPage">
+
+    </fragment>
+    <fragment android:id="@+id/personMoviesPage"
+        android:name="com.fragdance.myflixclient.pages.person_movies.PersonMoviesPage">
+        <argument
+            android:name="id"
+            app:argType="string"
+            />
+    </fragment>
     <fragment android:id="@+id/personDetails"
         android:name="com.fragdance.myflixclient.pages.persondetails.PersonDetailsPage">
         <argument
@@ -88,6 +99,8 @@
         app:popUpTo="@+id/main_nav_graph"
         app:destination="@id/moviesPage"/>
 
+    <action android:id="@+id/action_global_person_movies"
+        app:destination="@id/personMoviesPage"/>
     <action android:id="@+id/action_global_tvshows"
         app:popUpTo="@+id/main_nav_graph"
         app:destination="@id/tvshowsPage"/>
@@ -95,14 +108,20 @@
     <action android:id="@+id/action_global_person_details"
         app:destination="@id/personDetails"
         app:enterAnim="@anim/fragment_slide_left_enter"/>
+
     <action android:id="@+id/action_global_movie_details"
         app:destination="@id/movieDetailsFragment"
+
         app:enterAnim="@anim/fragment_slide_left_enter" />
+
     <action android:id="@+id/action_global_video_player"
         app:destination="@id/playbackFragment"
         app:enterAnim="@anim/fragment_slide_left_enter" />
     <action android:id="@+id/action_global_settings"
         app:destination="@id/settingsPage"
+        app:enterAnim="@anim/fragment_slide_left_enter"/>
+    <action android:id="@+id/action_global_search"
+        app:destination="@id/searchPage"
         app:enterAnim="@anim/fragment_slide_left_enter"/>
     <action
         android:id="@+id/action_global_tvshow_details"

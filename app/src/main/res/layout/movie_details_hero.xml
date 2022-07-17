@@ -23,10 +23,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.5"
+            android:adjustViewBounds="true"
             android:descendantFocusability="afterDescendants"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:adjustViewBounds="true"
             android:scaleType="centerCrop" />
 
         <com.fragdance.myflixclient.components.action_bar.ActionBar
@@ -47,6 +47,14 @@
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="24sp"
+                 />
 
             <TextView
                 android:id="@+id/genres"
@@ -73,4 +81,15 @@
         android:layout_x="100dp"
         android:layout_y="120dp"
          />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="260dp"
+        android:layout_height="99dp"
+        android:layout_x="350dp"
+        android:layout_y="0dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
+        android:scaleType="centerCrop" />
+
 </AbsoluteLayout>

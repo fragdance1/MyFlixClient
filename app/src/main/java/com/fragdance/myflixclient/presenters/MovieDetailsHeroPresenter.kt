@@ -9,10 +9,7 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.action_bar.ActionBar
 import com.fragdance.myflixclient.components.action_bar.ActionBarButtonPresenter
-import com.fragdance.myflixclient.models.IMovieDetails
-import com.fragdance.myflixclient.models.IMovieTorrent
-import com.fragdance.myflixclient.models.ITVShow
-import com.fragdance.myflixclient.models.IVideo
+import com.fragdance.myflixclient.models.*
 import com.fragdance.myflixclient.pages.persondetails.IAction
 import com.fragdance.myflixclient.services.torrentService
 import com.fragdance.myflixclient.views.MovieDetailsHeroView
@@ -23,11 +20,7 @@ import retrofit2.Response
 import com.fragdance.myflixclient.utils.movieDetailsToVideo
 import timber.log.Timber
 
-data class IAction(
-    val name:String,
-    val video: IVideo // Can be -1 for not downloaded yet
 
-)
 
 
 class MovieDetailsHeroPresenter:Presenter() {
@@ -45,31 +38,25 @@ class MovieDetailsHeroPresenter:Presenter() {
 
         // Load backdrop
         var backdropView: ImageView = v.findViewById(R.id.backdrop)
+        var titleView:TextView = v.findViewById(R.id.title)
+        var logoView:ImageView = v.findViewById(R.id.logo)
         var backdropUrl: String? = null
         var posterUrl: String? = null
+        var logoUrl:String? = null
         var summary: String? = null
-
+        var title:String? = null
         when (item) {
             is IMovieDetails -> {
-                if (item.backdrop is String) {
-                    backdropUrl =
-                        if (item.backdrop!!.startsWith("http")) item.backdrop else Settings.SERVER + item.backdrop
-                }
-                if (item.poster is String) {
-                    posterUrl =
-                        if (item.poster!!.startsWith("http")) item.poster else Settings.SERVER + item.poster
-                }
+                backdropUrl = Settings.SERVER+"/api/backdrop/movie/"+item.id;
+                posterUrl = Settings.SERVER+"/api/poster/movie/"+item.id;
+                logoUrl = Settings.SERVER+"/api/logo/movie/"+item.id
                 summary = item.overview
+                title = item.title + (if (item.year != 0) " ("+item.year+")" else "")
+
             }
             is ITVShow -> {
-                if (item.backdrop is String) {
-                    backdropUrl =
-                        if (item.backdrop!!.startsWith("http")) item.backdrop else Settings.SERVER + item.backdrop
-                }
-                if (item.poster is String) {
-                    posterUrl =
-                        if (item.poster!!.startsWith("http")) item.poster else Settings.SERVER + item.poster
-                }
+                backdropUrl = Settings.SERVER+"/api/backdrop/tv/"+item.id
+                posterUrl = Settings.SERVER+"/api/poster/tv/"+item.id
                 summary = item.overview
             }
         }
@@ -80,12 +67,11 @@ class MovieDetailsHeroPresenter:Presenter() {
                 .fit()
                 .centerCrop(Gravity.TOP)
                 .into(backdropView)
-
-
-
-
         }
 
+        if(logoUrl != null) {
+            Picasso.get().load(logoUrl).fit().into(logoView)
+        }
         // Load poster
         if (posterUrl != null) {
 
@@ -105,10 +91,15 @@ class MovieDetailsHeroPresenter:Presenter() {
         var genres: TextView = v.findViewById(R.id.genres)
         var lp: LinearLayout.LayoutParams = genres.layoutParams as LinearLayout.LayoutParams;
         lp.leftMargin = (Settings.WIDTH * 0.32).toInt()
+
+        lp.bottomMargin = (Settings.WIDTH * 0.015).toInt();
+
+        genres.text = "Genres"
+        titleView.text = title
+        lp = titleView.layoutParams as LinearLayout.LayoutParams;
+        lp.leftMargin = (Settings.WIDTH * 0.32).toInt()
         lp.topMargin = (Settings.WIDTH * 0.015).toInt();
         lp.bottomMargin = (Settings.WIDTH * 0.015).toInt();
-        genres.text = "Genres"
-
 
         // Summary / synopsis
         if (summary != null) {
@@ -125,7 +116,7 @@ class MovieDetailsHeroPresenter:Presenter() {
         var actionBar: ActionBar = v.findViewById(R.id.movie_details_actions)
 
         var actions: HorizontalGridView =
-            actionBar.getGridView()//v.findViewById(R.id.movie_details_actions)
+            actionBar.getGridView()
 
 
         var rowsAdapter = ArrayObjectAdapter(createPresenterSelector())
@@ -142,25 +133,26 @@ class MovieDetailsHeroPresenter:Presenter() {
 
         if (item is IMovieDetails) {
             //Timber.tag(Settings.TAG).d("details "+item)
-            if (item.url != null) {
-                actionsAdapter.add(IAction("Play", movieDetailsToVideo(item)));
+            if (item.video_files != null && item.video_files.isNotEmpty()) {
+                actionsAdapter.add(IAction("Play", movieDetailsToVideo(item),""));
             }
+            Timber.tag(Settings.TAG).d("IMDB id "+item.imdb_id)
 
             val getMovieTorrents = torrentService.getMovieTorrents(item.imdb_id)
-            getMovieTorrents.enqueue(object : Callback<IMovieTorrent> {
+            getMovieTorrents.enqueue(object : Callback<List<ITorrent>> {
                 override fun onResponse(
-                    call: Call<IMovieTorrent>,
-                    response: Response<IMovieTorrent>
+                    call: Call<List<ITorrent>>,
+                    response: Response<List<ITorrent>>
                 ) {
                     if (response.isSuccessful) {
-                        val torrents: IMovieTorrent = response.body()!!
-                        for (torrent in torrents.torrents) {
+                        val torrents: List<ITorrent> = response.body()!!
+                        for (torrent in torrents) {
                             actionsAdapter.add(
                                 IAction(
                                     torrent.quality, IVideo(
                                         item.id.toLong(),
                                         "mkv",
-                                        torrents.title,
+                                        item.title,
                                         null,
                                         null,
 
@@ -171,7 +163,7 @@ class MovieDetailsHeroPresenter:Presenter() {
                                         null,
                                         null,
                                         null
-                                    )
+                                    ),null
                                 )
                             )
                         }
@@ -179,8 +171,8 @@ class MovieDetailsHeroPresenter:Presenter() {
                     }
                 }
 
-                override fun onFailure(call: Call<IMovieTorrent>, t: Throwable) {
-                    Toast.makeText(v.context, "Something went wrong $t", Toast.LENGTH_LONG).show()
+                override fun onFailure(call: Call<List<ITorrent>>, t: Throwable) {
+                    Toast.makeText(v.context, "GetMovieTorrents Something went wrong $t", Toast.LENGTH_LONG).show()
                 }
 
             })

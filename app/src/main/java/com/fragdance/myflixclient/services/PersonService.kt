@@ -5,11 +5,15 @@ import com.fragdance.myflixclient.models.IMovieDetails
 import com.fragdance.myflixclient.models.IPersonDetails
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface PersonService {
-    @GET("person/details")
-    fun getPersonDetails(@Query("id") id:Int):Call<IPersonDetails>
+    @GET("person/details/{id}")
+    fun getPersonDetails(@Path("id") id:Int):Call<IPersonDetails>
+
+    @GET("person/movies/{id}")
+    fun getMovies(@Path("id") id:String):Call<List<IMovie>>
 }
 
 val personService  = JSONServiceBuilder.buildService(PersonService::class.java)

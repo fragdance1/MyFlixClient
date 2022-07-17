@@ -45,5 +45,6 @@ data class IMovieDetails(
     var crew:List<ICrew>,
     var imdb_id:String,
     var video_files:List<IVideoFile> = emptyList(),
-    var progress:Float
+    var progress:Float,
+    var year:Int
 ):Serializable

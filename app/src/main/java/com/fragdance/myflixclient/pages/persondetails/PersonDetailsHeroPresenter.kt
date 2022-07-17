@@ -1,30 +1,20 @@
 package com.fragdance.myflixclient.pages.persondetails
 
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.leanback.widget.*
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.components.action_bar.ActionBar
-import com.fragdance.myflixclient.components.action_bar.ActionBarButtonPresenter
 import com.fragdance.myflixclient.models.*
-import com.fragdance.myflixclient.presenters.IAction
 import com.fragdance.myflixclient.presenters.PersonRowPresenter
-import com.fragdance.myflixclient.services.torrentService
-import com.fragdance.myflixclient.views.MovieDetailsHeroView
 import com.squareup.picasso.Picasso
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import com.fragdance.myflixclient.utils.movieDetailsToVideo
 import timber.log.Timber
 
 data class IAction(
     val name:String,
-    val video: IVideo // Can be -1 for not downloaded yet
-
+    val video: IVideo?, // Can be -1 for not downloaded yet
+    val person:String?
 )
 
 
@@ -52,10 +42,13 @@ class PersonDetailsHeroPresenter:Presenter() {
         var summary: String? = null
         Timber.tag(Settings.TAG).d("Person "+item)
         if(item is IPersonDetails) {
+            var portrait =
+                if (item.id != null) (Settings.SERVER + "/api/portrait/" + item.id) else item.portrait
+
             Picasso.get()
-                .load(item.portrait)
+                .load(portrait)
                 .into(portraitView)
-nameView.text = item.name
+            nameView.text = item.name
             biographyView.text = item.biography
         }
     }

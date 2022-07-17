@@ -53,8 +53,6 @@ class MovieDetailsPage : Fragment() {
         )
     }
 
-
-
     private fun setupView() {
         val content: VerticalGridView = mRootView.findViewById(R.id.content);
         Timber.tag(Settings.TAG).d("setupview "+mDetails)
@@ -74,8 +72,10 @@ class MovieDetailsPage : Fragment() {
 
             // Add row of crew members
             val crewAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-                for (crew in mDetails!!.crew) {
-                    add(crewToPersonCard(crew))
+                if(mDetails!!.crew != null) {
+                    for (crew in mDetails!!.crew) {
+                        add(crewToPersonCard(crew))
+                    }
                 }
             }
             rowsAdapter.add(ListRow(HeaderItem(0, "Crew"), crewAdapter))

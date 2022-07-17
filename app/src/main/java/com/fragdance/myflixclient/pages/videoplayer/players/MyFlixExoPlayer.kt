@@ -46,7 +46,7 @@ class MyFlixExoPlayer:IVideoPlayer {
 
 
     private fun prepareGlue(localExoplayer: ExoPlayer) {
-        //Timber.tag(Settings.TAG).d("prepareGlue");
+        Timber.tag(Settings.TAG).d("prepareGlue");
         mExoPlayerGlue = ProgressTransportControlGlue(
             mContext,
             LeanbackPlayerAdapter(
@@ -67,7 +67,7 @@ class MyFlixExoPlayer:IVideoPlayer {
         mExoPlayerGlue.host.isControlsOverlayAutoHideEnabled = true
     }
     private fun createMediaSession() {
-        //Timber.tag(Settings.TAG).d("createMediaSession");
+        Timber.tag(Settings.TAG).d("createMediaSession "+mContext);
         mMediaSession = MediaSessionCompat(mContext, VideoPlayerFragment.MEDIA_SESSION_TAG)
 
         // Connect media session to player (exoplayer)

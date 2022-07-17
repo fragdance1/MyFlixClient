@@ -27,7 +27,7 @@ class MovieCardPresenter: Presenter() {
         if(item is IMovie) {
             Timber.tag(Settings.TAG).d("IMovie Progress is "+item.progress)
             var poster =
-                if (item.id != null) (Settings.SERVER + "/api/poster/" + item.id+"?type=movie") else item.poster
+                if (item.id != null) (Settings.SERVER + "/api/poster/movie/" + item.id) else item.poster
 
             v.mTitle.text = item.title
             Picasso.get()
@@ -35,7 +35,7 @@ class MovieCardPresenter: Presenter() {
                 .fit()
                 .into(v.mPoster)
             v.setOnClickListener {
-                val bundle = bundleOf("id" to item.id)
+                var bundle = bundleOf("id" to item.id)
 
                 v.findNavController().navigate(
                     R.id.action_global_movie_details, bundle
@@ -49,8 +49,8 @@ class MovieCardPresenter: Presenter() {
                 v.mProgress.visibility = View.VISIBLE
             }
         } else if(item is IMovieCardData) {
-            var poster = if(item.id != null)  (Settings.SERVER+"/api/poster/"+item.id+"?type=movie") else item.poster
-
+            var poster = if(item.id != null)  (Settings.SERVER+"/api/poster/movie/"+item.id) else item.poster
+            Timber.tag(Settings.TAG).d(poster)
             v.mTitle.text = item.title
             Picasso.get()
                 .load(poster)

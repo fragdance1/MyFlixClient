@@ -5,17 +5,18 @@ import com.fragdance.myflixclient.models.IMovieDetails
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MovieService {
-    @GET("movie/all")
+    @GET("movies")
     fun getLocalMovies(): Call<List<IMovie>>
 
     @GET("movie/latest")
     fun getLatestMovies(): Call<List<IMovie>>
 
-    @GET("movie/details")
-    fun getMovieDetails(@Query("id") id:String):Call<IMovieDetails>
+    @GET("movie/details/{id}")
+    fun getMovieDetails(@Path("id") id:String):Call<IMovieDetails>
 
     @GET("movie/boxoffice")
     fun getBoxOfficeMovies():Call<List<IMovie>>
@@ -26,8 +27,8 @@ interface MovieService {
     @GET("movie/trending")
     fun getTrendingMovies():Call<List<IMovie>>
 
-    @GET("movie/genre")
-    fun getMoviesByGenre(@Query("genre") genre:String):Call<List<IMovie>>
+    @GET("movie/genre/{genre}")
+    fun getMoviesByGenre(@Path("genre") genre:String):Call<List<IMovie>>
 }
 
 val movieService  = JSONServiceBuilder.buildService(MovieService::class.java)

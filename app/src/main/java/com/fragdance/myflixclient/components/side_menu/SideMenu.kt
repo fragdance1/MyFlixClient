@@ -60,7 +60,8 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
             0 -> findNavController(findFragment()).navigate(R.id.action_global_home)
             1 -> findNavController(findFragment()).navigate(R.id.action_global_movies);
             2 -> findNavController(findFragment()).navigate(R.id.action_global_tvshows);
-            4-> findNavController(findFragment()).navigate(R.id.action_global_settings)
+            4-> findNavController(findFragment()).navigate(R.id.action_global_settings);
+            5 -> findNavController(findFragment()).navigate(R.id.action_global_search);
         }
         closeSidePanel()
     }
@@ -103,6 +104,8 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
         iconsView.addView(createIconView(R.drawable.ic_search_solid))
         labelsView.addView(createMenuItem("Settings"))
         iconsView.addView(createIconView(R.drawable.ic_settings));
+        labelsView.addView(createMenuItem("Search"));
+        iconsView.addView(createIconView(R.drawable.ic_search_solid));
         setActiveMenuItem(0);
         onFocusChangeListener = View.OnFocusChangeListener { view, b ->
             if(b) {

@@ -10,9 +10,11 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.models.ITorrentDetails
+import com.fragdance.myflixclient.models.ITorrentStatus
 import com.fragdance.myflixclient.models.IVideo
 
 import com.fragdance.myflixclient.pages.persondetails.IAction
+import com.fragdance.myflixclient.services.FayeService
 import com.fragdance.myflixclient.services.torrentService
 import retrofit2.Call
 import retrofit2.Callback
@@ -37,56 +39,70 @@ class ActionBarButtonPresenter: Presenter() {
 
         v.setOnClickListener() {
             var playList = IPlayList()
-            if(item.video.hash != null) {
-                // Clicked a torrent
-                val addMovieTorrentCall = torrentService.addMovieTorrent(item.video.url!!,item.video.id)
-
-                addMovieTorrentCall.enqueue(object : Callback<ITorrentDetails> {
-                    override fun onResponse(
-                        call: Call<ITorrentDetails>,
-                        response: Response<ITorrentDetails>
-                    ) {
-                        val details:ITorrentDetails = response.body()!!
-                        val files = details.files.sortedBy { it.length }.reversed()
-                        val filename = files[0].name
-                        val ext = File(filename).extension
-
-                        val url = "/api/torrent/stream?hash="+details.hash+"&file="+files[0].name
-
-                        val video = IVideo(
-                            item.video.id,
-                            ext,
-                            item.video.title,
-                            item.video.poster,
-                            item.video.overview,
-                            url,
-                            details.hash,
-                        emptyList(),
-
-                            item.video.type,
-                            item.video.tmdbId,
-                            item.video.imdbId
+            if(item.video is IVideo) {
+                /*
+                if (item.video?.hash != null) {
+                    // Clicked a torrent
+                    val addMovieTorrentCall =
+                        torrentService.addMovieTorrent(item.video.url!!, item.video.id,
+                            item.video.hash!!
                         )
+                    FayeService.subscribe("/torrent/"+item.video.hash!!) { message ->
+                        run {
 
-                        playList.videos.add(video)
+                            Timber.tag(Settings.TAG).d("Message "+message)
+                        }
+                    }
+                    addMovieTorrentCall.enqueue(object : Callback<ITorrentStatus> {
+                        override fun onResponse(
+                            call: Call<ITorrentStatus>,
+                            response: Response<ITorrentStatus>
+                        ) {
+                           val url =
+                                "/api/video/torrent/" + item.video.hash
+                            if (item.video is IVideo) {
+                                val video = IVideo(
+                                    item.video.id,
+                                    "mkv",
+                                    item.video.title,
+                                    item.video.poster,
+                                    item.video.overview,
+                                    url,
+                                    item.video.hash,
+                                    emptyList(),
+
+                                    item.video.type,
+                                    item.video.tmdbId,
+                                    item.video.imdbId
+                                )
+
+                                playList.videos.add(video)
+                                val bundle = bundleOf("playlist" to playList)
+
+                                v.findNavController().navigate(
+                                    R.id.action_global_video_player, bundle
+                                )
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ITorrentStatus>, t: Throwable) {
+                            Timber.tag(Settings.TAG).d("ActionButton exception " + t)
+                        }
+
+                    })
+                } else {
+
+                 */
+                    if (item.video is IVideo) {
+                        playList.videos.add(item.video)
                         val bundle = bundleOf("playlist" to playList)
-
-                        v.findNavController().navigate(
-                            R.id.action_global_video_player,bundle)
-
-                    }
-
-                    override fun onFailure(call: Call<ITorrentDetails>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("ActionButton exception "+t)
-                    }
-
-                })
-            } else {
-                // Regular (local) video
-                    Timber.tag(Settings.TAG).d("Play video "+item.video)
-                playList.videos.add(item.video)
-                val bundle = bundleOf("playlist" to playList)
-                v.findNavController().navigate(R.id.action_global_video_player,bundle)
+                        v.findNavController().navigate(R.id.action_global_video_player, bundle)
+                    //}
+                }
+            } else if(item.person is String) {
+                Timber.tag(Settings.TAG).d("Clicked more "+item.person);
+                val bundle = bundleOf("id" to item.person);
+                v.findNavController().navigate(R.id.action_global_person_movies,bundle)
             }
         }
     }

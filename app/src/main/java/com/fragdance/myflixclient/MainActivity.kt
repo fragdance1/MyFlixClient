@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -32,6 +34,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
+import android.Manifest
+import org.json.JSONObject
 
 class MainView(context: Context, attrs: AttributeSet) : BrowseFrameLayout(context, attrs) {
 
@@ -44,6 +48,27 @@ class MainActivity : FragmentActivity() {
     private lateinit var mBonjour: NetworkDiscoveryService
     private var mServerFoundReceiver: BroadcastReceiver? = null
 
+    private fun reloadMovies() {
+        val requestCall = movieService.getLocalMovies()
+        requestCall.enqueue(object : Callback<List<IMovie>> {
+            override fun onResponse(call: Call<List<IMovie>>, response: Response<List<IMovie>>) {
+                if (response.isSuccessful) {
+
+                    Timber.tag(Settings.TAG).d("Movies reloaded");
+                    Settings.movies = response.body()!!
+                    val intent = Intent()
+                    intent.action = "movies_loaded"
+                    intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+                    sendBroadcast(intent)
+                }
+            }
+
+            override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "reloadMovies Something went wrong $t", Toast.LENGTH_LONG)
+                    .show()
+            }
+        })
+    }
     // Load all the local movies into settings
     private fun loadMovies() {
         val requestCall = movieService.getLocalMovies()
@@ -69,7 +94,7 @@ class MainActivity : FragmentActivity() {
             }
 
             override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Something went wrong $t", Toast.LENGTH_LONG)
+                Toast.makeText(this@MainActivity, "Loadmovies Something went wrong $t", Toast.LENGTH_LONG)
                     .show()
             }
         })
@@ -89,14 +114,14 @@ class MainActivity : FragmentActivity() {
                 } else {
                     Toast.makeText(
                         this@MainActivity,
-                        "Something went wrong ${response.message()}",
+                        "loadTVShows Something went wrong ${response.message()}",
                         Toast.LENGTH_LONG
                     ).show()
                 }
             }
 
             override fun onFailure(call: Call<List<ITVShow>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Something went wrong $t", Toast.LENGTH_LONG)
+                Toast.makeText(this@MainActivity, "loadTVShows Something went wrong $t", Toast.LENGTH_LONG)
                     .show()
             }
         })
@@ -134,24 +159,8 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mInstance = this;
-
+        Timber.tag(Settings.TAG).d("Creating faye server")
         FayeService.create()
-        FayeService.subscribe("/test/toaster") { message ->
-            run {
-
-                showToast("Toast inside activity")
-            }
-        }
-        FayeService.subscribe("/torrent/download") { message: Message? ->
-            run {
-                if (message is Message) {
-                    val obj = message?.dataAsMap
-                    if (obj["msg"] == "finished") {
-                        this.showToast("Finished downloading " + obj["folder"])
-                    }
-                }
-            }
-        }
 
         // Get window dimensions
         //window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -163,13 +172,13 @@ class MainActivity : FragmentActivity() {
         var server = preferences.getString("server",null);
         if(server is String) {
             Timber.tag(Settings.TAG).d("Got server from preferences");
-            Settings.SERVER = server;
+            //Settings.SERVER = server;
             loadStartingPage();
         } else {
 
             if (isEmulator()) { // Bonjour doesn't work on emulator
                 Timber.tag(Settings.TAG).d("Running on emulator");
-                Settings.SERVER = "http://192.168.1.79:5001"
+                Settings.SERVER = "http://192.168.1.79:8000"
                 loadStartingPage()
             } else {
                 mServerFoundReceiver = object : BroadcastReceiver() {
@@ -184,6 +193,7 @@ class MainActivity : FragmentActivity() {
                 mBonjour = NetworkDiscoveryService(applicationContext)
             }
         }
+        checkRunTimePermission()
     }
 
     override fun onDestroy() {
@@ -197,6 +207,7 @@ class MainActivity : FragmentActivity() {
 
     private fun loadStartingPage() {
         setContentView(R.layout.activity_main)
+        findViewById<View>(R.id.loading_progress).visibility = View.INVISIBLE
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
@@ -214,11 +225,55 @@ class MainActivity : FragmentActivity() {
         loadMovies()
         loadTVShows()
         navController.graph = navGraph
+
+
+/*
+        if(!FayeService.subscribe("/torrent/test") { message ->
+                run {
+                    val json = JSONObject(message) // String instance holding the above json
+                    val status = json.getString("event")
+                    Timber.tag(Settings.TAG).d("Got a message "+status)
+                }
+            }) {
+            Timber.tag(Settings.TAG).d("Couldn subscribe")
+        } else {
+            Timber.tag(Settings.TAG).d("Subscribed")
+        }
+*/
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
+    }
+
+    // Search stuff
+    private fun checkRunTimePermission() {
+        Timber.tag(Settings.TAG).d("==== checkRuntime Permission")
+
+        val permissionArrays = arrayOf(Manifest.permission.RECORD_AUDIO)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permissionArrays, 11111)
+        } else {
+            Timber.tag(Settings.TAG).d( "==== checkRuntime Permission else")
+            //mFragment.setRecognitionListener()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Timber.tag(Settings.TAG).d( "==== OnPermission Result")
+
+        if (11111 == requestCode && grantResults.isNotEmpty()) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show()
+            }
+            //mFragment.setRecognitionListener()
+        }
     }
 
     companion object {

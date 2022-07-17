@@ -62,10 +62,16 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
                 response: Response<List<ISubtitle>>
             ) {
                 if(response.isSuccessful) {
+
                     val subtitles = response.body() as List<ISubtitle>
+
                     mAdapter.clear()
-                    mAdapter.addAll(0,subtitles)
-                    mVerticalGridView.requestFocus()
+                    if(subtitles.size == 0) {
+                        Timber.tag(Settings.TAG).d("Found no subtitles")
+                    } else {
+                        mAdapter.addAll(0, subtitles)
+                        mVerticalGridView.requestFocus()
+                    }
                 }
             }
 

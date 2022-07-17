@@ -51,8 +51,7 @@ class HomePage: RowsSupportFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //title = "Test"
-        //headersState = HEADERS_ENABLED
+
         loadData()
     }
 }

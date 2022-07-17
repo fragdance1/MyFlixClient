@@ -11,6 +11,7 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.*
 import androidx.fragment.app.FragmentTransaction.*
@@ -27,13 +28,16 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.side_menu.SideMenu
 import com.fragdance.myflixclient.models.IPlayList
+import com.fragdance.myflixclient.models.IStatus
 import com.fragdance.myflixclient.models.ISubtitle
 import com.fragdance.myflixclient.models.IVideo
 import com.fragdance.myflixclient.pages.videoplayer.players.IVideoPlayer
 import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixExoPlayer
 import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixMediaPlayer
 import com.fragdance.myflixclient.pages.videoplayer.tracks.TrackSelectionMenu
+import com.fragdance.myflixclient.services.FayeService
 import com.fragdance.myflixclient.services.subtitleStringService
+import com.fragdance.myflixclient.services.torrentService
 import com.fragdance.myflixclient.services.trakttvService
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter
@@ -46,6 +50,9 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.SubtitleView
 import com.google.android.exoplayer2.upstream.*
 import com.google.common.collect.ImmutableSet
+import org.cometd.bayeux.Message
+import org.json.JSONArray
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -55,6 +62,20 @@ import java.lang.Exception
 import java.net.URI
 import java.time.Duration
 import java.time.LocalDateTime
+
+fun JSONObject.toMap(): Map<String, *> = keys().asSequence().associateWith {
+    when (val value = this[it])
+    {
+        is JSONArray ->
+        {
+            val map = (0 until value.length()).associate { Pair(it.toString(), value[it]) }
+            JSONObject(map).toMap().values.toList()
+        }
+        is JSONObject -> value.toMap()
+        JSONObject.NULL -> null
+        else            -> value
+    }
+}
 
 class VideoPlayerFragment : VideoSupportFragment() {
     // The video currently playing
@@ -121,7 +142,9 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-
+        if(mCurrentVideo?.hash != null) {
+            FayeService.unsubscribe("/torrent/"+mCurrentVideo.hash)
+        }
         activity?.findViewById<View>(R.id.side_menu)?.visibility = VISIBLE;
         activity?.findViewById<View>(R.id.side_menu)?.clearFocus()
     }
@@ -139,6 +162,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     override fun onDestroy() {
         destroyPlayer()
+        activity?.findViewById<View>(R.id.loading_progress)?.visibility = INVISIBLE;
         super.onDestroy()
     }
 
@@ -212,9 +236,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
         }
     }
 
-    private fun addVideo(video: IVideo) {
+    private fun startVideo(video:IVideo) {
         mCurrentVideo = video;
-
         if(video.extension == ".avi") {
             initializeMediaPlayer()
         } else {
@@ -233,6 +256,105 @@ class VideoPlayerFragment : VideoSupportFragment() {
         } else {
             disableSubtitles();
         }
+    }
+
+    private fun addTorrent(video:IVideo) {
+        activity?.findViewById<View>(R.id.loading_progress)?.visibility = VISIBLE;
+        activity?.findViewById<TextView>(R.id.loadingStatus)?.text = "Preparing torrent"
+        val addMovieTorrentCall =
+            torrentService.addMovieTorrent(video.url!!, video.id,
+                video.hash!!
+            )
+        addMovieTorrentCall.enqueue(object : Callback<IStatus> {
+            override fun onResponse(
+                call: Call<IStatus>,
+                response: Response<IStatus>
+            ) {
+                Timber.tag(Settings.TAG).d("Torrent function returned")
+                val url =
+                    "/api/video/torrent/" + video.hash
+            }
+
+            override fun onFailure(call: Call<IStatus>, t: Throwable) {
+                Timber.tag(Settings.TAG).d("Adding torrent exception " + t)
+            }
+
+        })
+    }
+    private fun addVideo(video: IVideo) {
+        mCurrentVideo = video;
+
+        // See if we have a torrent (ie hash != null)
+        if(video.hash != null) {
+            var ready = false
+            // Fire up faye
+
+            FayeService.subscribe("/torrent/"+video.hash) { message ->
+                run {
+                    val jsonObj = JSONObject(message)
+                    val obj = jsonObj.toMap()
+                        //val obj = message?.dataAsMap;
+                        val event = obj["event"]
+                        if(event == "TORRENT_ADDED") {
+                            Timber.tag(Settings.TAG).d("TORRENT_ADDED")
+                            activity?.runOnUiThread {
+                                activity?.findViewById<TextView>(R.id.loadingStatus)?.text =
+                                    obj["msg"].toString();
+                            }
+                        }
+                        if(event == "TORRENT_BUFFERING") {
+                            Timber.tag(Settings.TAG).d(obj["msg"].toString())
+                            activity?.runOnUiThread {
+                                activity?.findViewById<TextView>(R.id.loadingStatus)?.text =
+                                    obj["msg"].toString();
+                            }
+                        }
+                        if(event == "TORRENT_READY") {
+                            ready = true
+                            try {
+                                activity?.runOnUiThread {
+
+                                        activity?.findViewById<View>(R.id.loading_progress)?.visibility = View.INVISIBLE;
+
+                                    var url = "/api/video/torrent/" + video.hash
+                                    val video = IVideo(
+                                        video.id,
+                                        "mkv",
+                                        video.title,
+                                        video.poster,
+                                        video.overview,
+                                        url,
+                                        video.hash,
+                                        emptyList(),
+
+                                        video.type,
+                                        video.tmdbId,
+                                        video.imdbId
+                                    )
+
+                                    startVideo(video)
+                                }
+                            } catch (e:Exception){
+                                Timber.tag(Settings.TAG).d("Exception in runon")
+                            }
+
+                            // Start playing
+
+                        }
+
+                        //FayeService.handshake()
+
+                }
+            }
+            // Add torrent
+
+            Timber.tag(Settings.TAG).d("Got a torrent video")
+            addTorrent(video)
+
+        } else {
+            startVideo(video)
+        }
+
     }
 
     fun next() {
@@ -267,7 +389,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     fun selectExternalSubtitle(index: Int) {
         //mVideoPlayer!!.selectExternalSubtitle(index)
-
+        Timber.tag(Settings.TAG).d("selectExternalSubtitle")
         disableInternalSubtitle()
         if (mExternalSubtitles[index].subtitle == null) {
             mVideoPlayer!!.pause()
@@ -306,14 +428,14 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
         val url: String = subtitle.url
         val requestCall = subtitleStringService.downloadSubtitle(url,videoId)
-
+        Timber.tag(Settings.TAG).d("Downloading subtitle")
         requestCall.enqueue(object : Callback<String> {
             override fun onResponse(
                 call: Call<String>,
                 response: Response<String>
             ) {
                 if (response.isSuccessful) {
-
+                    Timber.tag(Settings.TAG).d("Subtitle downloaded");
                     val sub = response.body() as String
 
                     val decoder = OpenSubtitleDecoder()

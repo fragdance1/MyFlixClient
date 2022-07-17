@@ -22,13 +22,14 @@ class PersonCardPresenter: Presenter() {
 
     override fun onBindViewHolder(viewHolder: ViewHolder?, item: Any?) {
         var person = item as IPersonCardData
-
+    Timber.tag(Settings.TAG).d("Portrait "+person.portrait)
         val v: PersonCard = viewHolder?.view as PersonCard
-
+        val portrait = if(person.portrait!=null) person.portrait else Settings.SERVER+"/api/portrait/"+person.id;
+        Timber.tag(Settings.TAG).d("New portrait "+portrait)
         v.mTitle.text = person.title
         v.mSubtitle.text = person.subtitle
         Picasso.get()
-            .load(person.portrait)
+            .load(portrait)
             .fit()
             .into(v.mPoster)
         v.setOnClickListener() {
