@@ -5,7 +5,8 @@ import java.io.Serializable
 data class ITorrent (
     val url:String,
     val hash:String,
-    val quality:String
+    val quality:String,
+    val resolution:String
 ): Serializable
 
 data class IStatus (

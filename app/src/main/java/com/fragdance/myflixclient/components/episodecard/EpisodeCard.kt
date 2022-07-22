@@ -20,7 +20,7 @@ class EpisodeCard(context: Context): BaseCardView(context) {
 
     override fun setSelected(selected:Boolean) {
         if(selected) {
-            setBackgroundColor(Color.argb(0.01f,1f,1f,1f))
+            setBackgroundColor(Color.argb(0.05f,1f,1f,1f))
         } else {
             setBackgroundColor(Color.TRANSPARENT)
         }

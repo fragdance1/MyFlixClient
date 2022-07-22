@@ -106,6 +106,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPlaylist = PlaybackFragmentArgs.fromBundle(requireArguments()).playlist
+        Timber.tag(Settings.TAG).d(mPlaylist.videos.toString())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

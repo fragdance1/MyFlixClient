@@ -23,7 +23,7 @@ import timber.log.Timber
 
 
 
-class MovieDetailsHeroPresenter:Presenter() {
+class TvShowDetailsHeroPresenter:Presenter() {
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
         val card = MovieDetailsHeroView(parent!!.context)
         return ViewHolder(card)
@@ -47,16 +47,20 @@ class MovieDetailsHeroPresenter:Presenter() {
         var title:String? = null
         when (item) {
             is IMovieDetails -> {
-                backdropUrl = Settings.SERVER+"/api/backdrop/movie/"+item.id;
-                posterUrl = Settings.SERVER+"/api/poster/movie/"+item.id;
-                logoUrl = Settings.SERVER+"/api/logo/movie/"+item.id
+
+                backdropUrl = Settings.SERVER+"/api/backdrop/tv/"+item.id;
+                posterUrl = Settings.SERVER+"/api/poster/tv/"+item.id;
+                logoUrl = Settings.SERVER+"/api/logo/tv/"+item.id
                 summary = item.overview
                 title = item.title + (if (item.year != 0) " ("+item.year+")" else "")
 
             }
             is ITVShow -> {
+                Timber.tag(Settings.TAG).d("Is TV")
                 backdropUrl = Settings.SERVER+"/api/backdrop/tv/"+item.id
                 posterUrl = Settings.SERVER+"/api/poster/tv/"+item.id
+                logoUrl = Settings.SERVER+"/api/logo/tv/"+item.id
+                title = item.title
                 summary = item.overview
             }
         }
@@ -149,7 +153,7 @@ class MovieDetailsHeroPresenter:Presenter() {
                         for (torrent in torrents) {
                             actionsAdapter.add(
                                 IAction(
-                                    torrent.quality+" ("+torrent.resolution+")", IVideo(
+                                    torrent.quality, IVideo(
                                         item.id.toLong(),
                                         "mkv",
                                         item.title,

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/splash"
+    app:startDestination="@id/homePage"
     tools:ignore="UnusedNavigation">
 
     <fragment android:id="@+id/homePage"
@@ -15,7 +15,7 @@
         android:name="com.fragdance.myflixclient.pages.settings.SettingsPage">
     </fragment>
 
-    <fragment android:id="@id/splash"
+    <fragment android:id="@+id/splashFragment"
         android:name="com.fragdance.myflixclient.pages.splash.SplashFragment">
     </fragment>
 

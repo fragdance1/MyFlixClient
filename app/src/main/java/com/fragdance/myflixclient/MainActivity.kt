@@ -11,10 +11,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
@@ -24,10 +20,6 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.models.ITVShow
-import com.fragdance.myflixclient.services.FayeService
-import com.fragdance.myflixclient.services.NetworkDiscoveryService
-import com.fragdance.myflixclient.services.movieService
-import com.fragdance.myflixclient.services.sonarrService
 import com.fragdance.myflixclient.utils.isEmulator
 import org.cometd.bayeux.Message
 import retrofit2.Call
@@ -35,7 +27,14 @@ import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.view.*
+import android.view.animation.DecelerateInterpolator
+import androidx.core.animation.doOnEnd
+import com.fragdance.myflixclient.services.*
 import org.json.JSONObject
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainView(context: Context, attrs: AttributeSet) : BrowseFrameLayout(context, attrs) {
 
@@ -47,7 +46,7 @@ class MainActivity : FragmentActivity() {
     private lateinit var mRootView: BrowseFrameLayout
     private lateinit var mBonjour: NetworkDiscoveryService
     private var mServerFoundReceiver: BroadcastReceiver? = null
-
+    var contentHasLoaded = false
     private fun reloadMovies() {
         val requestCall = movieService.getLocalMovies()
         requestCall.enqueue(object : Callback<List<IMovie>> {
@@ -102,7 +101,7 @@ class MainActivity : FragmentActivity() {
 
     // Load all the local tv shows into settings
     private fun loadTVShows() {
-        val requestCall = sonarrService.getSeries()
+        val requestCall = tvShowService.getShows()
         requestCall.enqueue(object : Callback<List<ITVShow>> {
             override fun onResponse(call: Call<List<ITVShow>>, response: Response<List<ITVShow>>) {
                 if (response.isSuccessful) {
@@ -157,9 +156,25 @@ class MainActivity : FragmentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.tag(Settings.TAG).d("MainActivity.onCreate")
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        setupSplashScreen(splashScreen)
+        setContentView(R.layout.activity_main)
+
+        findViewById<View>(R.id.loading_progress).visibility = View.INVISIBLE
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+
+        navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+        //navGraph.startDestination = R.id.splashFragment
+        navController.graph = navGraph
+    //setContentView(R.layout.splash)
+
+        Timber.tag(Settings.TAG).d("MainActivity.onCreate")
         mInstance = this;
-        Timber.tag(Settings.TAG).d("Creating faye server")
+
         FayeService.create()
 
         // Get window dimensions
@@ -178,7 +193,7 @@ class MainActivity : FragmentActivity() {
 
             if (isEmulator()) { // Bonjour doesn't work on emulator
                 Timber.tag(Settings.TAG).d("Running on emulator");
-                Settings.SERVER = "http://192.168.1.79:8000"
+                Settings.SERVER = "http://192.168.1.121:8000"
                 loadStartingPage()
             } else {
                 mServerFoundReceiver = object : BroadcastReceiver() {
@@ -194,8 +209,40 @@ class MainActivity : FragmentActivity() {
             }
         }
         checkRunTimePermission()
+
+
+        Timber.tag(Settings.TAG).d("MainActivity.onCreate done")
     }
 
+    private fun setupSplashScreen(splashScreen: SplashScreen) {
+        val content: View = findViewById(android.R.id.content)
+
+        content.viewTreeObserver.addOnPreDrawListener(
+            object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    return if (contentHasLoaded) {
+                        content.viewTreeObserver.removeOnPreDrawListener(this)
+                        true
+                    } else false
+                }
+            }
+        )
+
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            val slideBack = ObjectAnimator.ofFloat(
+                splashScreenView.view,
+                View.TRANSLATION_X,
+                0f,
+                -splashScreenView.view.width.toFloat()
+            ).apply {
+                interpolator = DecelerateInterpolator()
+                duration = 800L
+                doOnEnd { splashScreenView.remove() }
+            }
+
+            slideBack.start()
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
 
@@ -206,12 +253,15 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun loadStartingPage() {
+        /*
         setContentView(R.layout.activity_main)
         findViewById<View>(R.id.loading_progress).visibility = View.INVISIBLE
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+
+         */
         mRootView = findViewById(R.id.main_browse_fragment)
         mRootView.onFocusSearchListener =
             BrowseFrameLayout.OnFocusSearchListener { focused, direction ->
@@ -221,10 +271,11 @@ class MainActivity : FragmentActivity() {
                     null
                 }
             }
-        navGraph.startDestination = R.id.homePage
+       // navGraph.startDestination = R.id.homePage
         loadMovies()
         loadTVShows()
-        navController.graph = navGraph
+        navGraph.startDestination = R.id.homePage
+        //navController.graph = navGraph
 
 
 /*
@@ -274,6 +325,7 @@ class MainActivity : FragmentActivity() {
             }
             //mFragment.setRecognitionListener()
         }
+        contentHasLoaded = true
     }
 
     companion object {

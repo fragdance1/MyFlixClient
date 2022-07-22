@@ -5,4 +5,8 @@
     <item name="fontFamily">@font/montserrat</item>
         <item name="android:textFontWeight">500</item>
     </style>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.MyFlixClient</item>
+        <item name="windowSplashScreenBackground">@drawable/splash</item>
+    </style>
 </resources>

@@ -48,7 +48,7 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
         )
         addClassPresenter(
             ITVShow::class.java,
-            MovieDetailsHeroPresenter()
+            TvShowDetailsHeroPresenter()
         )
     }
 
@@ -69,7 +69,7 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
 
             }
         })
-        val requestCall = sonarrService.getSeasons(mDetails!!.id)
+        val requestCall = tvShowService.getSeasons(mDetails!!.id)
         requestCall.enqueue(object:Callback<List<ISeason>>{
             override fun onResponse(call: Call<List<ISeason>>, response: Response<List<ISeason>>) {
                 if (response.isSuccessful) {
