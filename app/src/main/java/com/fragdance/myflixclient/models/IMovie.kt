@@ -9,10 +9,12 @@ class IMovie(
     var overview:String?,
     var url:String?,
     var video_files:List<IVideoFile> = emptyList(),
-    var progress:Float?
+    var progress:Float?,
+    var disc:Boolean?,
+    var videofile:Boolean?
 ):Serializable
 
-data class IMovieCardData(val id:String,val title:String,val subtitle:String?,val poster:String?,val progress:Float?):Serializable
+data class IMovieCardData(val id:String,val title:String,val subtitle:String?,val poster:String?,val progress:Float?,val disc:Boolean?,val videofile:Boolean?):Serializable
 
 data class IVideo(
     var id:Long,

@@ -56,7 +56,7 @@ class PersonDetailsHeroPresenter:Presenter() {
     override fun onUnbindViewHolder(viewHolder: ViewHolder?) {
         Timber.tag(Settings.TAG).d("MovieDetailsHeroPresenter unbind")
     }
-
+/*
     private fun createPresenterSelector() = ClassPresenterSelector().apply {
         addClassPresenter(
             ListRow::class.java,
@@ -64,5 +64,7 @@ class PersonDetailsHeroPresenter:Presenter() {
         )
 
     }
+
+ */
 
 }

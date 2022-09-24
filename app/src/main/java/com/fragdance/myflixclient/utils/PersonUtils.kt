@@ -29,7 +29,9 @@ fun crewToMovieCard(crew: ICrew): IMovieCardData {
         if(crew.movie?.title != null)crew.movie?.title!! else "No title",
         crew.job,
         crew.movie?.poster,
-        crew.movie?.progress
+        crew.movie?.progress,
+        crew.movie?.disc,
+        crew.movie?.videofile
     )
 }
 
@@ -39,7 +41,9 @@ fun castToMovieCard(cast: ICast): IMovieCardData {
         cast.movie?.title!!,
         cast.character,
         cast.movie?.poster,
-        cast.movie?.progress
+        cast.movie?.progress,
+        cast.movie?.disc,
+        cast.movie?.videofile
     )
 }
 

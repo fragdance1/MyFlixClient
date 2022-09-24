@@ -55,7 +55,6 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
     }
 
     private fun activateMenuItem(index:Int) {
-        Timber.tag(Settings.TAG).d("Index is "+index)
         when(index) {
             0 -> findNavController(findFragment()).navigate(R.id.action_global_home)
             1 -> findNavController(findFragment()).navigate(R.id.action_global_movies);
@@ -127,6 +126,7 @@ class SideMenu(): Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Timber.tag(Settings.TAG).d("Create menu "+Settings.WIDTH)
         mRootView = inflater.inflate(R.layout.side_menu, container, false) as ViewGroup
         mMenuView = mRootView.findViewById(R.id.menu)
         Timber.tag(Settings.TAG).d("SideMenu.onCreateView "+Settings.WIDTH)

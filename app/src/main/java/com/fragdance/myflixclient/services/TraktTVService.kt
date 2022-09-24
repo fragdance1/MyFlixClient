@@ -37,7 +37,7 @@ interface TraktTVService {
                           @Query("id") id:String,
         @Query("watched_at") watched_at:String):Call<Unit>
 
-    @GET("trakttv/search")
+    @GET("movie/search")
     fun search(@Query("query") query:String,@Query("count") count:Int = 10,@Query("page") page:Int = 1):Call<List<IMovie>>
 }
 

@@ -32,7 +32,7 @@ class MovieLoaders {
                     }
 
                     override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Get latest movies failes " + t);
+                        Timber.tag(Settings.TAG).d("Get latest movies failed " + t);
                     }
 
                 })
@@ -58,7 +58,7 @@ class MovieLoaders {
                     }
 
                     override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Recommended movies " + t);
+                        Timber.tag(Settings.TAG).d("Recommended movies failed" + t);
                     }
 
                 })
@@ -106,6 +106,7 @@ class MovieLoaders {
                         if (response.isSuccessful) {
                             adapter.addAll(0, response.body()!!)
                             Settings.startMovies[genre] = response.body()!!
+
                         }
                     }
 

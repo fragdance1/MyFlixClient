@@ -251,7 +251,7 @@ public class FayeClient {
     }
 
     private void handleFayeMessage(String message) {
-
+        Timber.tag(Settings.TAG).d("handleFayeMessage "+message);
         JSONArray arr = null;
         try {
             arr = new JSONArray(message);

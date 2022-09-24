@@ -56,7 +56,6 @@ class TvShowDetailsHeroPresenter:Presenter() {
 
             }
             is ITVShow -> {
-                Timber.tag(Settings.TAG).d("Is TV")
                 backdropUrl = Settings.SERVER+"/api/backdrop/tv/"+item.id
                 posterUrl = Settings.SERVER+"/api/poster/tv/"+item.id
                 logoUrl = Settings.SERVER+"/api/logo/tv/"+item.id
@@ -140,7 +139,6 @@ class TvShowDetailsHeroPresenter:Presenter() {
             if (item.video_files != null && item.video_files.isNotEmpty()) {
                 actionsAdapter.add(IAction("Play", movieDetailsToVideo(item),""));
             }
-            Timber.tag(Settings.TAG).d("IMDB id "+item.imdb_id)
 
             val getMovieTorrents = torrentService.getMovieTorrents(item.imdb_id)
             getMovieTorrents.enqueue(object : Callback<List<ITorrent>> {

@@ -11,12 +11,14 @@ import androidx.navigation.fragment.navArgs
 import com.fragdance.myflixclient.MainActivity
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
+import com.fragdance.myflixclient.components.MyFlixListRow
 import com.fragdance.myflixclient.components.personcard.PersonCardPresenter
 import com.fragdance.myflixclient.models.ICast
 import com.fragdance.myflixclient.models.ICrew
 import com.fragdance.myflixclient.models.IMovieDetails
 import com.fragdance.myflixclient.models.IPersonCardData
 import com.fragdance.myflixclient.presenters.MovieDetailsHeroPresenter
+import com.fragdance.myflixclient.presenters.MyFlixListRowPresenter
 
 import com.fragdance.myflixclient.presenters.PersonRowPresenter
 import com.fragdance.myflixclient.services.movieService
@@ -45,6 +47,10 @@ class MovieDetailsPage : Fragment() {
     private fun createPresenterSelector(movie: IMovieDetails) = ClassPresenterSelector().apply {
         addClassPresenter(
             ListRow::class.java,
+            MyFlixListRowPresenter()
+        )
+        addClassPresenter(
+            IPersonCardData::class.java,
             PersonRowPresenter()
         )
         addClassPresenter(
@@ -55,7 +61,6 @@ class MovieDetailsPage : Fragment() {
 
     private fun setupView() {
         val content: VerticalGridView = mRootView.findViewById(R.id.content);
-        Timber.tag(Settings.TAG).d("setupview "+mDetails)
         if(mDetails is IMovieDetails) {
             // Add movie details
             val rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
@@ -67,7 +72,7 @@ class MovieDetailsPage : Fragment() {
                     add(castToPersonCard(cast))
                 }
             }
-            val castRow = ListRow(HeaderItem(0, "Cast"), castAdapter)
+            val castRow = MyFlixListRow(HeaderItem(0, "Cast"), castAdapter)
             rowsAdapter.add(castRow)
 
             // Add row of crew members

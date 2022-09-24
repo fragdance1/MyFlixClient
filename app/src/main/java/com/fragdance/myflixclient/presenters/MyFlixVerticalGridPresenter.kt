@@ -9,7 +9,6 @@ class MyFlixVerticalGridPresenter( zoom:Int, v:Boolean) : VerticalGridPresenter(
             var gridView = vh.gridView
             gridView.verticalSpacing = 40;
             gridView.horizontalSpacing = 20;
-
         }
     }
 }

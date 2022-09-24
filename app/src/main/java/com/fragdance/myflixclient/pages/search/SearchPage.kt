@@ -51,6 +51,7 @@ class SearchPage: SearchSupportFragment(),SearchSupportFragment.SearchResultProv
     fun loadQuery(query:String?) {
         if(query is String) {
             mAdapter.clear()
+            Timber.tag(Settings.TAG).d("Asking TMDB about "+query)
             val requestCall = trakttvService.search(query)
             requestCall.enqueue(object : Callback<List<IMovie>> {
                 override fun onResponse(
@@ -64,11 +65,13 @@ class SearchPage: SearchSupportFragment(),SearchSupportFragment.SearchResultProv
                         listRowAdapter.addAll(0, response.body()!!)
                         val header = HeaderItem(0, "Test")
                         mAdapter.add(ListRow(null, listRowAdapter))
+                    } else {
+                        Timber.tag(Settings.TAG).d("No movies for us")
                     }
                 }
 
                 override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-
+                    Timber.tag(Settings.TAG).d("Abort, abort")
                 }
 
             });

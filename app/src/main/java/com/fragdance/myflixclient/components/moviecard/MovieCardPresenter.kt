@@ -25,7 +25,7 @@ class MovieCardPresenter: Presenter() {
         checkNotNull(viewHolder)
         val v: MovieCard = viewHolder.view as MovieCard
         if(item is IMovie) {
-            Timber.tag(Settings.TAG).d("IMovie Progress is "+item.progress)
+
             var poster =
                 if (item.id != null) (Settings.SERVER + "/api/poster/movie/" + item.id) else item.poster
 
@@ -72,8 +72,10 @@ class MovieCardPresenter: Presenter() {
             }
         } else if(item is ITVShow) {
             v.mTitle.text = item.title
+            var poster =
+                if (item.id != null) (Settings.SERVER + "/api/poster/tv/" + item.id) else item.poster
             Picasso.get()
-                .load(item.poster)
+                .load(poster)
                 .fit()
                 .into(v.mPoster)
         }

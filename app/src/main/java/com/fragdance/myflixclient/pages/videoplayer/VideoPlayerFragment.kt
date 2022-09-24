@@ -106,8 +106,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPlaylist = PlaybackFragmentArgs.fromBundle(requireArguments()).playlist
-        Timber.tag(Settings.TAG).d(mPlaylist.videos.toString())
-    }
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -143,6 +142,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         if(mCurrentVideo?.hash != null) {
             FayeService.unsubscribe("/torrent/"+mCurrentVideo.hash)
         }
@@ -218,7 +218,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
             val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
             val tmdbId = mCurrentVideo.tmdbId.toString()
             val imdbId = mCurrentVideo.imdbId.toString()
-            Timber.tag(Settings.TAG).d("Progress is "+progress);
             val startCall = if(mCurrentVideo.type == "movie")
                 trakttvService.stopMovie(access_token,imdbId,progress)
             else
@@ -271,7 +270,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 call: Call<IStatus>,
                 response: Response<IStatus>
             ) {
-                Timber.tag(Settings.TAG).d("Torrent function returned")
                 val url =
                     "/api/video/torrent/" + video.hash
             }
@@ -289,13 +287,15 @@ class VideoPlayerFragment : VideoSupportFragment() {
         if(video.hash != null) {
             var ready = false
             // Fire up faye
-
+            Timber.tag(Settings.TAG).d("Subscribing to "+video.hash)
             FayeService.subscribe("/torrent/"+video.hash) { message ->
                 run {
                     val jsonObj = JSONObject(message)
+
                     val obj = jsonObj.toMap()
                         //val obj = message?.dataAsMap;
                         val event = obj["event"]
+                        Timber.tag(Settings.TAG).d("Torrent message "+event)
                         if(event == "TORRENT_ADDED") {
                             Timber.tag(Settings.TAG).d("TORRENT_ADDED")
                             activity?.runOnUiThread {

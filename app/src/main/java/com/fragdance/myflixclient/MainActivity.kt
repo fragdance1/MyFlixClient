@@ -52,8 +52,6 @@ class MainActivity : FragmentActivity() {
         requestCall.enqueue(object : Callback<List<IMovie>> {
             override fun onResponse(call: Call<List<IMovie>>, response: Response<List<IMovie>>) {
                 if (response.isSuccessful) {
-
-                    Timber.tag(Settings.TAG).d("Movies reloaded");
                     Settings.movies = response.body()!!
                     val intent = Intent()
                     intent.action = "movies_loaded"
@@ -77,7 +75,6 @@ class MainActivity : FragmentActivity() {
                     var editor = getSharedPreferences("myflix",MODE_PRIVATE).edit();
                     editor.putString("server",Settings.SERVER)
                     editor.commit()
-                    Timber.tag(Settings.TAG).d("Movies loaded");
                     Settings.movies = response.body()!!
                     val intent = Intent()
                     intent.action = "movies_loaded"
@@ -160,6 +157,9 @@ class MainActivity : FragmentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         setupSplashScreen(splashScreen)
+        val displayMetrics = this.resources.displayMetrics
+        Settings.WIDTH = displayMetrics.widthPixels.toFloat()
+        Settings.HEIGHT = displayMetrics.heightPixels.toFloat()
         setContentView(R.layout.activity_main)
 
         findViewById<View>(R.id.loading_progress).visibility = View.INVISIBLE
@@ -179,9 +179,7 @@ class MainActivity : FragmentActivity() {
 
         // Get window dimensions
         //window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val displayMetrics = this.resources.displayMetrics
-        Settings.WIDTH = displayMetrics.widthPixels.toFloat()
-        Settings.HEIGHT = displayMetrics.heightPixels.toFloat()
+
         var preferences = getSharedPreferences("myflix",MODE_PRIVATE)
         //SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         var server = preferences.getString("server",null);
@@ -193,7 +191,7 @@ class MainActivity : FragmentActivity() {
 
             if (isEmulator()) { // Bonjour doesn't work on emulator
                 Timber.tag(Settings.TAG).d("Running on emulator");
-                Settings.SERVER = "http://192.168.1.121:8000"
+                Settings.SERVER = "http://192.168.1.79:8000"
                 loadStartingPage()
             } else {
                 mServerFoundReceiver = object : BroadcastReceiver() {

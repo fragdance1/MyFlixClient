@@ -32,8 +32,10 @@ class EpisodeCardPresenter : Presenter() {
             v.mTitle.text = item.title
             v.mSubtitle.text = item.subtitle
             v.mProgress.setProgress((item.progress * 100).toInt())
+            var still =
+                if (item.id != null) (Settings.SERVER + "/api/still/" + item.id) else item.poster
             Picasso.get()
-                .load(item.poster)
+                .load(still)
                 .fit()
                 .into(v.mPoster)
 
