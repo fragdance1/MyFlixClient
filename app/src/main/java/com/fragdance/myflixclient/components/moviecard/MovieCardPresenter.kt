@@ -14,6 +14,8 @@ import com.fragdance.myflixclient.models.IMovieCardData
 import com.fragdance.myflixclient.models.ITVShow
 import com.squareup.picasso.Picasso
 import timber.log.Timber
+import android.widget.ImageView
+
 
 class MovieCardPresenter: Presenter() {
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
@@ -30,6 +32,23 @@ class MovieCardPresenter: Presenter() {
                 if (item.id != null) (Settings.SERVER + "/api/poster/movie/" + item.id) else item.poster
 
             v.mTitle.text = item.title
+            v.mIcons.removeAllViews()
+            if(item.watched == true) {
+                val icon = ImageView(viewHolder.view.context)
+                icon.setImageResource(R.drawable.ic_eye_solid)
+                icon.adjustViewBounds = true
+                v.mIcons.addView(icon)
+            }
+
+            if(item.video_files != null && item.video_files?.isNotEmpty()) {
+                val icon = ImageView(viewHolder.view.context)
+                icon.setImageResource(R.drawable.ic_hard_drive)
+                icon.adjustViewBounds = true
+                v.mIcons.addView(icon)
+            }
+
+
+
             Picasso.get()
                 .load(poster)
                 .fit()
@@ -38,14 +57,15 @@ class MovieCardPresenter: Presenter() {
                 var bundle = bundleOf("id" to item.id)
 
                 v.findNavController().navigate(
-                    R.id.action_global_movie_details, bundle
+                    com.fragdance.myflixclient.R.id.action_global_movie_details, bundle
                 )
             }
-            if(item.progress == null || item.progress == 0.0f) {
+
+            if(item.progress == null || item.progress == 0.0f || item.progress == 100.0f) {
                 v.mProgress.visibility = View.GONE
             } else {
                 Timber.tag(Settings.TAG).d("Progress is "+item.progress)
-                v.mProgress.progress = (item.progress!! * 100.0f).toInt()
+                v.mProgress.progress = (item.progress!!).toInt()
                 v.mProgress.visibility = View.VISIBLE
             }
         } else if(item is IMovieCardData) {
@@ -60,7 +80,7 @@ class MovieCardPresenter: Presenter() {
                 val bundle = bundleOf("id" to item.id)
 
                 v.findNavController().navigate(
-                    R.id.action_global_movie_details, bundle
+                    com.fragdance.myflixclient.R.id.action_global_movie_details, bundle
                 )
             }
 

@@ -118,6 +118,10 @@ class MyFlixExoPlayer:IVideoPlayer {
         }
 
     }
+    override fun seekTo(progress:Float) {
+        Timber.tag(Settings.TAG).d("SEtting progress "+progress)
+        mExoplayer!!.seekTo((progress * mExoplayer!!.contentDuration * 0.01f).toLong())
+    }
 
     override fun loadVideo(video: IVideo) {
         val url: String = Settings.SERVER + video.url
@@ -132,6 +136,8 @@ class MyFlixExoPlayer:IVideoPlayer {
         mExoplayer!!.prepare()
         prepareGlue(mExoplayer!!)
         mExoPlayerGlue.title = video.title
+        Timber.tag(Settings.TAG).d("Progress "+video.progress)
+
     }
 
     override fun disableInternalSubtitle() {

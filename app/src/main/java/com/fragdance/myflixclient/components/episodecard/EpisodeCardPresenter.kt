@@ -51,12 +51,10 @@ class EpisodeCardPresenter : Presenter() {
             v.setOnClickListener() {
                 if (item.video is IVideo) {
                     var playlist = IPlayList()
-                    Timber.tag(Settings.TAG).d("Item is "+item.video)
-                    Timber.tag(Settings.TAG).d("Playlist is "+Settings.playList)
                     if(Settings.playList is ArrayList<IVideo>) {
                         // Get index of item
                             var index = (Settings.playList as ArrayList<IVideo>).indexOfFirst { it.id == item.video.id }
-                        Timber.tag(Settings.TAG).d("Index of item is "+index)
+
                         playlist.videos = (Settings.playList as ArrayList<IVideo>)!!;
                         playlist.position = index.toLong()
                     } else {

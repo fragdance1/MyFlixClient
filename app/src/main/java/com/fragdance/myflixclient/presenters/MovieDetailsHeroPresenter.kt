@@ -162,7 +162,7 @@ class MovieDetailsHeroPresenter:Presenter() {
                                         emptyList(),
                                         null,
                                         null,
-                                        null
+                                        item.imdb_id
                                     ),null
                                 )
                             )

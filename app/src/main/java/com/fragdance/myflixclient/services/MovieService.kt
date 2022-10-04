@@ -27,6 +27,8 @@ interface MovieService {
     @GET("movie/trending")
     fun getTrendingMovies():Call<List<IMovie>>
 
+    @GET("movie/inprogress")
+    fun getInProgressMovies():Call<List<IMovie>>
     @GET("movie/genre/{genre}")
     fun getMoviesByGenre(@Path("genre") genre:String):Call<List<IMovie>>
 }

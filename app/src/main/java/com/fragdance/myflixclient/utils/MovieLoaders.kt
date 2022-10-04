@@ -64,6 +64,31 @@ class MovieLoaders {
                 })
             }
         }
+        private fun loadInProgressMovies(adapter:ArrayObjectAdapter) {
+            // Check if already downloaded
+            val movies = Settings.startMovies["In Progress"];
+            if(movies!=null) {
+                adapter.addAll(0, movies)
+            } else {
+                val requestCall = movieService.getInProgressMovies()
+                requestCall.enqueue(object : Callback<List<IMovie>> {
+                    override fun onResponse(
+                        call: Call<List<IMovie>>,
+                        response: Response<List<IMovie>>
+                    ) {
+                        if (response.isSuccessful) {
+                            adapter.addAll(0, response.body()!!)
+                            Settings.startMovies["In Progress"] = response.body()!!
+                        }
+                    }
+
+                    override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
+                        Timber.tag(Settings.TAG).d("In Progress movies failed " + t);
+                    }
+
+                })
+            }
+        }
         private fun loadBoxOfficeMovies(adapter:ArrayObjectAdapter) {
             // Check if already downloaded
             val movies = Settings.startMovies["BoxOffice"];
@@ -123,6 +148,7 @@ class MovieLoaders {
                 "Latest" -> loadLatestMovies(adapter)
                 "Recommended" -> loadRecommendedMovies(adapter)
                 "Boxoffice" -> loadBoxOfficeMovies(adapter)
+                "In Progress" -> loadInProgressMovies(adapter)
                 else -> loadGenre(type,adapter)
             }
 

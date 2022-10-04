@@ -28,6 +28,12 @@ class HomePage: RowsSupportFragment() {
                 val header = HeaderItem(rowsAdapter.size().toLong(), type)
                 rowsAdapter.add(ListRow(header, listRowAdapter))
             }
+            "In Progress" -> {
+                val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
+                MovieLoaders.loadMovies(type,listRowAdapter)
+                val header = HeaderItem(rowsAdapter.size().toLong(), type)
+                rowsAdapter.add(ListRow(header, listRowAdapter))
+            }
             else -> {
                 val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
                 MovieLoaders.loadMovies(type,listRowAdapter)
@@ -41,6 +47,7 @@ class HomePage: RowsSupportFragment() {
         loadHomePageMovies("Latest")
         loadHomePageMovies("Recommended")
         loadHomePageMovies("Boxoffice")
+        loadHomePageMovies("In Progress")
         for(genre in Settings.MOVIE_GENRES) {
             loadHomePageMovies(genre)
         }

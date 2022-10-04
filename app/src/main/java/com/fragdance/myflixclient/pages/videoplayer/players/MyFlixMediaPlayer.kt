@@ -28,6 +28,7 @@ interface IVideoPlayer {
     fun pause()
 
     fun getProgress():Float
+    fun seekTo(progress:Float)
 }
 
 class MyFlixMediaPlayer:IVideoPlayer {
@@ -65,6 +66,9 @@ class MyFlixMediaPlayer:IVideoPlayer {
         }
     }
 
+    override fun seekTo(progress:Float) {
+        mMediaPlayer!!.seekTo((progress * mMediaPlayer!!.duration / 100).toInt())
+    }
     override fun destroy() {
         /* no-op */
         //mMediaPlayer?.release()

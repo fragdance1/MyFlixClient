@@ -35,10 +35,7 @@ import com.fragdance.myflixclient.pages.videoplayer.players.IVideoPlayer
 import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixExoPlayer
 import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixMediaPlayer
 import com.fragdance.myflixclient.pages.videoplayer.tracks.TrackSelectionMenu
-import com.fragdance.myflixclient.services.FayeService
-import com.fragdance.myflixclient.services.subtitleStringService
-import com.fragdance.myflixclient.services.torrentService
-import com.fragdance.myflixclient.services.trakttvService
+import com.fragdance.myflixclient.services.*
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -92,6 +89,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     // View from exoplayer for displaying subtitles
     private lateinit var mSubtitleView: SubtitleView
+    private var mPlaying = false
     // A list of external subtitles for this video
     var mExternalSubtitles: ArrayList<ISubtitle> = arrayListOf()
 
@@ -142,7 +140,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-
+        mPlaying = false
         if(mCurrentVideo?.hash != null) {
             FayeService.unsubscribe("/torrent/"+mCurrentVideo.hash)
         }
@@ -215,13 +213,10 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
         if(mVideoPlayer != null) {
             val progress = mVideoPlayer!!.getProgress();
-            val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
             val tmdbId = mCurrentVideo.tmdbId.toString()
-            val imdbId = mCurrentVideo.imdbId.toString()
-            val startCall = if(mCurrentVideo.type == "movie")
-                trakttvService.stopMovie(access_token,imdbId,progress)
-            else
-                trakttvService.stopEpisode(access_token,tmdbId,progress)
+            val scrobble = ScrobbleData(progress)
+            val startCall = videoService.stop(mCurrentVideo.type!!,tmdbId,scrobble)
+
             startCall.enqueue(object:Callback<Unit> {
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     Timber.tag(Settings.TAG).d("TraktTV stopped")
@@ -238,6 +233,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     private fun startVideo(video:IVideo) {
         mCurrentVideo = video;
+        mPlaying = false;
         if(video.extension == ".avi") {
             initializeMediaPlayer()
         } else {
@@ -251,11 +247,23 @@ class VideoPlayerFragment : VideoSupportFragment() {
         mVideoPlayer!!.init(requireContext(),this )
 
         mVideoPlayer!!.loadVideo(video)
+
         if(video!!.subtitles.count() > 0) {
             selectExternalSubtitle(0)
         } else {
             disableSubtitles();
         }
+        val tmdbId = mCurrentVideo.tmdbId.toString()
+        val scrobble = ScrobbleData(0.0f)
+        val startCall = videoService.start(mCurrentVideo.type!!,tmdbId,scrobble)
+        startCall.enqueue(object:Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                Timber.tag(Settings.TAG).d("TraktTV started")
+            }
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Timber.tag(Settings.TAG).d("TraktTV failed")
+            }
+        })
     }
 
     private fun addTorrent(video:IVideo) {
@@ -327,9 +335,9 @@ class VideoPlayerFragment : VideoSupportFragment() {
                                         url,
                                         video.hash,
                                         emptyList(),
+                                        "movie",
 
-                                        video.type,
-                                        video.tmdbId,
+                                        video.id,
                                         video.imdbId
                                     )
 
@@ -426,7 +434,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     fun downloadSubtitle(subtitle: ISubtitle,videoId:Long) {
-
         val url: String = subtitle.url
         val requestCall = subtitleStringService.downloadSubtitle(url,videoId)
         Timber.tag(Settings.TAG).d("Downloading subtitle")
@@ -468,10 +475,14 @@ class VideoPlayerFragment : VideoSupportFragment() {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
 
             super.onIsPlayingChanged(isPlaying)
-            if(isPlaying) {
+            if(isPlaying && !mPlaying) {
+                mPlaying = true
                 val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
                 val tmdbId = mCurrentVideo.tmdbId.toString()
                 var imdbId = mCurrentVideo.imdbId.toString()
+
+                mVideoPlayer!!.seekTo(mCurrentVideo.progress)
+
                 val startCall = if(mCurrentVideo.type == "movie")
                     trakttvService.startMovie(access_token,imdbId,"0")
                 else
@@ -484,6 +495,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
                         Timber.tag(Settings.TAG).d("TraktTV failed")
                     }
                 })
+
+
             }
         }
 

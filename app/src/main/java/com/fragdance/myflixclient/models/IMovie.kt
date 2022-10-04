@@ -11,7 +11,8 @@ class IMovie(
     var video_files:List<IVideoFile> = emptyList(),
     var progress:Float?,
     var disc:Boolean?,
-    var videofile:Boolean?
+    var videofile:Boolean?,
+    var watched:Boolean?
 ):Serializable
 
 data class IMovieCardData(val id:String,val title:String,val subtitle:String?,val poster:String?,val progress:Float?,val disc:Boolean?,val videofile:Boolean?):Serializable
@@ -27,7 +28,8 @@ data class IVideo(
     var subtitles:List<ISubtitle> = emptyList(),
     var type:String?,
     var tmdbId:Long?,
-    var imdbId:String? // For movies
+    var imdbId:String?, // For movies
+    var progress:Float = 0.0f
 
 ):Serializable
 
