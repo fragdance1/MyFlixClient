@@ -161,7 +161,7 @@ class TvShowDetailsHeroPresenter:Presenter() {
                                         torrent.url,
                                         torrent.hash,
 
-                                        emptyList(),
+                                        mutableListOf(),
                                         null,
                                         null,
                                         null

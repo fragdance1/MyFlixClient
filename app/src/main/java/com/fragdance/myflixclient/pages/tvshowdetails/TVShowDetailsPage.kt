@@ -83,7 +83,7 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
                                     val video:IVideo? = if(episode.video_files.count() > 0) {
                                         val videoFile = episode.video_files[0] as IVideoFile
                                         val url = "/api/video/local/"+videoFile.id
-                                        IVideo(videoFile.id.toLong(),videoFile.extension,episode.name,episode.still,episode.overview,url,null,emptyList(),"episode",episode.id,null)//,videoFile.subtitles)
+                                        IVideo(videoFile.id.toLong(),videoFile.extension,episode.name,episode.still,episode.overview,url,null,mutableListOf(),"episode",episode.id,null)//,videoFile.subtitles)
                                     } else {
                                         null
                                     }

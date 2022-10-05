@@ -191,7 +191,7 @@ class MainActivity : FragmentActivity() {
 
             if (isEmulator()) { // Bonjour doesn't work on emulator
                 Timber.tag(Settings.TAG).d("Running on emulator");
-                Settings.SERVER = "http://192.168.1.79:8000"
+                Settings.SERVER = "http://192.168.1.121:8000"
                 loadStartingPage()
             } else {
                 mServerFoundReceiver = object : BroadcastReceiver() {

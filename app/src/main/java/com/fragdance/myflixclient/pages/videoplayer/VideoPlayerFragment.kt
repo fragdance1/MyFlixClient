@@ -242,8 +242,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
         mExternalSubtitles.clear()
         if(video?.subtitles != null) {
             mExternalSubtitles.addAll(0, video.subtitles)
-
         }
+        Timber.tag(Settings.TAG).d("Number of subtitles "+mExternalSubtitles.size)
         mVideoPlayer!!.init(requireContext(),this )
 
         mVideoPlayer!!.loadVideo(video)
@@ -288,6 +288,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
         })
     }
+
     private fun addVideo(video: IVideo) {
         mCurrentVideo = video;
 
@@ -334,7 +335,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                                         video.overview,
                                         url,
                                         video.hash,
-                                        emptyList(),
+                                        video.subtitles,
                                         "movie",
 
                                         video.id,
@@ -350,9 +351,19 @@ class VideoPlayerFragment : VideoSupportFragment() {
                             // Start playing
 
                         }
+                        if(event == "SUBTITLE_READY") {
+                            Timber.tag(Settings.TAG).d("Got subtitles from torrent")
+                            var subtitle = ISubtitle(
+                                -1,
+                                "Sven",
+                                "und",
+                                "",
+                                obj["msg"].toString(),
+                                prepareSrt(obj["msg"].toString())
+                            )
 
-                        //FayeService.handshake()
-
+                            video.subtitles.add(subtitle)
+                        }
                 }
             }
             // Add torrent

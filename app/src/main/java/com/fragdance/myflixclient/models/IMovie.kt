@@ -25,7 +25,7 @@ data class IVideo(
     var overview:String?,
     var url:String?,
     var hash:String?,
-    var subtitles:List<ISubtitle> = emptyList(),
+    var subtitles:MutableList<ISubtitle> = mutableListOf(),
     var type:String?,
     var tmdbId:Long?,
     var imdbId:String?, // For movies

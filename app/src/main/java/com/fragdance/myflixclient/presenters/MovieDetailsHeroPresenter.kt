@@ -159,7 +159,7 @@ class MovieDetailsHeroPresenter:Presenter() {
                                         torrent.url,
                                         torrent.hash,
 
-                                        emptyList(),
+                                        mutableListOf(),
                                         null,
                                         null,
                                         item.imdb_id
