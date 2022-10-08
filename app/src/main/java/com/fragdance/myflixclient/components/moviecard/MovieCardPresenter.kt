@@ -15,6 +15,12 @@ import com.fragdance.myflixclient.models.ITVShow
 import com.squareup.picasso.Picasso
 import timber.log.Timber
 import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.core.view.marginLeft
+import android.widget.RelativeLayout
+
+
+
 
 
 class MovieCardPresenter: Presenter() {
@@ -32,21 +38,28 @@ class MovieCardPresenter: Presenter() {
                 if (item.id != null) (Settings.SERVER + "/api/poster/movie/" + item.id) else item.poster
 
             v.mTitle.text = item.title
+            /*
             v.mIcons.removeAllViews()
             if(item.watched == true) {
                 val icon = ImageView(viewHolder.view.context)
                 icon.setImageResource(R.drawable.ic_eye_solid)
                 icon.adjustViewBounds = true
+                var params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                params.setMargins((Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt())
+                icon.layoutParams = params
                 v.mIcons.addView(icon)
             }
 
-            if(item.video_files != null && item.video_files?.isNotEmpty()) {
+            if(item.videofile == true || (item.video_files != null && item.video_files?.isNotEmpty())) {
                 val icon = ImageView(viewHolder.view.context)
                 icon.setImageResource(R.drawable.ic_hard_drive)
                 icon.adjustViewBounds = true
+                var params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                params.setMargins((Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt())
+                icon.layoutParams = params
                 v.mIcons.addView(icon)
             }
-
+*/
 
 
             Picasso.get()
@@ -64,7 +77,6 @@ class MovieCardPresenter: Presenter() {
             if(item.progress == null || item.progress == 0.0f || item.progress == 100.0f) {
                 v.mProgress.visibility = View.GONE
             } else {
-                Timber.tag(Settings.TAG).d("Progress is "+item.progress)
                 v.mProgress.progress = (item.progress!!).toInt()
                 v.mProgress.visibility = View.VISIBLE
             }
@@ -98,6 +110,8 @@ class MovieCardPresenter: Presenter() {
                 .load(poster)
                 .fit()
                 .into(v.mPoster)
+
+                v.mProgress.visibility = View.GONE
         }
     }
 

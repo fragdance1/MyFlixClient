@@ -18,13 +18,13 @@ interface MovieService {
     @GET("movie/details/{id}")
     fun getMovieDetails(@Path("id") id:String):Call<IMovieDetails>
 
-    @GET("movie/boxoffice")
+    @GET("movies/boxoffice")
     fun getBoxOfficeMovies():Call<List<IMovie>>
 
-    @GET("movie/recommended")
+    @GET("movies/recommended")
     fun getRecommendedMovies():Call<List<IMovie>>
 
-    @GET("movie/trending")
+    @GET("movies/trending")
     fun getTrendingMovies():Call<List<IMovie>>
 
     @GET("movie/inprogress")

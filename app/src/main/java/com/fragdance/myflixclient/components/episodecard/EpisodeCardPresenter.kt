@@ -3,6 +3,7 @@ package com.fragdance.myflixclient.components.episodecard
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.leanback.widget.Presenter
@@ -31,7 +32,12 @@ class EpisodeCardPresenter : Presenter() {
 
             v.mTitle.text = item.title
             v.mSubtitle.text = item.subtitle
-            v.mProgress.setProgress((item.progress * 100).toInt())
+            if(item.progress > 0 && item.progress < 100.0f) {
+                v.mProgress.setProgress((item.progress * 100).toInt())
+                v.mProgress.visibility = View.VISIBLE
+            } else {
+                v.mProgress.visibility = View.GONE
+            }
             var still =
                 if (item.id != null) (Settings.SERVER + "/api/still/" + item.id) else item.poster
             Picasso.get()

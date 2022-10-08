@@ -9,7 +9,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.leanback.app.VerticalGridSupportFragment
 import androidx.leanback.widget.*
-import androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_SMALL
+import androidx.leanback.widget.FocusHighlight.*
 import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import androidx.navigation.fragment.findNavController
@@ -72,10 +72,11 @@ open class MovieGridFragment : VerticalGridSupportFragment(){
     }
 
     private fun setupFragment() {
-        view?.setBackgroundColor(Color.parseColor("#121212"))
-        val gridPresenter = MyFlixVerticalGridPresenter(ZOOM_FACTOR_SMALL, false)
+        view?.setBackgroundColor(Color.parseColor("#00000000"))
+        val gridPresenter = MyFlixVerticalGridPresenter(ZOOM_FACTOR_MEDIUM, false)
 
         gridPresenter.numberOfColumns = 4
+        gridPresenter.shadowEnabled = false
         setGridPresenter(gridPresenter)
 
         mAdapter = ArrayObjectAdapter(MovieCardPresenter())

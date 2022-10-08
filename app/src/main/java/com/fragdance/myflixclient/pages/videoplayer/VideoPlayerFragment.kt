@@ -156,6 +156,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     override fun onStop() {
         super.onStop()
+        Timber.tag(Settings.TAG).d("onStop")
         destroyPlayer()
     }
 
@@ -166,6 +167,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     fun onPlayCompleted() {
+        Timber.tag(Settings.TAG).d("onPlayCompleted")
         destroyPlayer()
         val date = LocalDateTime.now().toString()
         val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
@@ -245,7 +247,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
         }
         Timber.tag(Settings.TAG).d("Number of subtitles "+mExternalSubtitles.size)
         mVideoPlayer!!.init(requireContext(),this )
-
+        Timber.tag(Settings.TAG).d("Loading video");
         mVideoPlayer!!.loadVideo(video)
 
         if(video!!.subtitles.count() > 0) {
@@ -253,6 +255,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
         } else {
             disableSubtitles();
         }
+        Timber.tag(Settings.TAG).d("Getting stuff")
         val tmdbId = mCurrentVideo.tmdbId.toString()
         val scrobble = ScrobbleData(0.0f)
         val startCall = videoService.start(mCurrentVideo.type!!,tmdbId,scrobble)
@@ -484,7 +487,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     inner class PlayerEventListener : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
-
+Timber.tag(Settings.TAG).d("onIsPlayingChanged")
             super.onIsPlayingChanged(isPlaying)
             if(isPlaying && !mPlaying) {
                 mPlaying = true
@@ -492,7 +495,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 val tmdbId = mCurrentVideo.tmdbId.toString()
                 var imdbId = mCurrentVideo.imdbId.toString()
 
-                mVideoPlayer!!.seekTo(mCurrentVideo.progress)
+                //mVideoPlayer!!.seekTo(mCurrentVideo.progress)
 
                 val startCall = if(mCurrentVideo.type == "movie")
                     trakttvService.startMovie(access_token,imdbId,"0")

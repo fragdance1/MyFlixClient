@@ -12,134 +12,94 @@ import timber.log.Timber
 
 class MovieLoaders {
     companion object {
-        private fun loadLatestMovies(adapter:ArrayObjectAdapter) {
-            // Check if already downloaded
-            val movies = Settings.startMovies["Latest"];
-            if(movies!=null) {
-
-                adapter.addAll(0, movies)
-            } else {
-                val requestCall = movieService.getLatestMovies()
-                requestCall.enqueue(object : Callback<List<IMovie>> {
-                    override fun onResponse(
-                        call: Call<List<IMovie>>,
-                        response: Response<List<IMovie>>
-                    ) {
-                        if (response.isSuccessful) {
-                            adapter.addAll(0, response.body()!!)
-                            Settings.startMovies["Latest"] = response.body()!!
+        private fun loadMovies(name:String,requestCall:Call<List<IMovie>>,adapter:ArrayObjectAdapter?) {
+            requestCall.enqueue(object : Callback<List<IMovie>> {
+                override fun onResponse(
+                    call: Call<List<IMovie>>,
+                    response: Response<List<IMovie>>
+                ) {
+                    if (response.isSuccessful) {
+                        Settings.startMovies[name] = response.body()!!
+                        Timber.tag(Settings.TAG).d(name+" "+Settings.startMovies[name]?.size)
+                        if(adapter != null) {
+                            adapter.addAll(0,Settings.startMovies[name])
                         }
                     }
+                }
+                override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
+                    Timber.tag(Settings.TAG).d("Get latest movies failed " + t);
+                }
 
-                    override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Get latest movies failed " + t);
-                    }
+            })
+        }
 
-                })
+        private fun reloadLatestMovies(adapter:ArrayObjectAdapter?) {
+            val requestCall = movieService.getLatestMovies()
+            loadMovies("Latest",requestCall,adapter)
+        }
+        private fun loadLatestMovies(adapter:ArrayObjectAdapter) {
+            // Check if already downloaded
+            if(Settings.startMovies["Latest"] == null) {
+                reloadLatestMovies(adapter)
             }
+            if(Settings.startMovies["Latest"]!=null) {
+                adapter.addAll(0, Settings.startMovies["Latest"])
+            }
+        }
+
+        private fun reloadRecommendedMovies(adapter:ArrayObjectAdapter?) {
+            val requestCall = movieService.getRecommendedMovies()
+            loadMovies("Recommended",requestCall,adapter)
         }
         private fun loadRecommendedMovies(adapter:ArrayObjectAdapter) {
             // Check if already downloaded
-            val movies = Settings.startMovies["Recommended"];
-            if(movies!=null) {
-
-                adapter.addAll(0, movies)
-            } else {
-                val requestCall = movieService.getRecommendedMovies()
-                requestCall.enqueue(object : Callback<List<IMovie>> {
-                    override fun onResponse(
-                        call: Call<List<IMovie>>,
-                        response: Response<List<IMovie>>
-                    ) {
-                        if (response.isSuccessful) {
-                            adapter.addAll(0, response.body()!!)
-                            Settings.startMovies["Recommended"] = response.body()!!
-                        }
-                    }
-
-                    override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Recommended movies failed" + t);
-                    }
-
-                })
+            if(Settings.startMovies["Recommended"] == null) {
+                reloadRecommendedMovies(adapter)
+            }
+            if(Settings.startMovies["Recommended"] != null) {
+                adapter.addAll(0,Settings.startMovies["Recommended"])
             }
         }
-        private fun loadInProgressMovies(adapter:ArrayObjectAdapter) {
+
+        private fun reloadInProgressMovies(adapter:ArrayObjectAdapter?) {
+            val requestCall = movieService.getInProgressMovies()
+            loadMovies("In Progress",requestCall,adapter)
+        }
+        private fun loadInProgressMovies(adapter:ArrayObjectAdapter,) {
             // Check if already downloaded
-            val movies = Settings.startMovies["In Progress"];
-            if(movies!=null) {
-                adapter.addAll(0, movies)
-            } else {
-                val requestCall = movieService.getInProgressMovies()
-                requestCall.enqueue(object : Callback<List<IMovie>> {
-                    override fun onResponse(
-                        call: Call<List<IMovie>>,
-                        response: Response<List<IMovie>>
-                    ) {
-                        if (response.isSuccessful) {
-                            adapter.addAll(0, response.body()!!)
-                            Settings.startMovies["In Progress"] = response.body()!!
-                        }
-                    }
-
-                    override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("In Progress movies failed " + t);
-                    }
-
-                })
+            if(Settings.startMovies["In Progress"] == null) {
+                reloadInProgressMovies(adapter)
             }
+            if(Settings.startMovies["In Progress"] != null) {
+                adapter.addAll(0,Settings.startMovies["In Progress"])
+            }
+        }
+
+        private fun reloadBoxOfficeMovies(adapter:ArrayObjectAdapter?) {
+            val requestCall = movieService.getBoxOfficeMovies()
+            loadMovies("BoxOffice",requestCall,adapter)
         }
         private fun loadBoxOfficeMovies(adapter:ArrayObjectAdapter) {
             // Check if already downloaded
-            val movies = Settings.startMovies["BoxOffice"];
-            if(movies!=null) {
-
-                adapter.addAll(0, movies)
-            } else {
-                val requestCall = movieService.getBoxOfficeMovies()
-                requestCall.enqueue(object : Callback<List<IMovie>> {
-                    override fun onResponse(
-                        call: Call<List<IMovie>>,
-                        response: Response<List<IMovie>>
-                    ) {
-                        if (response.isSuccessful) {
-                            adapter.addAll(0, response.body()!!)
-                            Settings.startMovies["BoxOffice"] = response.body()!!
-                        }
-                    }
-
-                    override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Boxoffice movies failed " + t);
-                    }
-
-                })
+            if(Settings.startMovies["BoxOffice"] == null) {
+                reloadBoxOfficeMovies(adapter)
             }
+            if(Settings.startMovies["BoxOffice"] != null) {
+                adapter.addAll(0,Settings.startMovies["BoxOffice"])
+            }
+        }
+
+        private fun reloadGenre(genre:String,adapter:ArrayObjectAdapter?) {
+            val requestCall = movieService.getMoviesByGenre(genre)
+            loadMovies(genre,requestCall,adapter)
         }
         private fun loadGenre(genre:String,adapter:ArrayObjectAdapter) {
             // Check if already downloaded
-            val movies = Settings.startMovies[genre];
-            if(movies!=null) {
-
-                adapter.addAll(0, movies)
-            } else {
-                val requestCall = movieService.getMoviesByGenre(genre)
-                requestCall.enqueue(object : Callback<List<IMovie>> {
-                    override fun onResponse(
-                        call: Call<List<IMovie>>,
-                        response: Response<List<IMovie>>
-                    ) {
-                        if (response.isSuccessful) {
-                            adapter.addAll(0, response.body()!!)
-                            Settings.startMovies[genre] = response.body()!!
-
-                        }
-                    }
-
-                    override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("Genre "+genre+" failed " + t);
-                    }
-
-                })
+            if(Settings.startMovies[genre] == null) {
+                reloadGenre(genre,adapter)
+            }
+            if(Settings.startMovies[genre] != null) {
+                adapter.addAll(0,Settings.startMovies[genre])
             }
         }
 
@@ -151,7 +111,16 @@ class MovieLoaders {
                 "In Progress" -> loadInProgressMovies(adapter)
                 else -> loadGenre(type,adapter)
             }
+        }
 
+        fun reloadMovies(type:String,adapter:ArrayObjectAdapter?) {
+            when(type) {
+                "Latest" -> reloadLatestMovies(adapter)
+                "Recommended" -> reloadRecommendedMovies(adapter)
+                "Boxoffice" -> reloadBoxOfficeMovies(adapter)
+                "In Progress" -> reloadInProgressMovies(adapter)
+                else -> reloadGenre(type,adapter)
+            }
         }
     }
 }

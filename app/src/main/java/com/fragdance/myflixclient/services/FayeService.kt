@@ -11,20 +11,18 @@ class FayeService: FayeClientListener {
     var callbacks = HashMap<String,(message:String?)->Unit>();
     init {
         var meta = MetaMessage();
-        client = FayeClient("ws://192.168.1.121:8000/api/faye/",meta);
+        client = FayeClient("ws://192.168.1.79:8000/api/faye/",meta);
         client.listener = this;
         client.connectServer();
     }
 
     private fun subscribe(channel:String, callback: (message:String?)->Unit):Boolean {
     if(client.isConnectedServer) {
-        Timber.tag(Settings.TAG).d("isConnectedServer")
         client.subscribeChannel(channel);
         callbacks[channel] = callback
         return true
     } else {
         client.connectServer()
-        Timber.tag(Settings.TAG).d("not isConnectedServer")
         return false
     }
 

@@ -9,18 +9,27 @@ import androidx.leanback.widget.ListRowPresenter
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import com.fragdance.myflixclient.utils.MovieLoaders
+import timber.log.Timber
 
 
 class HomePage: RowsSupportFragment() {
-    val movieCardPresenter = MovieCardPresenter()
-    val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-    fun loadHomePageMovies(type:String) {
+    private val movieCardPresenter = MovieCardPresenter()
+    private var mRowPresenter = ListRowPresenter()
+    private lateinit var rowsAdapter:ArrayObjectAdapter;// = ArrayObjectAdapter(ListRowPresenter())
+
+    private fun loadHomePageMovies(type:String) {
+
+        val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
+
+        MovieLoaders.reloadMovies(type,listRowAdapter)
+        val header = HeaderItem(rowsAdapter.size().toLong(), type)
+        val row = ListRow(header, listRowAdapter)
+
+        rowsAdapter.add(row)
+        /*
         when(type) {
             "Latest" -> {
-                val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
-                MovieLoaders.loadMovies(type,listRowAdapter)
-                val header = HeaderItem(rowsAdapter.size().toLong(), type)
-                rowsAdapter.add(ListRow(header, listRowAdapter))
+
             }
             "Recommended" -> {
                 val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
@@ -30,7 +39,7 @@ class HomePage: RowsSupportFragment() {
             }
             "In Progress" -> {
                 val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
-                MovieLoaders.loadMovies(type,listRowAdapter)
+                MovieLoaders.reloadMovies(type,listRowAdapter)
                 val header = HeaderItem(rowsAdapter.size().toLong(), type)
                 rowsAdapter.add(ListRow(header, listRowAdapter))
             }
@@ -42,8 +51,11 @@ class HomePage: RowsSupportFragment() {
             }
         }
 
+         */
+
     }
-    fun loadData() {
+
+    private fun loadData() {
         loadHomePageMovies("Latest")
         loadHomePageMovies("Recommended")
         loadHomePageMovies("Boxoffice")
@@ -51,13 +63,17 @@ class HomePage: RowsSupportFragment() {
         for(genre in Settings.MOVIE_GENRES) {
             loadHomePageMovies(genre)
         }
-
         adapter = rowsAdapter
+
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mRowPresenter.shadowEnabled = false;
+        
+        rowsAdapter = ArrayObjectAdapter(mRowPresenter)
+        Timber.tag(Settings.TAG).d("HomePage.OnCreate")
         loadData()
     }
 }

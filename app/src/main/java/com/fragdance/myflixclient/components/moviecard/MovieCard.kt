@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.view.marginLeft
 import androidx.core.view.setMargins
 
 import androidx.leanback.widget.BaseCardView
@@ -27,36 +28,41 @@ class MovieCard(context: Context, attrs: AttributeSet?): BaseCardView(context,at
     }
 
     override fun setSelected(selected:Boolean) {
+        /*
         val overlay = findViewById<View>(R.id.movie_card_info)
         var target = mHeight
         if(selected) target = 0f
         val mSlidInAnimator = ObjectAnimator.ofFloat(overlay, "translationY", target )
         mSlidInAnimator.duration = 300
         mSlidInAnimator.start()
+
+         */
     }
 
     private fun buildImageCardView() {
         focusable = FOCUSABLE
         isFocusableInTouchMode = true
+        background.alpha = 0
 
         val displayMetrics = context.resources.displayMetrics
-        mWidth = (displayMetrics.widthPixels*0.2).toFloat()
-        mHeight = (displayMetrics.widthPixels*0.3).toFloat()
+        mWidth = 240.0f//(displayMetrics.widthPixels*0.2).toFloat()
+        mHeight = 360.0f;//(displayMetrics.widthPixels*0.3).toFloat()
 
 
         val inflater:LayoutInflater = LayoutInflater.from(context)
         inflater.inflate(R.layout.movie_card,this)
-        val overlay:View = findViewById<View>(R.id.movie_card_info)
+        //val overlay:View = findViewById<View>(R.id.movie_card_info)
         val card = findViewById<ViewGroup>(R.id.movie_card)
         mProgress = findViewById<ProgressBar>(R.id.progressBar)
-        mIcons = findViewById<LinearLayout>(R.id.icons_row)
-        card.layoutParams.width =  mWidth.toInt()
+       // mIcons = findViewById<LinearLayout>(R.id.icons_row)
+
+
         //card.layoutParams.height = mHeight.toInt()
 
         mPoster = findViewById(R.id.poster)
-        mPoster.layoutParams.width = mWidth.toInt()
-        mPoster.layoutParams.height = mHeight.toInt()
+        //mPoster.layoutParams.width = mWidth.toInt()
+        //mPoster.layoutParams.height = mHeight.toInt()
         mTitle = findViewById(R.id.movie_card_title)
-        overlay.translationY = mHeight
+        //overlay.translationY = mHeight
     }
 }

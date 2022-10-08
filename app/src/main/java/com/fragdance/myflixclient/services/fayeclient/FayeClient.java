@@ -64,12 +64,10 @@ public class FayeClient {
                 super.handleMessage(msg);
                 switch(msg.what) {
                     case WebSocket.ON_OPEN:
-                        Timber.tag(Settings.TAG).d( "onOpen() executed");
                         mIsConnectedServer = true;
                         handShake();
                         break;
                     case WebSocket.ON_CLOSE:
-                        Timber.tag(Settings.TAG).d( "onClosed() executed");
                         mIsConnectedServer = false;
                         mFayeConnected = false;
                         if(mListener != null && mListener instanceof FayeClientListener) {
@@ -251,7 +249,6 @@ public class FayeClient {
     }
 
     private void handleFayeMessage(String message) {
-        Timber.tag(Settings.TAG).d("handleFayeMessage "+message);
         JSONArray arr = null;
         try {
             arr = new JSONArray(message);
@@ -306,7 +303,6 @@ public class FayeClient {
                 String subscription = obj.optString(MetaMessage.KEY_SUBSCRIPTION);
                 if(successful) {
                     mFayeConnected = true;
-                    Timber.tag(Settings.TAG).d( "Subscribed channel " + subscription);
                 } else {
                     Timber.tag(Settings.TAG).d("Subscribing channel " + subscription
                             + " Error: " + obj.toString());

@@ -149,6 +149,7 @@ class MyFlixExoPlayer:IVideoPlayer {
     }
 
     override fun play() {
+
         mExoplayer!!.play()
     }
 
@@ -167,7 +168,7 @@ class MyFlixExoPlayer:IVideoPlayer {
     }
 
     override fun destroy() {
-
+Timber.tag(Settings.TAG).d("exo destroy")
         mMediaSession.isActive = false
         mMediaSessionConnector.setPlayer(null)
         mExoplayer?.let {

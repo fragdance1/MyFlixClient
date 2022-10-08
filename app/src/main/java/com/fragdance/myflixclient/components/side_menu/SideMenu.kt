@@ -129,7 +129,7 @@ class SideMenu(): Fragment() {
         Timber.tag(Settings.TAG).d("Create menu "+Settings.WIDTH)
         mRootView = inflater.inflate(R.layout.side_menu, container, false) as ViewGroup
         mMenuView = mRootView.findViewById(R.id.menu)
-        Timber.tag(Settings.TAG).d("SideMenu.onCreateView "+Settings.WIDTH)
+
         mMenuView?.layoutParams?.width =  (Settings.WIDTH * 0.4f).toInt()
         mMenuView?.layoutParams?.height = Settings.HEIGHT.toInt()
 

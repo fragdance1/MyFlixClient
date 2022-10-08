@@ -47,26 +47,8 @@ class MainActivity : FragmentActivity() {
     private lateinit var mBonjour: NetworkDiscoveryService
     private var mServerFoundReceiver: BroadcastReceiver? = null
     var contentHasLoaded = false
-    private fun reloadMovies() {
-        val requestCall = movieService.getLocalMovies()
-        requestCall.enqueue(object : Callback<List<IMovie>> {
-            override fun onResponse(call: Call<List<IMovie>>, response: Response<List<IMovie>>) {
-                if (response.isSuccessful) {
-                    Settings.movies = response.body()!!
-                    val intent = Intent()
-                    intent.action = "movies_loaded"
-                    intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
-                    sendBroadcast(intent)
-                }
-            }
 
-            override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "reloadMovies Something went wrong $t", Toast.LENGTH_LONG)
-                    .show()
-            }
-        })
-    }
-    // Load all the local movies into settings
+   // Load all the local movies into settings
     private fun loadMovies() {
         val requestCall = movieService.getLocalMovies()
         requestCall.enqueue(object : Callback<List<IMovie>> {
@@ -168,17 +150,12 @@ class MainActivity : FragmentActivity() {
         navController = navHostFragment.navController
 
         navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
-        //navGraph.startDestination = R.id.splashFragment
-        navController.graph = navGraph
-    //setContentView(R.layout.splash)
 
-        Timber.tag(Settings.TAG).d("MainActivity.onCreate")
+        navController.graph = navGraph
+
         mInstance = this;
 
         FayeService.create()
-
-        // Get window dimensions
-        //window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         var preferences = getSharedPreferences("myflix",MODE_PRIVATE)
         //SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
@@ -191,7 +168,7 @@ class MainActivity : FragmentActivity() {
 
             if (isEmulator()) { // Bonjour doesn't work on emulator
                 Timber.tag(Settings.TAG).d("Running on emulator");
-                Settings.SERVER = "http://192.168.1.121:8000"
+                Settings.SERVER = "http://192.168.1.79:8000"
                 loadStartingPage()
             } else {
                 mServerFoundReceiver = object : BroadcastReceiver() {
@@ -213,6 +190,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun setupSplashScreen(splashScreen: SplashScreen) {
+        Timber.tag(Settings.TAG).d("setupSplashScreen")
         val content: View = findViewById(android.R.id.content)
 
         content.viewTreeObserver.addOnPreDrawListener(
@@ -241,6 +219,7 @@ class MainActivity : FragmentActivity() {
             slideBack.start()
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -251,15 +230,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun loadStartingPage() {
-        /*
-        setContentView(R.layout.activity_main)
-        findViewById<View>(R.id.loading_progress).visibility = View.INVISIBLE
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-        navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
-
-         */
+        Timber.tag(Settings.TAG).d("loadStartingPage")
         mRootView = findViewById(R.id.main_browse_fragment)
         mRootView.onFocusSearchListener =
             BrowseFrameLayout.OnFocusSearchListener { focused, direction ->
@@ -269,43 +240,22 @@ class MainActivity : FragmentActivity() {
                     null
                 }
             }
-       // navGraph.startDestination = R.id.homePage
         loadMovies()
         loadTVShows()
         navGraph.startDestination = R.id.homePage
-        //navController.graph = navGraph
-
-
-/*
-        if(!FayeService.subscribe("/torrent/test") { message ->
-                run {
-                    val json = JSONObject(message) // String instance holding the above json
-                    val status = json.getString("event")
-                    Timber.tag(Settings.TAG).d("Got a message "+status)
-                }
-            }) {
-            Timber.tag(Settings.TAG).d("Couldn subscribe")
-        } else {
-            Timber.tag(Settings.TAG).d("Subscribed")
-        }
-*/
     }
 
     override fun onNewIntent(intent: Intent?) {
+        Timber.tag(Settings.TAG).d("onNewIntent")
         super.onNewIntent(intent)
         setIntent(intent)
     }
 
-    // Search stuff
+    // Set permissions to use voice search
     private fun checkRunTimePermission() {
-        Timber.tag(Settings.TAG).d("==== checkRuntime Permission")
-
         val permissionArrays = arrayOf(Manifest.permission.RECORD_AUDIO)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(permissionArrays, 11111)
-        } else {
-            Timber.tag(Settings.TAG).d( "==== checkRuntime Permission else")
-            //mFragment.setRecognitionListener()
         }
     }
 
@@ -315,14 +265,7 @@ class MainActivity : FragmentActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Timber.tag(Settings.TAG).d( "==== OnPermission Result")
-
-        if (11111 == requestCode && grantResults.isNotEmpty()) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show()
-            }
-            //mFragment.setRecognitionListener()
-        }
+        Timber.tag(Settings.TAG).d("onRequestPermissionsResult")
         contentHasLoaded = true
     }
 

@@ -41,6 +41,7 @@ class MovieDetailsPage : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         mRootView = inflater.inflate(R.layout.movie_details_view, container, false) as ViewGroup
+
         return mRootView
     }
 
@@ -67,14 +68,15 @@ class MovieDetailsPage : Fragment() {
             rowsAdapter.add(mDetails)
 
             // Add row of cast members
-            val castAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
-                for (cast in mDetails!!.cast) {
-                    add(castToPersonCard(cast))
+            if(mDetails!!.cast != null) {
+                val castAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
+                    for (cast in mDetails!!.cast) {
+                        add(castToPersonCard(cast))
+                    }
                 }
+                val castRow = MyFlixListRow(HeaderItem(0, "Cast"), castAdapter)
+                rowsAdapter.add(castRow)
             }
-            val castRow = MyFlixListRow(HeaderItem(0, "Cast"), castAdapter)
-            rowsAdapter.add(castRow)
-
             // Add row of crew members
             val crewAdapter = ArrayObjectAdapter(PersonCardPresenter()).apply {
                 if(mDetails!!.crew != null) {
