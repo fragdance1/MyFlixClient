@@ -26,33 +26,6 @@ class HomePage: RowsSupportFragment() {
         val row = ListRow(header, listRowAdapter)
 
         rowsAdapter.add(row)
-        /*
-        when(type) {
-            "Latest" -> {
-
-            }
-            "Recommended" -> {
-                val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
-                MovieLoaders.loadMovies(type,listRowAdapter)
-                val header = HeaderItem(rowsAdapter.size().toLong(), type)
-                rowsAdapter.add(ListRow(header, listRowAdapter))
-            }
-            "In Progress" -> {
-                val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
-                MovieLoaders.reloadMovies(type,listRowAdapter)
-                val header = HeaderItem(rowsAdapter.size().toLong(), type)
-                rowsAdapter.add(ListRow(header, listRowAdapter))
-            }
-            else -> {
-                val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
-                MovieLoaders.loadMovies(type,listRowAdapter)
-                val header = HeaderItem(rowsAdapter.size().toLong(), type)
-                rowsAdapter.add(ListRow(header, listRowAdapter))
-            }
-        }
-
-         */
-
     }
 
     private fun loadData() {

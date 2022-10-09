@@ -38,19 +38,19 @@ class NetworkDiscoveryService(context:Context) {
                 Timber.tag(Settings.TAG).d("Resolve Succeeded. $serviceInfo")
 
                 if (serviceInfo.serviceName === mServiceName) {
-
                     return
                 }
                 mService = serviceInfo
-                Timber.tag(Settings.TAG).d("serviceInfo "+serviceInfo.host.hostAddress)
-                Settings.SERVER = "http://"+serviceInfo.host.hostAddress + ':'+serviceInfo.port
+ //               Timber.tag(Settings.TAG).d("serviceInfo "+serviceInfo.host.hostAddress)
+                //Settings.SERVER = "http://"+serviceInfo.host.hostAddress + ":8000"//+serviceInfo.port
 
                 val intent = Intent()
                 intent.action = "server_found"
+                intent.putExtra("server","http://"+serviceInfo.host.hostAddress+":8000")
                 intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
                 mContext.sendBroadcast(intent)
 
-                Timber.tag(Settings.TAG).d("Server: "+Settings.SERVER)
+//                Timber.tag(Settings.TAG).d("Server: "+Settings.SERVER)
 //                val port: Int = serviceInfo.port
 //                val host: InetAddress = serviceInfo.host
             }

@@ -35,6 +35,12 @@ import com.fragdance.myflixclient.services.*
 import org.json.JSONObject
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.HeaderItem
+import androidx.leanback.widget.ListRow
+import com.fragdance.myflixclient.utils.MovieLoaders
+import kotlinx.coroutines.*
+import kotlin.coroutines.EmptyCoroutineContext
 
 class MainView(context: Context, attrs: AttributeSet) : BrowseFrameLayout(context, attrs) {
 
@@ -50,61 +56,61 @@ class MainActivity : FragmentActivity() {
 
    // Load all the local movies into settings
     private fun loadMovies() {
-        val requestCall = movieService.getLocalMovies()
-        requestCall.enqueue(object : Callback<List<IMovie>> {
-            override fun onResponse(call: Call<List<IMovie>>, response: Response<List<IMovie>>) {
-                if (response.isSuccessful) {
-                    var editor = getSharedPreferences("myflix",MODE_PRIVATE).edit();
-                    editor.putString("server",Settings.SERVER)
-                    editor.commit()
-                    Settings.movies = response.body()!!
-                    val intent = Intent()
-                    intent.action = "movies_loaded"
-                    intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
-                    sendBroadcast(intent)
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Something went wrong ${response.message()}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
+       runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading movies" }
 
-            override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Loadmovies Something went wrong $t", Toast.LENGTH_LONG)
-                    .show()
+        try {
+            var response = movieService.getLocalMovies().execute()
+            if (response.isSuccessful) {
+                var editor = getSharedPreferences("myflix", MODE_PRIVATE).edit();
+                editor.putString("server", Settings.SERVER)
+                editor.commit()
+                Settings.movies = response.body()!!
+                val intent = Intent()
+                intent.action = "movies_loaded"
+                intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+                sendBroadcast(intent)
+                //loadTVShows()
+            } else {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Something went wrong ${response.message()}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
-        })
+        } catch(e:Exception) {
+            Timber.tag(Settings.TAG).d("Failed to load movies")
+        }
+
+
     }
 
     // Load all the local tv shows into settings
     private fun loadTVShows() {
-        val requestCall = tvShowService.getShows()
-        requestCall.enqueue(object : Callback<List<ITVShow>> {
-            override fun onResponse(call: Call<List<ITVShow>>, response: Response<List<ITVShow>>) {
-                if (response.isSuccessful) {
-                    Settings.tvshows = response.body()!!
-                    val intent = Intent()
-                    intent.action = "tvshows_loaded"
-                    intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
-                    sendBroadcast(intent)
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "loadTVShows Something went wrong ${response.message()}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading TV-shows"}
+        try {
+            var response = tvShowService.getShows().execute()
+            if (response.isSuccessful) {
+                Settings.tvshows = response.body()!!
+                val intent = Intent()
+                intent.action = "tvshows_loaded"
+                intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+                sendBroadcast(intent)
+                //setupView()
+            } else {
+                Toast.makeText(
+                    this@MainActivity,
+                    "loadTVShows Something went wrong ${response.message()}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
+        } catch(e:Exception) {
 
-            override fun onFailure(call: Call<List<ITVShow>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "loadTVShows Something went wrong $t", Toast.LENGTH_LONG)
-                    .show()
-            }
-        })
+        }
     }
 
+    private fun loadCategories() {
+
+    }
     // Show a toast
     private fun showToast(message: String) {
         Handler(Looper.getMainLooper()).post {
@@ -134,17 +140,11 @@ class MainActivity : FragmentActivity() {
 
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Timber.tag(Settings.TAG).d("MainActivity.onCreate")
-        val splashScreen = installSplashScreen()
-        super.onCreate(savedInstanceState)
-        setupSplashScreen(splashScreen)
-        val displayMetrics = this.resources.displayMetrics
-        Settings.WIDTH = displayMetrics.widthPixels.toFloat()
-        Settings.HEIGHT = displayMetrics.heightPixels.toFloat()
+    private fun setupView() {
         setContentView(R.layout.activity_main)
 
         findViewById<View>(R.id.loading_progress).visibility = View.INVISIBLE
+
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
@@ -153,28 +153,111 @@ class MainActivity : FragmentActivity() {
 
         navController.graph = navGraph
 
-        mInstance = this;
+        loadStartingPage();
+    }
 
+    private fun pingServer(server:String) : Boolean {
+        try {
+            Settings.SERVER = server;
+            serverService.ping().execute()
+            return true
+        }catch( e:Exception) {
+            Settings.SERVER = ""
+            return false;
+        }
+    }
+
+    fun init()  {
+        GlobalScope.launch {
+            getServer()
+            //FayeService.create()
+            //loadMovies()
+            //checkRunTimePermission()
+        }
+
+    }
+    private fun loadHomePageMovies(type:String) {
+        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading "+type }
+        MovieLoaders.reloadMovies(type,null)
+    }
+    private fun startup() {
+        Timber.tag(Settings.TAG).d("startup")
         FayeService.create()
-
+        Timber.tag(Settings.TAG).d("loadMovies")
+        loadMovies()
+        Timber.tag(Settings.TAG).d("loadTVShows")
+        loadTVShows()
+        Timber.tag(Settings.TAG).d("checkRuntimePermissions")
+        checkRunTimePermission()
+        Timber.tag(Settings.TAG).d("loadGenre")
+        Timber.tag(Settings.TAG).d("setupView")
+        loadHomePageMovies("Latest")
+        loadHomePageMovies("Recommended")
+        loadHomePageMovies("Boxoffice")
+        loadHomePageMovies("In Progress")
+        for(genre in Settings.MOVIE_GENRES) {
+            loadHomePageMovies(genre)
+        }
+        runOnUiThread { setupView()}
+    }
+    // Try to retrieve the server address
+    private fun getServer() {
+        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Finding server" }
+        // First see if we have a saved server and that it works
         var preferences = getSharedPreferences("myflix",MODE_PRIVATE)
-        //SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         var server = preferences.getString("server",null);
-        if(server is String) {
+        if(server is String && pingServer(server)) {
+            startup()
+            return;
+        }
+        // If we're running on emulator, hardcode ip
+        if(isEmulator() && pingServer("http://192.168.1.79:8000")) {
+            startup()
+            return
+        }
+        Timber.tag(Settings.TAG).d("Got no server")
+        // Testing bonjour
+        mServerFoundReceiver = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                var server = p1!!.getStringExtra("server")
+                if(server != null && pingServer(server)) {
+                    startup()
+                }
+            }
+        }
+        val filter = IntentFilter()
+        filter.addAction("server_found")
+        applicationContext.registerReceiver(mServerFoundReceiver, filter)
+        mBonjour = NetworkDiscoveryService(applicationContext)
+        /*
+        val filter = IntentFilter()
+        filter.addAction("server_found")
+        applicationContext.registerReceiver(mServerFoundReceiver, filter)
+        mBonjour = NetworkDiscoveryService(applicationContext)
+        mServerFoundReceiver = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                Timber.tag(Settings.TAG).d("Server received " + p1!!.getStringExtra("server"))
+
+                //loadStartingPage()
+            }
+        }*/
+
+        /*if(server is String) {
             Timber.tag(Settings.TAG).d("Got server from preferences");
             //Settings.SERVER = server;
-            loadStartingPage();
+
         } else {
 
             if (isEmulator()) { // Bonjour doesn't work on emulator
                 Timber.tag(Settings.TAG).d("Running on emulator");
                 Settings.SERVER = "http://192.168.1.79:8000"
+
                 loadStartingPage()
             } else {
                 mServerFoundReceiver = object : BroadcastReceiver() {
                     override fun onReceive(p0: Context?, p1: Intent?) {
                         Timber.tag(Settings.TAG).d("Server received " + Settings.SERVER)
-                        loadStartingPage()
+                        //loadStartingPage()
                     }
                 }
                 val filter = IntentFilter()
@@ -182,15 +265,31 @@ class MainActivity : FragmentActivity() {
                 applicationContext.registerReceiver(mServerFoundReceiver, filter)
                 mBonjour = NetworkDiscoveryService(applicationContext)
             }
-        }
-        checkRunTimePermission()
+        //}
 
+         */
 
-        Timber.tag(Settings.TAG).d("MainActivity.onCreate done")
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Start by showing the splash screen
+        val splashScreen = installSplashScreen()
+        super.onCreate(savedInstanceState)
+        setupSplashScreen(splashScreen)
+
+        // Set up some dimensions etc
+        val displayMetrics = this.resources.displayMetrics
+        Settings.WIDTH = displayMetrics.widthPixels.toFloat()
+        Settings.HEIGHT = displayMetrics.heightPixels.toFloat()
+
+        setContentView(R.layout.splash)
+        mInstance = this;
+        contentHasLoaded = true
+        init()
+        Timber.tag(Settings.TAG).d("onCreate done")
     }
 
     private fun setupSplashScreen(splashScreen: SplashScreen) {
-        Timber.tag(Settings.TAG).d("setupSplashScreen")
         val content: View = findViewById(android.R.id.content)
 
         content.viewTreeObserver.addOnPreDrawListener(
@@ -203,21 +302,6 @@ class MainActivity : FragmentActivity() {
                 }
             }
         )
-
-        splashScreen.setOnExitAnimationListener { splashScreenView ->
-            val slideBack = ObjectAnimator.ofFloat(
-                splashScreenView.view,
-                View.TRANSLATION_X,
-                0f,
-                -splashScreenView.view.width.toFloat()
-            ).apply {
-                interpolator = DecelerateInterpolator()
-                duration = 800L
-                doOnEnd { splashScreenView.remove() }
-            }
-
-            slideBack.start()
-        }
     }
 
     override fun onDestroy() {
@@ -230,7 +314,6 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun loadStartingPage() {
-        Timber.tag(Settings.TAG).d("loadStartingPage")
         mRootView = findViewById(R.id.main_browse_fragment)
         mRootView.onFocusSearchListener =
             BrowseFrameLayout.OnFocusSearchListener { focused, direction ->
@@ -240,13 +323,9 @@ class MainActivity : FragmentActivity() {
                     null
                 }
             }
-        loadMovies()
-        loadTVShows()
-        navGraph.startDestination = R.id.homePage
     }
 
     override fun onNewIntent(intent: Intent?) {
-        Timber.tag(Settings.TAG).d("onNewIntent")
         super.onNewIntent(intent)
         setIntent(intent)
     }
@@ -265,7 +344,6 @@ class MainActivity : FragmentActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Timber.tag(Settings.TAG).d("onRequestPermissionsResult")
         contentHasLoaded = true
     }
 
@@ -274,7 +352,5 @@ class MainActivity : FragmentActivity() {
         fun showToast(message: String): Unit {
             mInstance.showToast(message)
         }
-
     }
-
 }

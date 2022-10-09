@@ -20,10 +20,7 @@ class MovieLoaders {
                 ) {
                     if (response.isSuccessful) {
                         Settings.startMovies[name] = response.body()!!
-                        Timber.tag(Settings.TAG).d(name+" "+Settings.startMovies[name]?.size)
-                        if(adapter != null) {
-                            adapter.addAll(0,Settings.startMovies[name])
-                        }
+                        adapter?.addAll(0,Settings.startMovies[name])
                     }
                 }
                 override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {

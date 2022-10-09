@@ -8,4 +8,13 @@
     android:layout_height="540dp">
 
 
+    <TextView
+        android:id="@+id/splashMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textSize="20sp" />
 </androidx.appcompat.widget.LinearLayoutCompat>

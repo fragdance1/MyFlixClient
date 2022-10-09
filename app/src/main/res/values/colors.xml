@@ -9,5 +9,5 @@
     <color name="black_60">#99000000</color>
     <color name="black_80">#CC121212</color>
     <color name="black_90">#E6121212</color>
-
+    <color name="colorAccent">#ffff0000</color>
 </resources>

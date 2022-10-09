@@ -29,7 +29,7 @@ class MyFlixApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        MyFlixApplication.instance = this
+        instance = this
         if (BuildConfig.DEBUG) {
             enableStrictMode()
             Timber.plant(Timber.DebugTree())
