@@ -29,6 +29,29 @@ class MovieCardPresenter: Presenter() {
         return ViewHolder(card)
     }
 
+    private fun setIcon(v:MovieCard,hasDisc:Boolean, hasHdd:Boolean, watched:Boolean) {
+        v.mIcon.visibility = if (hasDisc || hasHdd) View.VISIBLE else View.GONE
+        if(hasDisc && hasHdd) {
+            if(watched == true) {
+                v.mIcon.setImageResource(R.drawable.hdd_disc_watched)
+            } else {
+                v.mIcon.setImageResource(R.drawable.hdd_disc_unwatched)
+            }
+        }
+        else if(hasDisc) {
+            if(watched == true) {
+                v.mIcon.setImageResource(R.drawable.disc_watched)
+            } else {
+                v.mIcon.setImageResource(R.drawable.disc_unwatched)
+            }
+        } else if(hasHdd) {
+            if(watched == true) {
+                v.mIcon.setImageResource(R.drawable.hdd_watched)
+            } else {
+                v.mIcon.setImageResource(R.drawable.hdd_unwatched)
+            }
+        }
+    }
     override fun onBindViewHolder(viewHolder: ViewHolder?, item: Any?) {
         checkNotNull(viewHolder)
         val v: MovieCard = viewHolder.view as MovieCard
@@ -38,41 +61,26 @@ class MovieCardPresenter: Presenter() {
                 if (item.id != null) (Settings.SERVER + "/api/poster/movie/" + item.id) else item.poster
 
             v.mTitle.text = item.title
-            /*
-            v.mIcons.removeAllViews()
-            if(item.watched == true) {
-                val icon = ImageView(viewHolder.view.context)
-                icon.setImageResource(R.drawable.ic_eye_solid)
-                icon.adjustViewBounds = true
-                var params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                params.setMargins((Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt())
-                icon.layoutParams = params
-                v.mIcons.addView(icon)
+            var hasDisc = (item.discs != null && item.discs.isNotEmpty()) ||(item.disc != null && item.disc == true)
+            var hasHdd = (item.video_files != null && item.video_files.isNotEmpty()) ||( item.videofile != null && item.videofile == true)
+            var watched = item.watched == true
+
+            setIcon(v,hasDisc,hasHdd,watched)
+            try {
+                Picasso.get()
+                    .load(poster)
+                    .fit()
+                    .into(v.mPoster)
+            } catch(e :Exception ) {
+
             }
+                v.setOnClickListener {
+                    var bundle = bundleOf("id" to item.id)
 
-            if(item.videofile == true || (item.video_files != null && item.video_files?.isNotEmpty())) {
-                val icon = ImageView(viewHolder.view.context)
-                icon.setImageResource(R.drawable.ic_hard_drive)
-                icon.adjustViewBounds = true
-                var params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                params.setMargins((Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt(), (Settings.WIDTH * 0.005).toInt())
-                icon.layoutParams = params
-                v.mIcons.addView(icon)
-            }
-*/
-
-
-            Picasso.get()
-                .load(poster)
-                .fit()
-                .into(v.mPoster)
-            v.setOnClickListener {
-                var bundle = bundleOf("id" to item.id)
-
-                v.findNavController().navigate(
-                    com.fragdance.myflixclient.R.id.action_global_movie_details, bundle
-                )
-            }
+                    v.findNavController().navigate(
+                        com.fragdance.myflixclient.R.id.action_global_movie_details, bundle
+                    )
+                }
 
             if(item.progress == null || item.progress == 0.0f || item.progress == 100.0f) {
                 v.mProgress.visibility = View.GONE
@@ -95,7 +103,11 @@ class MovieCardPresenter: Presenter() {
                     com.fragdance.myflixclient.R.id.action_global_movie_details, bundle
                 )
             }
+            var hasDisc =(item.disc != null && item.disc == true)
+            var hasHdd = (item.videofile != null && item.videofile == true)
+            var watched = item.watched == true
 
+            setIcon(v,hasDisc,hasHdd,watched)
             if(item.progress != null && item.progress!! > 0.0f) {
                 v.mProgress.progress = (item.progress!! * 100.0f).toInt()
                 v.mProgress.visibility = View.VISIBLE

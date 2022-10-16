@@ -299,7 +299,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
         if(video.hash != null) {
             var ready = false
             // Fire up faye
-            Timber.tag(Settings.TAG).d("Subscribing to "+video.hash)
             FayeService.subscribe("/torrent/"+video.hash) { message ->
                 run {
                     val jsonObj = JSONObject(message)
@@ -309,14 +308,12 @@ class VideoPlayerFragment : VideoSupportFragment() {
                         val event = obj["event"]
                         Timber.tag(Settings.TAG).d("Torrent message "+event)
                         if(event == "TORRENT_ADDED") {
-                            Timber.tag(Settings.TAG).d("TORRENT_ADDED")
                             activity?.runOnUiThread {
                                 activity?.findViewById<TextView>(R.id.loadingStatus)?.text =
                                     obj["msg"].toString();
                             }
                         }
                         if(event == "TORRENT_BUFFERING") {
-                            Timber.tag(Settings.TAG).d(obj["msg"].toString())
                             activity?.runOnUiThread {
                                 activity?.findViewById<TextView>(R.id.loadingStatus)?.text =
                                     obj["msg"].toString();
@@ -356,6 +353,10 @@ class VideoPlayerFragment : VideoSupportFragment() {
                         }
                         if(event == "SUBTITLE_READY") {
                             Timber.tag(Settings.TAG).d("Got subtitles from torrent")
+                            activity?.runOnUiThread {
+                                activity?.findViewById<TextView>(R.id.loadingStatus)?.text =
+                                    "Subtitle downloaded"
+                            }
                             var subtitle = ISubtitle(
                                 -1,
                                 "Sven",
@@ -447,10 +448,10 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     }
 
-    fun downloadSubtitle(subtitle: ISubtitle,videoId:Long) {
+    fun downloadSubtitle(subtitle: ISubtitle,videoId:Long?,hash:String?) {
         val url: String = subtitle.url
-        val requestCall = subtitleStringService.downloadSubtitle(url,videoId)
-        Timber.tag(Settings.TAG).d("Downloading subtitle")
+        val requestCall = subtitleStringService.downloadSubtitle(url,videoId,hash)
+        Timber.tag(Settings.TAG).d("Downloading subtitle for "+videoId)
         requestCall.enqueue(object : Callback<String> {
             override fun onResponse(
                 call: Call<String>,
@@ -487,7 +488,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     inner class PlayerEventListener : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
-Timber.tag(Settings.TAG).d("onIsPlayingChanged")
+            Timber.tag(Settings.TAG).d("onIsPlayingChanged")
             super.onIsPlayingChanged(isPlaying)
             if(isPlaying && !mPlaying) {
                 mPlaying = true

@@ -41,12 +41,12 @@ class NetworkDiscoveryService(context:Context) {
                     return
                 }
                 mService = serviceInfo
- //               Timber.tag(Settings.TAG).d("serviceInfo "+serviceInfo.host.hostAddress)
+               Timber.tag(Settings.TAG).d("serviceInfo "+serviceInfo.host.hostAddress)
                 //Settings.SERVER = "http://"+serviceInfo.host.hostAddress + ":8000"//+serviceInfo.port
 
                 val intent = Intent()
                 intent.action = "server_found"
-                intent.putExtra("server","http://"+serviceInfo.host.hostAddress+":8000")
+                intent.putExtra("server",serviceInfo.host.hostAddress)
                 intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
                 mContext.sendBroadcast(intent)
 

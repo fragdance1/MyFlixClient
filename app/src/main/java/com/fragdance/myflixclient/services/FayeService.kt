@@ -11,7 +11,9 @@ class FayeService: FayeClientListener {
     var callbacks = HashMap<String,(message:String?)->Unit>();
     init {
         var meta = MetaMessage();
-        client = FayeClient("ws://"+Settings.SERVER+"/api/faye/",meta);
+        var url = "ws://"+Settings.SERVER_IP+":8000/api/faye/"
+        Timber.tag(Settings.TAG).d("Connecting faye with "+url)
+        client = FayeClient(url,meta);
         client.listener = this;
         client.connectServer();
     }
@@ -59,15 +61,12 @@ class FayeService: FayeClientListener {
 
     override fun onConnectedServer(fc: FayeClient?) {
         Timber.tag(Settings.TAG).d("Faye Connected to server")
-        FayeService.subscribe("/test/test") { message ->
-            run {
-                Timber.tag(Settings.TAG).d("Test")
-            }
-        }
+
     }
 
     override fun onDisconnectedServer(fc: FayeClient?) {
         Timber.tag(Settings.TAG).d("Faye Disconnected from server")
+
     }
 
     override fun onReceivedMessage(fc: FayeClient?, channel:String,msg: String?) {

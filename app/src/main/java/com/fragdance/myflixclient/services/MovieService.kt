@@ -9,27 +9,27 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MovieService {
-    @GET("movies")
+    @GET("api/movies")
     fun getLocalMovies(): Call<List<IMovie>>
 
-    @GET("movie/latest")
+    @GET("api/movie/latest")
     fun getLatestMovies(): Call<List<IMovie>>
 
-    @GET("movie/details/{id}")
+    @GET("api/movie/details/{id}")
     fun getMovieDetails(@Path("id") id:String):Call<IMovieDetails>
 
-    @GET("movies/boxoffice")
+    @GET("api/movies/boxoffice")
     fun getBoxOfficeMovies():Call<List<IMovie>>
 
-    @GET("movies/recommended")
+    @GET("api/movies/recommended")
     fun getRecommendedMovies():Call<List<IMovie>>
 
-    @GET("movies/trending")
+    @GET("api/movies/trending")
     fun getTrendingMovies():Call<List<IMovie>>
 
-    @GET("movie/inprogress")
+    @GET("api/movie/inprogress")
     fun getInProgressMovies():Call<List<IMovie>>
-    @GET("movie/genre/{genre}")
+    @GET("api/movie/genre/{genre}")
     fun getMoviesByGenre(@Path("genre") genre:String):Call<List<IMovie>>
 }
 

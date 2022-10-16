@@ -21,7 +21,7 @@ class HomePage: RowsSupportFragment() {
 
         val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
 
-        MovieLoaders.reloadMovies(type,listRowAdapter)
+        MovieLoaders.loadMovies(type,listRowAdapter)
         val header = HeaderItem(rowsAdapter.size().toLong(), type)
         val row = ListRow(header, listRowAdapter)
 

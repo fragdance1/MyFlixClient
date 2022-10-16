@@ -22,7 +22,7 @@ class MovieCard(context: Context, attrs: AttributeSet?): BaseCardView(context,at
     lateinit var mPoster:ImageView
     lateinit var mTitle: TextView
     lateinit var mProgress: ProgressBar
-    lateinit var mIcons:LinearLayout
+    lateinit var mIcon:ImageView
     init {
         buildImageCardView()
     }
@@ -54,7 +54,8 @@ class MovieCard(context: Context, attrs: AttributeSet?): BaseCardView(context,at
         //val overlay:View = findViewById<View>(R.id.movie_card_info)
         val card = findViewById<ViewGroup>(R.id.movie_card)
         mProgress = findViewById<ProgressBar>(R.id.progressBar)
-       // mIcons = findViewById<LinearLayout>(R.id.icons_row)
+        mIcon = findViewById<ImageView>(R.id.icon)
+
 
 
         //card.layoutParams.height = mHeight.toInt()

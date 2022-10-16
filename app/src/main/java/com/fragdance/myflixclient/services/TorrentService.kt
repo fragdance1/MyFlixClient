@@ -7,10 +7,10 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface TorrentService {
-    @GET("torrent/search/{imdb}")
+    @GET("api/torrent/search/{imdb}")
     fun getMovieTorrents(@Path("imdb") imdb:String): Call<List<ITorrent>>
 
-    @GET("torrent/add")
+    @GET("api/torrent/add")
     fun addMovieTorrent(@Query("url")  url:String, @Query("id") id:Long,@Query("hash") hash:String):Call<IStatus>
 }
 

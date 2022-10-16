@@ -6,10 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
 import android.widget.TextView
 import android.widget.Toast
@@ -28,6 +24,7 @@ import retrofit2.Response
 import timber.log.Timber
 import android.Manifest
 import android.animation.ObjectAnimator
+import android.os.*
 import android.view.*
 import android.view.animation.DecelerateInterpolator
 import androidx.core.animation.doOnEnd
@@ -41,6 +38,10 @@ import androidx.leanback.widget.ListRow
 import com.fragdance.myflixclient.utils.MovieLoaders
 import kotlinx.coroutines.*
 import kotlin.coroutines.EmptyCoroutineContext
+import android.os.Bundle
+
+
+
 
 class MainView(context: Context, attrs: AttributeSet) : BrowseFrameLayout(context, attrs) {
 
@@ -61,9 +62,6 @@ class MainActivity : FragmentActivity() {
         try {
             var response = movieService.getLocalMovies().execute()
             if (response.isSuccessful) {
-                var editor = getSharedPreferences("myflix", MODE_PRIVATE).edit();
-                editor.putString("server", Settings.SERVER)
-                editor.commit()
                 Settings.movies = response.body()!!
                 val intent = Intent()
                 intent.action = "movies_loaded"
@@ -158,10 +156,12 @@ class MainActivity : FragmentActivity() {
 
     private fun pingServer(server:String) : Boolean {
         try {
-            Settings.SERVER = server;
-            serverService.ping().execute()
+            Settings.SERVER_IP = server;
+            val response = serverService.ping().execute()
+            Settings.SERVER = "http://"+Settings.SERVER_IP+":8000"
             return true
         }catch( e:Exception) {
+            Timber.tag(Settings.TAG).d("Ping failed "+e.message)
             Settings.SERVER = ""
             return false;
         }
@@ -181,16 +181,10 @@ class MainActivity : FragmentActivity() {
         MovieLoaders.reloadMovies(type,null)
     }
     private fun startup() {
-        Timber.tag(Settings.TAG).d("startup")
         FayeService.create()
-        Timber.tag(Settings.TAG).d("loadMovies")
         loadMovies()
-        Timber.tag(Settings.TAG).d("loadTVShows")
         loadTVShows()
-        Timber.tag(Settings.TAG).d("checkRuntimePermissions")
         checkRunTimePermission()
-        Timber.tag(Settings.TAG).d("loadGenre")
-        Timber.tag(Settings.TAG).d("setupView")
         loadHomePageMovies("Latest")
         loadHomePageMovies("Recommended")
         loadHomePageMovies("Boxoffice")
@@ -206,12 +200,14 @@ class MainActivity : FragmentActivity() {
         // First see if we have a saved server and that it works
         var preferences = getSharedPreferences("myflix",MODE_PRIVATE)
         var server = preferences.getString("server",null);
+
         if(server is String && pingServer(server)) {
             startup()
             return;
         }
+
         // If we're running on emulator, hardcode ip
-        if(isEmulator() && pingServer("http://192.168.1.79:8000")) {
+        if(isEmulator() && pingServer("192.168.1.121")) {
             startup()
             return
         }
@@ -220,8 +216,12 @@ class MainActivity : FragmentActivity() {
         mServerFoundReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
                 var server = p1!!.getStringExtra("server")
+                Timber.tag(Settings.TAG).d("Got server "+server)
                 if(server != null && pingServer(server)) {
+                    Timber.tag(Settings.TAG).d("Yay")
                     startup()
+                } else {
+                    Timber.tag(Settings.TAG).d("All tries failed")
                 }
             }
         }
@@ -288,6 +288,7 @@ class MainActivity : FragmentActivity() {
         init()
         Timber.tag(Settings.TAG).d("onCreate done")
     }
+
 
     private fun setupSplashScreen(splashScreen: SplashScreen) {
         val content: View = findViewById(android.R.id.content)

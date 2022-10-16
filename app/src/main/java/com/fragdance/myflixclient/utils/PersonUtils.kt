@@ -31,7 +31,8 @@ fun crewToMovieCard(crew: ICrew): IMovieCardData {
         crew.movie?.poster,
         crew.movie?.progress,
         crew.movie?.disc,
-        crew.movie?.videofile
+        crew.movie?.videofile,
+        crew.movie?.watched
     )
 }
 
@@ -42,8 +43,9 @@ fun castToMovieCard(cast: ICast): IMovieCardData {
         cast.character,
         cast.movie?.poster,
         cast.movie?.progress,
-        cast.movie?.disc,
-        cast.movie?.videofile
+        cast.movie?.disc == true || (cast.movie?.discs != null && cast.movie?.discs?.size > 0),
+        cast.movie?.videofile == true ||(cast.movie?.video_files != null && cast.movie?.discs.isNotEmpty()),
+        cast.movie?.watched
     )
 }
 

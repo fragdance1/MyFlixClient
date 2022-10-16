@@ -41,7 +41,8 @@
         app:layout_constraintStart_toStartOf="@id/poster"
         app:layout_constraintEnd_toEndOf="@id/poster"
         app:layout_constraintBottom_toBottomOf="@id/poster"
- />
+    />
+
     <TextView
         android:id="@+id/movie_card_title"
         android:layout_width="0dp"
@@ -54,6 +55,17 @@
         app:layout_constraintEnd_toEndOf="@id/poster"
         app:layout_constraintStart_toStartOf="@id/poster"
         android:text="TextView" />
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:adjustViewBounds="true"
+
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/disc_unwatched" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

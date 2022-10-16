@@ -9,10 +9,10 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface PersonService {
-    @GET("person/details/{id}")
+    @GET("api/person/details/{id}")
     fun getPersonDetails(@Path("id") id:Int):Call<IPersonDetails>
 
-    @GET("person/movies/{id}")
+    @GET("api/person/movies/{id}")
     fun getMovies(@Path("id") id:String):Call<List<IMovie>>
 }
 

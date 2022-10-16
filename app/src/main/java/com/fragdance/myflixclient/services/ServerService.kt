@@ -7,9 +7,8 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ServerService {
-    @GET("ping")
-    fun ping():Call<Boolean>
-
+    @GET("api/server/connect")
+    fun ping():Call<String>
 }
 
 val serverService  = StringServiceBuilder.buildService(ServerService::class.java)

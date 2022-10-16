@@ -17,3 +17,8 @@ data class IVideoFile(
 
 ):Serializable
 
+data class IDisc(
+   var id:Int,
+   var type:String,
+   var upc:String
+)

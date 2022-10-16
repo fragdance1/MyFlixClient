@@ -8,7 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface SonarrService {
-    @GET("sonarr/seasons")
+    @GET("api/sonarr/seasons")
     fun getSeasons(@Query("id") id:Long):Call<List<ISeason>>
 }
 
