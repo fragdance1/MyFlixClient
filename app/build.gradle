@@ -63,13 +63,14 @@ dependencies {
 
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
     implementation "androidx.navigation:navigation-ui-ktx:2.3.5"
-    implementation "com.google.android.exoplayer:exoplayer:2.17.1"
-    implementation "com.google.android.exoplayer:extension-leanback:2.17.1"
-    implementation "com.google.android.exoplayer:extension-mediasession:2.17.1"
+    implementation "com.google.android.exoplayer:exoplayer:2.18.1"
+    implementation "com.google.android.exoplayer:extension-leanback:2.18.1"
+    implementation "com.google.android.exoplayer:extension-mediasession:2.18.1"
     implementation "com.google.android.gms:play-services-cast-tv:18.0.0"
     implementation "com.google.android.gms:play-services-cast:20.1.0"
     implementation("com.jakewharton.timber:timber:4.7.1")
-    implementation("org.jellyfin.exoplayer:exoplayer-ffmpeg-extension:2.17.1+1")
+    //noinspection GradleDependency
+    implementation("org.jellyfin.exoplayer:exoplayer-ffmpeg-extension:2.18.1+2")
     implementation("org.cometd.java:cometd-java-client-http-okhttp:7.0.6")
     implementation("org.cometd.java:cometd-java-client-websocket-okhttp:7.0.6")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.3.2")

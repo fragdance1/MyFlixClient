@@ -20,8 +20,6 @@ interface IVideoPlayer {
     fun currentMs():Long
     fun getTrackSelector():DefaultTrackSelector?
 
-    fun disableSubtitles()
-    fun selectExternalSubtitle(index: Int)
     fun disableInternalSubtitle()
 
     fun play()
@@ -29,6 +27,8 @@ interface IVideoPlayer {
 
     fun getProgress():Float
     fun seekTo(progress:Float)
+
+    fun selectInternalSubtitle(lang:String):Boolean
 }
 
 class MyFlixMediaPlayer:IVideoPlayer {
@@ -44,19 +44,21 @@ class MyFlixMediaPlayer:IVideoPlayer {
             var glueHost = VideoSupportFragmentGlueHost(playerFragment)
             mMediaPlayerAdapter = MediaPlayerAdapter(context)
 
-            mMediaPlayerAdapter.setProgressUpdatingEnabled(true)//.progressUpdatingInterval = VideoPlayerFragment.PLAYER_UPDATE_INTERVAL_MILLIS.toInt()
+            mMediaPlayerAdapter.setProgressUpdatingEnabled(true)
             mMediaPlayer = mMediaPlayerAdapter.mediaPlayer
             mMediaPlayerGlue = ProgressTransportControlGlue<MediaPlayerAdapter>(context,mMediaPlayerAdapter,playerFragment.onProgressUpdate,playerFragment)
             mMediaPlayerGlue.setHost(glueHost)
             mMediaPlayerGlue.isSeekEnabled = true
             mMediaPlayerGlue.playWhenPrepared()
-
-
         } catch(e: Exception) {
             //Timber.tag(Settings.TAG).d(e.message)
         }
     }
 
+    // AVI-videos doesn't have internal subtitles
+    override fun selectInternalSubtitle(lang:String):Boolean {
+        return false;
+    }
     override fun loadVideo(video: IVideo) {
         try {
             mMediaPlayerAdapter.setDataSource(Uri.parse(Settings.SERVER+video.url))
@@ -83,14 +85,6 @@ class MyFlixMediaPlayer:IVideoPlayer {
 
     override fun getTrackSelector(): DefaultTrackSelector? {
         return null
-    }
-
-    override fun disableSubtitles() {
-        /* no-op */
-    }
-
-    override fun selectExternalSubtitle(index: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun disableInternalSubtitle() {

@@ -81,7 +81,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
     private lateinit var mPlaylist: IPlayList
     // The current video player (MediaPlayer/Exoplayer denpending on format)
     private var mVideoPlayer:IVideoPlayer? = null
-    //private val mViewModel: PlaybackViewModel by viewModels()
 
     // The currently active external subtitle
     private var mSubtitle: Subtitle? = null
@@ -104,7 +103,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPlaylist = PlaybackFragmentArgs.fromBundle(requireArguments()).playlist
-        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -167,21 +166,22 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     fun onPlayCompleted() {
-        Timber.tag(Settings.TAG).d("onPlayCompleted")
+
         destroyPlayer()
         val date = LocalDateTime.now().toString()
         val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
         val tmdbId = mCurrentVideo.tmdbId.toString()
 
-        var watchedCall = if(mCurrentVideo.type == "movie") trakttvService.setMovieWatched(access_token,tmdbId,date) else trakttvService.setEpisodeWatched(access_token,tmdbId,date)
+        var watchedCall = if(mCurrentVideo.type == "movie")
+            trakttvService.setMovieWatched(access_token,tmdbId,date)
+        else
+            trakttvService.setEpisodeWatched(access_token,tmdbId,date)
         watchedCall.enqueue(object:Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 Timber.tag(Settings.TAG).d("TraktTV started")
-                //TODO("Not yet implemented")
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                //TODO("Not yet implemented")
                 Timber.tag(Settings.TAG).d("TraktTV failed")
             }
         })
@@ -212,7 +212,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     private fun destroyPlayer() {
-
         if(mVideoPlayer != null) {
             val progress = mVideoPlayer!!.getProgress();
             val tmdbId = mCurrentVideo.tmdbId.toString()
@@ -245,9 +244,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
         if(video?.subtitles != null) {
             mExternalSubtitles.addAll(0, video.subtitles)
         }
-        Timber.tag(Settings.TAG).d("Number of subtitles "+mExternalSubtitles.size)
+
         mVideoPlayer!!.init(requireContext(),this )
-        Timber.tag(Settings.TAG).d("Loading video");
         mVideoPlayer!!.loadVideo(video)
 
         if(video!!.subtitles.count() > 0) {
@@ -267,6 +265,13 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 Timber.tag(Settings.TAG).d("TraktTV failed")
             }
         })
+    }
+
+    // 1. See if there are internal subtitles
+    // 2. See if there are external subtitles
+    // 3. Disable subtitles
+    private fun enableSubtitle() {
+
     }
 
     private fun addTorrent(video:IVideo) {
@@ -400,7 +405,9 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     // Disable all subtitles
     fun disableSubtitles() {
-        mVideoPlayer!!.disableInternalSubtitle()
+        if(mVideoPlayer != null) {
+            mVideoPlayer!!.disableInternalSubtitle()
+        }
         mSubtitle = null;
         mSubtitleView.setCues(null)
     }
@@ -411,9 +418,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
         return decoder.my_decode(srt.toByteArray(), srt.length, true)
     }
 
+    // Download / select external (srt) subtitle
     fun selectExternalSubtitle(index: Int) {
-        //mVideoPlayer!!.selectExternalSubtitle(index)
-        Timber.tag(Settings.TAG).d("selectExternalSubtitle")
         disableInternalSubtitle()
         if (mExternalSubtitles[index].subtitle == null) {
             mVideoPlayer!!.pause()
@@ -429,7 +435,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
                         mExternalSubtitles[index].subtitle =
                             prepareSrt(mExternalSubtitles[index].srt!!)
                         mSubtitle = mExternalSubtitles[index].subtitle
-                        //Timber.tag(Settings.TAG).d("Done")
                     } else {
                         Timber.tag(Settings.TAG).d("Failed")
                     }
@@ -441,7 +446,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 }
             })
         } else {
-            //Timber.tag(Settings.TAG).d("Testing")
             mSubtitle = mExternalSubtitles[index].subtitle
             mVideoPlayer!!.play()
         }
@@ -486,22 +490,41 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     }
 
+    fun selectExternalSubtitle(lang:String): Boolean {
+        if(mExternalSubtitles.size > 0) {
+            for ((index, value) in mExternalSubtitles.withIndex()) {
+                if(value.language == lang) {
+                    selectExternalSubtitle(index);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     inner class PlayerEventListener : Player.Listener {
+        override fun onTracksChanged(tracks: Tracks) {
+            super.onTracksChanged(tracks)
+            if(!mVideoPlayer!!.selectInternalSubtitle("en")) {
+                if (!selectExternalSubtitle("en")) {
+                    disableSubtitles()
+                }
+            }
+        }
         override fun onIsPlayingChanged(isPlaying: Boolean) {
-            Timber.tag(Settings.TAG).d("onIsPlayingChanged")
             super.onIsPlayingChanged(isPlaying)
             if(isPlaying && !mPlaying) {
+                // Let trakttv know we've started watching a video
                 mPlaying = true
                 val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
                 val tmdbId = mCurrentVideo.tmdbId.toString()
                 var imdbId = mCurrentVideo.imdbId.toString()
 
-                //mVideoPlayer!!.seekTo(mCurrentVideo.progress)
-
                 val startCall = if(mCurrentVideo.type == "movie")
                     trakttvService.startMovie(access_token,imdbId,"0")
                 else
                     trakttvService.startEpisode(access_token,tmdbId,"0")
+
                 startCall.enqueue(object:Callback<Unit> {
                     override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                         Timber.tag(Settings.TAG).d("TraktTV started")

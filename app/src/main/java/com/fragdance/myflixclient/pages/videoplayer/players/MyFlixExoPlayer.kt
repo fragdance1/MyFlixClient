@@ -3,34 +3,32 @@ package com.fragdance.myflixclient.pages.videoplayer.players
 import android.content.Context
 import android.net.Uri
 import android.support.v4.media.session.MediaSessionCompat
-import android.view.ViewGroup
 import androidx.leanback.app.VideoSupportFragmentGlueHost
-import androidx.leanback.media.PlaybackGlue
-import androidx.navigation.Navigation
-import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.models.IVideo
 import com.fragdance.myflixclient.pages.videoplayer.ProgressTransportControlGlue
 import com.fragdance.myflixclient.pages.videoplayer.VideoPlayerFragment
-import com.fragdance.myflixclient.pages.videoplayer.tracks.TrackSelectionMenu
-import com.fragdance.myflixclient.services.subtitleStringService
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.text.Subtitle
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.ui.SubtitleView
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.common.collect.ImmutableSet
 import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
-import java.lang.Exception
+import com.google.android.exoplayer2.RendererCapabilities
+import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.RendererCapabilities.AdaptiveSupport
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+
+import com.google.android.exoplayer2.util.MimeTypes
+import com.google.android.exoplayer2.util.Util
+import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.source.TrackGroup
+
 
 class MyFlixExoPlayer:IVideoPlayer {
     private lateinit var mExoPlayerGlue: ProgressTransportControlGlue<LeanbackPlayerAdapter>
@@ -43,7 +41,7 @@ class MyFlixExoPlayer:IVideoPlayer {
     //private lateinit var mSubtitleView: SubtitleView
     private var mSubtitle: Subtitle? = null
     var mExoplayer: ExoPlayer? = null
-
+    private val TEXT_FORMAT: Format = Format.Builder().setSampleMimeType(MimeTypes.TEXT_VTT).build()
 
     private fun prepareGlue(localExoplayer: ExoPlayer) {
         Timber.tag(Settings.TAG).d("prepareGlue");
@@ -76,6 +74,10 @@ class MyFlixExoPlayer:IVideoPlayer {
             //setQueueNavigator(PlaylistQueueNavigation(mediaSession,video))
         }
     }
+    private val TEXT_CAPABILITIES = FakeRendererCapabilities(C.TRACK_TYPE_TEXT)
+    private val SUBTITLE_CAPABILITIES =
+        arrayOf<RendererCapabilities>(TEXT_CAPABILITIES)
+
     fun buildRenderersFactory():RenderersFactory {
         return DefaultRenderersFactory(mContext).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
     }
@@ -95,6 +97,7 @@ class MyFlixExoPlayer:IVideoPlayer {
         )
 
         mTrackSelector = DefaultTrackSelector(mContext)
+
         val mediaSourceFactory = ProgressiveMediaSource.Factory(dataSourceFactory)
 
         val builder = OkHttpClient.Builder()
@@ -111,10 +114,11 @@ class MyFlixExoPlayer:IVideoPlayer {
 
         with(mExoplayer!!) {
             addListener(mPlayerFragment.PlayerEventListener())
-
             mMediaSessionConnector.setPlayer(this)
             mMediaSession.isActive = true
             playWhenReady = true
+            trackSelectionParameters =
+                trackSelectionParameters.buildUpon().setPreferredTextLanguage("en").build();
         }
 
     }
@@ -141,15 +145,15 @@ class MyFlixExoPlayer:IVideoPlayer {
     }
 
     override fun disableInternalSubtitle() {
+        Timber.tag(Settings.TAG).d("disableInternalSubtitle")
         mExoplayer!!.trackSelectionParameters = mExoplayer!!.trackSelectionParameters
             .buildUpon()
-            .setDisabledTrackTypes(ImmutableSet.of(C.TRACK_TYPE_TEXT))
+            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT,true)
             .build()
 
     }
 
     override fun play() {
-
         mExoplayer!!.play()
     }
 
@@ -157,18 +161,8 @@ class MyFlixExoPlayer:IVideoPlayer {
         mExoplayer!!.pause()
     }
 
-    override fun disableSubtitles() {
-        disableInternalSubtitle()
-        mSubtitle = null
-        //mSubtitleView.setCues(null)
-    }
-
-    override fun selectExternalSubtitle(index: Int) {
-        disableInternalSubtitle()
-    }
-
     override fun destroy() {
-Timber.tag(Settings.TAG).d("exo destroy")
+        Timber.tag(Settings.TAG).d("exo destroy")
         mMediaSession.isActive = false
         mMediaSessionConnector.setPlayer(null)
         mExoplayer?.let {
@@ -179,7 +173,43 @@ Timber.tag(Settings.TAG).d("exo destroy")
         }
         mMediaSession.release()
     }
+/*
+    private fun wrapFormats(vararg formats: Format): TrackGroupArray {
+        val trackGroups = arrayOfNulls<TrackGroup>(formats.size)
+        for (i in trackGroups.indices) {
+            trackGroups[i] = TrackGroup(formats[i])
+        }
+        return TrackGroupArray(*trackGroups)
+    }
 
+ */
+    override fun selectInternalSubtitle(lang:String):Boolean {
+        if (mExoplayer!!.currentTracks.containsType(C.TRACK_TYPE_TEXT)) {
+            val formatBuilder: Format.Builder = TEXT_FORMAT.buildUpon()
+            val noRoleFlags = formatBuilder.build()
+            val lessRoleFlags = formatBuilder.setRoleFlags(C.ROLE_FLAG_CAPTION).build()
+            val moreRoleFlags = formatBuilder
+                .setRoleFlags(C.ROLE_FLAG_CAPTION or C.ROLE_FLAG_COMMENTARY or C.ROLE_FLAG_DUB)
+                .build()
+
+            val trackGroups = arrayOf<TrackGroup>(TrackGroup(lessRoleFlags))
+            val trackGroupArray = TrackGroupArray(*trackGroups)
+            // Enable text
+            mExoplayer!!.trackSelectionParameters = mExoplayer!!.trackSelectionParameters
+                .buildUpon()
+                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT,false)
+                .setPreferredTextLanguage(lang)
+                .build()
+
+            var timeline = mExoplayer!!.currentTimeline
+            var periodId = MediaSource.MediaPeriodId(timeline.getUidOfPeriod(/* periodIndex= */ 0));
+
+            var trackSelection = mExoplayer!!.trackSelector!!.selectTracks(SUBTITLE_CAPABILITIES,trackGroupArray,periodId,timeline)
+
+            return trackSelection.length > 0
+        }
+        return false;
+    }
     override fun currentMs():Long {
         return mExoplayer!!.currentPosition * 1000
     }
@@ -190,4 +220,30 @@ Timber.tag(Settings.TAG).d("exo destroy")
     override fun getProgress():Float {
         return mExoplayer!!.currentPosition.toFloat() /mExoplayer!!.contentDuration.toFloat()
     }
+
+    private class FakeRendererCapabilities(private val trackType: Int) :
+        RendererCapabilities {
+        override fun getName(): String {
+            return "FakeRenderer(" + Util.getTrackTypeString(trackType).toString() + ")"
+        }
+
+        override fun getTrackType(): Int {
+            return trackType
+        }
+
+        @Throws(ExoPlaybackException::class)
+        override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+            return if (MimeTypes.getTrackType(format.sampleMimeType) == trackType) RendererCapabilities.create(
+                C.FORMAT_HANDLED,
+                RendererCapabilities.ADAPTIVE_SEAMLESS,
+                RendererCapabilities.TUNNELING_NOT_SUPPORTED
+            ) else RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
+        }
+
+        @Throws(ExoPlaybackException::class)
+        override fun supportsMixedMimeTypeAdaptation(): @AdaptiveSupport Int {
+            return RendererCapabilities.ADAPTIVE_SEAMLESS
+        }
+    }
+
 }

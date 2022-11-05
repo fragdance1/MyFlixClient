@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit
 class HostSelectionInterceptor: Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         Settings.SERVER_IP?.let { host ->
-            Timber.tag(Settings.TAG).d("New url "+host)
             val request = chain.request()
 
             val newUrl = request.url.newBuilder().host(host).port(8000).build()
