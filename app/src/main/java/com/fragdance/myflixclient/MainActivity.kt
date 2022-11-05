@@ -58,7 +58,6 @@ class MainActivity : FragmentActivity() {
    // Load all the local movies into settings
     private fun loadMovies() {
        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading movies" }
-
         try {
             var response = movieService.getLocalMovies().execute()
             if (response.isSuccessful) {
@@ -78,8 +77,6 @@ class MainActivity : FragmentActivity() {
         } catch(e:Exception) {
             Timber.tag(Settings.TAG).d("Failed to load movies")
         }
-
-
     }
 
     // Load all the local tv shows into settings
@@ -106,9 +103,6 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    private fun loadCategories() {
-
-    }
     // Show a toast
     private fun showToast(message: String) {
         Handler(Looper.getMainLooper()).post {
@@ -154,6 +148,7 @@ class MainActivity : FragmentActivity() {
         loadStartingPage();
     }
 
+    // Ping the server, return false if not found
     private fun pingServer(server:String) : Boolean {
         try {
             Settings.SERVER_IP = server;
@@ -170,16 +165,15 @@ class MainActivity : FragmentActivity() {
     fun init()  {
         GlobalScope.launch {
             getServer()
-            //FayeService.create()
-            //loadMovies()
-            //checkRunTimePermission()
         }
 
     }
+
     private fun loadHomePageMovies(type:String) {
         runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading "+type }
         MovieLoaders.reloadMovies(type,null)
     }
+
     private fun startup() {
         FayeService.create()
         loadMovies()
@@ -194,6 +188,7 @@ class MainActivity : FragmentActivity() {
         }
         runOnUiThread { setupView()}
     }
+
     // Try to retrieve the server address
     private fun getServer() {
         runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Finding server" }
@@ -229,47 +224,7 @@ class MainActivity : FragmentActivity() {
         filter.addAction("server_found")
         applicationContext.registerReceiver(mServerFoundReceiver, filter)
         mBonjour = NetworkDiscoveryService(applicationContext)
-        /*
-        val filter = IntentFilter()
-        filter.addAction("server_found")
-        applicationContext.registerReceiver(mServerFoundReceiver, filter)
-        mBonjour = NetworkDiscoveryService(applicationContext)
-        mServerFoundReceiver = object : BroadcastReceiver() {
-            override fun onReceive(p0: Context?, p1: Intent?) {
-                Timber.tag(Settings.TAG).d("Server received " + p1!!.getStringExtra("server"))
-
-                //loadStartingPage()
-            }
-        }*/
-
-        /*if(server is String) {
-            Timber.tag(Settings.TAG).d("Got server from preferences");
-            //Settings.SERVER = server;
-
-        } else {
-
-            if (isEmulator()) { // Bonjour doesn't work on emulator
-                Timber.tag(Settings.TAG).d("Running on emulator");
-                Settings.SERVER = "http://192.168.1.79:8000"
-
-                loadStartingPage()
-            } else {
-                mServerFoundReceiver = object : BroadcastReceiver() {
-                    override fun onReceive(p0: Context?, p1: Intent?) {
-                        Timber.tag(Settings.TAG).d("Server received " + Settings.SERVER)
-                        //loadStartingPage()
-                    }
-                }
-                val filter = IntentFilter()
-                filter.addAction("server_found")
-                applicationContext.registerReceiver(mServerFoundReceiver, filter)
-                mBonjour = NetworkDiscoveryService(applicationContext)
-            }
-        //}
-
-         */
-
-    }
+     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Start by showing the splash screen
