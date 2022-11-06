@@ -174,16 +174,7 @@ class MyFlixExoPlayer:IVideoPlayer {
         }
         mMediaSession.release()
     }
-/*
-    private fun wrapFormats(vararg formats: Format): TrackGroupArray {
-        val trackGroups = arrayOfNulls<TrackGroup>(formats.size)
-        for (i in trackGroups.indices) {
-            trackGroups[i] = TrackGroup(formats[i])
-        }
-        return TrackGroupArray(*trackGroups)
-    }
 
- */
     override fun selectInternalSubtitle(lang:String):Boolean {
         if (mExoplayer!!.currentTracks.containsType(C.TRACK_TYPE_TEXT)) {
             val formatBuilder: Format.Builder = TEXT_FORMAT.buildUpon()

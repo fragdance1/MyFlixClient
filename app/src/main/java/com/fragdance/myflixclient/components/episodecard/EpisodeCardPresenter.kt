@@ -32,8 +32,8 @@ class EpisodeCardPresenter : Presenter() {
 
             v.mTitle.text = item.title
             v.mSubtitle.text = item.subtitle
-            if(item.progress > 0 && item.progress < 100.0f) {
-                v.mProgress.setProgress((item.progress * 100).toInt())
+            if(item.progress > 0) {
+                v.mProgress.setProgress((item.progress).toInt())
                 v.mProgress.visibility = View.VISIBLE
             } else {
                 v.mProgress.visibility = View.GONE
