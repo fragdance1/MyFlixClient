@@ -12,6 +12,8 @@ interface TVShowService {
     fun getShows(): Call<List<ITVShow>>
     @GET("api/tvshow/seasons/{id}")
     fun getSeasons(@Path("id") id:Long):Call<List<ISeason>>
+    @GET("api/tvshow/{id}/lastwatched")
+    fun getLastWatched(@Path("id") id:Long):Call<IEpisode>
     @GET("api/tvshow/playlist/{id}")
     fun getPlaylist(@Path("id") id:Long): Call<List<IVideo>>
 

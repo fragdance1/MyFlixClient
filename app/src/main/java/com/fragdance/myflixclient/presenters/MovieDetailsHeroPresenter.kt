@@ -9,8 +9,9 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.action_bar.ActionBar
 import com.fragdance.myflixclient.components.action_bar.ActionBarButtonPresenter
+import com.fragdance.myflixclient.components.action_bar.IVideoAction
 import com.fragdance.myflixclient.models.*
-import com.fragdance.myflixclient.pages.persondetails.IAction
+
 import com.fragdance.myflixclient.services.torrentService
 import com.fragdance.myflixclient.views.MovieDetailsHeroView
 import com.squareup.picasso.Picasso
@@ -134,7 +135,7 @@ class MovieDetailsHeroPresenter:Presenter() {
         if (item is IMovieDetails) {
             //Timber.tag(Settings.TAG).d("details "+item)
             if (item.video_files != null && item.video_files.isNotEmpty()) {
-                actionsAdapter.add(IAction("Play", movieDetailsToVideo(item),""));
+                actionsAdapter.add(IVideoAction("Play", movieDetailsToVideo(item)));
             }
             Timber.tag(Settings.TAG).d("IMDB id "+item.imdb_id)
 
@@ -148,7 +149,7 @@ class MovieDetailsHeroPresenter:Presenter() {
                         val torrents: List<ITorrent> = response.body()!!
                         for (torrent in torrents) {
                             actionsAdapter.add(
-                                IAction(
+                                IVideoAction(
                                     torrent.quality+" ("+torrent.resolution+")", IVideo(
                                         item.id.toLong(),
                                         "mkv",
@@ -163,7 +164,7 @@ class MovieDetailsHeroPresenter:Presenter() {
                                         null,
                                         null,
                                         item.imdb_id
-                                    ),null
+                                    )
                                 )
                             )
                         }

@@ -54,6 +54,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
     private lateinit var mCurrentVideo: IVideo
     // The list of videos to play. At least one
     private lateinit var mPlaylist: IPlayList
+    // Progress in the current video (for resuming)
+    private var mProgress: Float = 0.0f
     // The current video player (MediaPlayer/Exoplayer denpending on format)
     private var mVideoPlayer:IVideoPlayer? = null
 
@@ -78,6 +80,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPlaylist = PlaybackFragmentArgs.fromBundle(requireArguments()).playlist
+        mProgress = PlaybackFragmentArgs.fromBundle(requireArguments()).progress
+        Timber.tag(Settings.TAG).d("Progress after "+mProgress)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -141,7 +145,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     fun onPlayCompleted() {
-
         destroyPlayer()
         val date = LocalDateTime.now().toString()
         val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
@@ -151,7 +154,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
             trakttvService.setMovieWatched(access_token,tmdbId,date)
         else
             trakttvService.setEpisodeWatched(access_token,tmdbId,date)
-        watchedCall.enqueue(object:Callback<Unit> {
+            watchedCall.enqueue(object:Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 Timber.tag(Settings.TAG).d("TraktTV started")
             }
@@ -230,7 +233,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
         }
         Timber.tag(Settings.TAG).d("Getting stuff")
         val tmdbId = mCurrentVideo.tmdbId.toString()
-        val scrobble = ScrobbleData(0.0f)
+        val scrobble = ScrobbleData(mProgress)
+
         val startCall = videoService.start(mCurrentVideo.type!!,tmdbId,scrobble)
         startCall.enqueue(object:Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -476,11 +480,15 @@ class VideoPlayerFragment : VideoSupportFragment() {
                 val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
                 val tmdbId = mCurrentVideo.tmdbId.toString()
                 var imdbId = mCurrentVideo.imdbId.toString()
-
+                if(mProgress > 0.0f) {
+                    mVideoPlayer!!.seekTo(mProgress)
+                }
+                /*
+                val scrobble = ScrobbleData(mProgress)
                 val startCall = if(mCurrentVideo.type == "movie")
-                    trakttvService.startMovie(access_token,imdbId,"0")
+                    trakttvService.startMovie(access_token,imdbId,scrobble)
                 else
-                    trakttvService.startEpisode(access_token,tmdbId,"0")
+                    trakttvService.startEpisode(access_token,tmdbId,scrobble)
 
                 startCall.enqueue(object:Callback<Unit> {
                     override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -489,7 +497,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                     override fun onFailure(call: Call<Unit>, t: Throwable) {
                         Timber.tag(Settings.TAG).d("TraktTV failed")
                     }
-                })
+                })*/
 
 
             }

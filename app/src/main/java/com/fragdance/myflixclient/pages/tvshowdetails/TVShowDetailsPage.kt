@@ -29,7 +29,7 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
     lateinit var mRootView: ViewGroup
     var mDetails: ITVShow? = null
     lateinit var mSeasons: VerticalGridView
-    var mThis = this;
+    lateinit var mCurrentEpisode:IEpisode
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,12 +69,11 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
 
             }
         })
+
         val requestCall = tvShowService.getSeasons(mDetails!!.id)
         requestCall.enqueue(object:Callback<List<ISeason>>{
             override fun onResponse(call: Call<List<ISeason>>, response: Response<List<ISeason>>) {
                 if (response.isSuccessful) {
-                    //Settings.tvshows = response.body()!!
-                    //Timber.tag(Settings.TAG).d("seasons " + response.body())
                     val seasons:List<ISeason>? = response.body()
                     if(seasons is List<ISeason>) {
                         for(season in seasons) {
@@ -115,7 +114,7 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
 
         })
 
-        var bridgeAdapter = ItemBridgeAdapter()//MenuItemBridgeAdapter(mThis);
+        var bridgeAdapter = ItemBridgeAdapter()
         bridgeAdapter.setAdapter(rowsAdapter)
         mSeasons.adapter = bridgeAdapter
     }
@@ -126,7 +125,6 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
 
         val args: TVShowDetailsPageArgs by navArgs()
         mDetails = args.show
-        Timber.tag(Settings.TAG).d("tv show is "+mDetails)
         setupView()
     }
 

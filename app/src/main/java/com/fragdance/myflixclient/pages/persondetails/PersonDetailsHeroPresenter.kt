@@ -11,11 +11,6 @@ import com.fragdance.myflixclient.presenters.PersonRowPresenter
 import com.squareup.picasso.Picasso
 import timber.log.Timber
 
-data class IAction(
-    val name:String,
-    val video: IVideo?, // Can be -1 for not downloaded yet
-    val person:String?
-)
 
 
 class PersonDetailsHeroPresenter:Presenter() {

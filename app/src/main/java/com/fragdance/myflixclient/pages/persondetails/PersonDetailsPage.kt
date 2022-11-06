@@ -11,6 +11,7 @@ import androidx.navigation.fragment.navArgs
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.action_bar.ActionBarButtonPresenter
+import com.fragdance.myflixclient.components.action_bar.IPersonAction
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import com.fragdance.myflixclient.models.IPersonCardData
 import com.fragdance.myflixclient.models.IPersonDetails
@@ -83,7 +84,7 @@ class PersonDetailsPage: Fragment() {
             }
             val actionsAdapter = ArrayObjectAdapter(ActionBarButtonPresenter())
             var actionsRow = ListRow(actionsAdapter)
-            actionsAdapter.add(IAction("More", null, mDetails?.id));
+            actionsAdapter.add(IPersonAction("More", mDetails?.id));
             rowsAdapter.add(actionsRow)
             var bridgeAdapter = ItemBridgeAdapter()
             bridgeAdapter.setAdapter(rowsAdapter)

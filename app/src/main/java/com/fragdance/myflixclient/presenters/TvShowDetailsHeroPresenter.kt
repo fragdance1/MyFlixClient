@@ -9,19 +9,16 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.action_bar.ActionBar
 import com.fragdance.myflixclient.components.action_bar.ActionBarButtonPresenter
+import com.fragdance.myflixclient.components.action_bar.IEpisodeAction
 import com.fragdance.myflixclient.models.*
-import com.fragdance.myflixclient.pages.persondetails.IAction
-import com.fragdance.myflixclient.services.torrentService
+
+import com.fragdance.myflixclient.services.tvShowService
 import com.fragdance.myflixclient.views.MovieDetailsHeroView
 import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.fragdance.myflixclient.utils.movieDetailsToVideo
 import timber.log.Timber
-
-
-
 
 class TvShowDetailsHeroPresenter:Presenter() {
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
@@ -133,7 +130,7 @@ class TvShowDetailsHeroPresenter:Presenter() {
         var bridgeAdapter = ItemBridgeAdapter();
         bridgeAdapter.setAdapter(rowsAdapter)
         actions.adapter = bridgeAdapter
-
+        /*
         if (item is IMovieDetails) {
             //Timber.tag(Settings.TAG).d("details "+item)
             if (item.video_files != null && item.video_files.isNotEmpty()) {
@@ -178,6 +175,23 @@ class TvShowDetailsHeroPresenter:Presenter() {
                 }
 
             })
+        }*/
+        if(item is ITVShow) {
+            val lastWatched = tvShowService.getLastWatched(item.id)
+            lastWatched.enqueue(object:Callback<IEpisode>{
+                override fun onResponse(call:Call<IEpisode>,response:Response<IEpisode>) {
+                    if(response.isSuccessful) {
+                        var format = "S%02dE%02d";
+                        Timber.tag(Settings.TAG).d("Got an episode")
+                        var episode = response.body()!!
+                        actionsAdapter.add(IEpisodeAction("Continue "+format.format(episode.seasonNumber,episode.episodeNumber),episode))
+                    }
+                }
+                override fun onFailure(call:Call<IEpisode>,t:Throwable) {
+                    Timber.tag(Settings.TAG).d("onfailure")
+                }
+            })
+
         }
     }
 
