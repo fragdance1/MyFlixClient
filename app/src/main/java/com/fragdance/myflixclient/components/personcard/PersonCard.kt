@@ -9,16 +9,14 @@ import androidx.leanback.widget.BaseCardView
 import com.fragdance.myflixclient.R
 
 class PersonCard(context: Context): BaseCardView(context) {
-    var mHeight:Float = 0.0f
-    var mWidth:Float = 0.0f
     lateinit var mPoster: ImageView
     lateinit var mTitle: TextView
     lateinit var mSubtitle:TextView
     init {
         buildImageCardView()
     }
-    override fun setSelected(selected:Boolean) {
 
+    override fun setSelected(selected:Boolean) {
         if(selected) {
             setBackgroundColor(Color.argb(0.1f,1f,1f,1f))
         } else {
@@ -39,6 +37,5 @@ class PersonCard(context: Context): BaseCardView(context) {
 
         mTitle = findViewById(R.id.card_title)
         mSubtitle = findViewById(R.id.card_subtitle)
-
     }
 }

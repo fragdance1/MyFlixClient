@@ -6,7 +6,6 @@ import androidx.leanback.widget.Presenter
 import androidx.navigation.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.components.personcard.PersonCard
 import com.fragdance.myflixclient.models.IPersonCardData
 import com.squareup.picasso.Picasso
 import timber.log.Timber
@@ -22,7 +21,7 @@ class PersonCardPresenter: Presenter() {
 
     override fun onBindViewHolder(viewHolder: ViewHolder?, item: Any?) {
         var person = item as IPersonCardData
-    Timber.tag(Settings.TAG).d("Portrait "+person.portrait)
+
         val v: PersonCard = viewHolder?.view as PersonCard
         val portrait = if(person.portrait!=null) person.portrait else Settings.SERVER+"/api/portrait/"+person.id;
         Timber.tag(Settings.TAG).d("New portrait "+portrait)
@@ -41,7 +40,6 @@ class PersonCardPresenter: Presenter() {
             )
 
         }
-        //(viewHolder!!.view as TextView).text = item as String
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder?) {

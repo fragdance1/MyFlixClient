@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.VerticalGridView
 import com.fragdance.myflixclient.R
-import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.menu.MenuItemBridgeAdapter
 import com.fragdance.myflixclient.components.menu.MenuItemPresenter
 import com.fragdance.myflixclient.models.ISubtitle
@@ -19,7 +18,7 @@ import com.fragdance.myflixclient.services.subtitleService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import timber.log.Timber
+
 
 interface OnMenuItemViewClickedListener {
     fun onMenuItemClicked(item:Any)
@@ -54,7 +53,6 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
     }
 
     private fun searchSubtitle() {
-        Timber.tag(Settings.TAG).d("Subtitle "+mVideo)
         val requestCall = subtitleService.searchSubtitle(mVideo.url,mVideo.title,null)
         requestCall.enqueue(object: Callback<List<ISubtitle>>{
             override fun onResponse(
@@ -66,11 +64,11 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
                     val subtitles = response.body() as List<ISubtitle>
 
                     mAdapter.clear()
-                    if(subtitles.size == 0) {
-                        Timber.tag(Settings.TAG).d("Found no subtitles")
-                    } else {
+                    if(subtitles.size > 0) {
                         mAdapter.addAll(0, subtitles)
                         mVerticalGridView.requestFocus()
+                    } else {
+                        // Add message 'No subtitles
                     }
                 }
             }

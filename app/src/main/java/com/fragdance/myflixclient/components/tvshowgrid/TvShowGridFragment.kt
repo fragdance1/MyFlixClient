@@ -73,6 +73,6 @@ open class TvShowGridFragment : VerticalGridSupportFragment(){
         setGridPresenter(gridPresenter)
 
         mAdapter = ArrayObjectAdapter(MovieCardPresenter())
-        setAdapter(mAdapter)
+        adapter = mAdapter
     }
 }

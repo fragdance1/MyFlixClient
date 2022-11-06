@@ -9,13 +9,11 @@ import androidx.leanback.widget.ListRowPresenter
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import com.fragdance.myflixclient.utils.MovieLoaders
-import timber.log.Timber
-
 
 class HomePage: RowsSupportFragment() {
     private val movieCardPresenter = MovieCardPresenter()
     private var mRowPresenter = ListRowPresenter()
-    private lateinit var rowsAdapter:ArrayObjectAdapter;// = ArrayObjectAdapter(ListRowPresenter())
+    private lateinit var rowsAdapter:ArrayObjectAdapter
 
     private fun loadHomePageMovies(type:String) {
 
@@ -37,16 +35,12 @@ class HomePage: RowsSupportFragment() {
             loadHomePageMovies(genre)
         }
         adapter = rowsAdapter
-
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mRowPresenter.shadowEnabled = false;
-        
         rowsAdapter = ArrayObjectAdapter(mRowPresenter)
-        Timber.tag(Settings.TAG).d("HomePage.OnCreate")
         loadData()
     }
 }

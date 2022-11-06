@@ -477,29 +477,9 @@ class VideoPlayerFragment : VideoSupportFragment() {
             if(isPlaying && !mPlaying) {
                 // Let trakttv know we've started watching a video
                 mPlaying = true
-                val access_token = "73f7cc828bb000a3fcf37c87e43b37d2128baddf248c5accdc4dfb6014346593"
-                val tmdbId = mCurrentVideo.tmdbId.toString()
-                var imdbId = mCurrentVideo.imdbId.toString()
                 if(mProgress > 0.0f) {
                     mVideoPlayer!!.seekTo(mProgress)
                 }
-                /*
-                val scrobble = ScrobbleData(mProgress)
-                val startCall = if(mCurrentVideo.type == "movie")
-                    trakttvService.startMovie(access_token,imdbId,scrobble)
-                else
-                    trakttvService.startEpisode(access_token,tmdbId,scrobble)
-
-                startCall.enqueue(object:Callback<Unit> {
-                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                        Timber.tag(Settings.TAG).d("TraktTV started")
-                    }
-                    override fun onFailure(call: Call<Unit>, t: Throwable) {
-                        Timber.tag(Settings.TAG).d("TraktTV failed")
-                    }
-                })*/
-
-
             }
         }
 

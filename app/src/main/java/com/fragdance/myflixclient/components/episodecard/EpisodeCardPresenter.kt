@@ -14,8 +14,6 @@ import com.fragdance.myflixclient.models.IEpisodeCardData
 import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.models.IVideo
 import com.squareup.picasso.Picasso
-import timber.log.Timber
-
 
 class EpisodeCardPresenter : Presenter() {
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {

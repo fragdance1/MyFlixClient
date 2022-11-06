@@ -4,9 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.leanback.widget.Presenter
-import androidx.leanback.widget.Visibility
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.models.IMovie
@@ -14,14 +12,6 @@ import com.fragdance.myflixclient.models.IMovieCardData
 import com.fragdance.myflixclient.models.ITVShow
 import com.squareup.picasso.Picasso
 import timber.log.Timber
-import android.widget.ImageView
-import android.widget.LinearLayout
-import androidx.core.view.marginLeft
-import android.widget.RelativeLayout
-
-
-
-
 
 class MovieCardPresenter: Presenter() {
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {

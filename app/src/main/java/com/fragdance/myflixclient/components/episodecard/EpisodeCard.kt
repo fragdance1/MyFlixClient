@@ -14,6 +14,7 @@ class EpisodeCard(context: Context): BaseCardView(context) {
     lateinit var mTitle: TextView
     lateinit var mSubtitle:TextView
     lateinit var mProgress:ProgressBar
+
     init {
         buildEpisodeCardView()
     }

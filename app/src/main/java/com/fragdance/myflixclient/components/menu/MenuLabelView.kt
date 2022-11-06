@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.fragdance.myflixclient.Settings
-import timber.log.Timber
 
 class MenuLabelView : LinearLayout {
     var textView: TextView

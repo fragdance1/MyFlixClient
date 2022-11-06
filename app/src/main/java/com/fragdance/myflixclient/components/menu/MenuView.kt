@@ -1,28 +1,20 @@
 package com.fragdance.myflixclient.components.menu
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.view.View.FOCUSABLE
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.leanback.widget.ItemBridgeAdapter
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.VerticalGridView
-import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.subtitlemodal.OnMenuItemViewClickedListener
 import com.fragdance.myflixclient.models.ISubtitle
-import timber.log.Timber
-
 
 class MenuView(context: Context,attrs: AttributeSet): VerticalGridView(context,attrs) {
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        //requestFocus()
-    }
+
 }
 
 class MenuItemPresenter: Presenter() {
@@ -33,7 +25,6 @@ class MenuItemPresenter: Presenter() {
         label.focusable = FOCUSABLE;
         label.isFocusableInTouchMode = true;
         label.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT)
-        //label.setTextColor(Color.WHITE)
         val lp = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -41,7 +32,6 @@ class MenuItemPresenter: Presenter() {
         lp.gravity = Gravity.START
         label.layoutParams = lp
 
-        //label.setTextColor(Color.WHITE)
         label.setPadding(20, 10, 20, 10)
 
         return ViewHolder(label)

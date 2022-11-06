@@ -17,7 +17,6 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.menu.MenuIconView
 import com.fragdance.myflixclient.components.menu.MenuLabelView
-import com.fragdance.myflixclient.models.IMenuItem
 import timber.log.Timber
 
 class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,attrs) {
@@ -68,8 +67,7 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
     private fun setActiveMenuItem(index:Int) {
         (labelsView.children.elementAt(childIndex) as MenuLabelView).setActive(false)
         (labelsView.children.elementAt(index) as MenuLabelView).setActive(true)
-        (iconsView.children.elementAt(childIndex) as MenuIconView).setActive(false)
-        (iconsView.children.elementAt(index) as MenuIconView).setActive(true)
+
         childIndex = index;
     }
     private fun createMenuItem(label:String):View {

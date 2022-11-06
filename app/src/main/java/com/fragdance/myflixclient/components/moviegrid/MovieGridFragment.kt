@@ -14,7 +14,6 @@ import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.Settings
-import timber.log.Timber
 import com.fragdance.myflixclient.R;
 import com.fragdance.myflixclient.presenters.MyFlixVerticalGridPresenter
 

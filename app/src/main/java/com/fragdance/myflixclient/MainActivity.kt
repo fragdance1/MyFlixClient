@@ -1,51 +1,31 @@
 package com.fragdance.myflixclient
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.*
 import android.util.AttributeSet
+import android.view.*
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.leanback.widget.BrowseFrameLayout
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
-import com.fragdance.myflixclient.models.IMovie
-import com.fragdance.myflixclient.models.ITVShow
-import com.fragdance.myflixclient.utils.isEmulator
-import org.cometd.bayeux.Message
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import timber.log.Timber
-import android.Manifest
-import android.animation.ObjectAnimator
-import android.os.*
-import android.view.*
-import android.view.animation.DecelerateInterpolator
-import androidx.core.animation.doOnEnd
 import com.fragdance.myflixclient.services.*
-import org.json.JSONObject
-import androidx.core.splashscreen.SplashScreen
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.leanback.widget.ArrayObjectAdapter
-import androidx.leanback.widget.HeaderItem
-import androidx.leanback.widget.ListRow
 import com.fragdance.myflixclient.utils.MovieLoaders
+import com.fragdance.myflixclient.utils.isEmulator
 import kotlinx.coroutines.*
-import kotlin.coroutines.EmptyCoroutineContext
-import android.os.Bundle
+import timber.log.Timber
 
 
-
-
-class MainView(context: Context, attrs: AttributeSet) : BrowseFrameLayout(context, attrs) {
-
-}
+class MainView(context: Context, attrs: AttributeSet) : BrowseFrameLayout(context, attrs)
 
 class MainActivity : FragmentActivity() {
     private lateinit var navGraph: NavGraph
@@ -55,9 +35,9 @@ class MainActivity : FragmentActivity() {
     private var mServerFoundReceiver: BroadcastReceiver? = null
     var contentHasLoaded = false
 
-   // Load all the local movies into settings
+    // Load all the local movies into settings
     private fun loadMovies() {
-       runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading movies" }
+        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading movies" }
         try {
             var response = movieService.getLocalMovies().execute()
             if (response.isSuccessful) {
@@ -74,14 +54,14 @@ class MainActivity : FragmentActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             }
-        } catch(e:Exception) {
+        } catch (e: Exception) {
             Timber.tag(Settings.TAG).d("Failed to load movies")
         }
     }
 
     // Load all the local tv shows into settings
     private fun loadTVShows() {
-        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading TV-shows"}
+        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading TV-shows" }
         try {
             var response = tvShowService.getShows().execute()
             if (response.isSuccessful) {
@@ -98,7 +78,7 @@ class MainActivity : FragmentActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             }
-        } catch(e:Exception) {
+        } catch (e: Exception) {
 
         }
     }
@@ -120,16 +100,11 @@ class MainActivity : FragmentActivity() {
             // Get the TextView of the toast
             val textView = viewGroup!!.getChildAt(0) as TextView
 
-            // Set the text size
-            //textView.textSize = 20f
-
             // Set the background color of toast
-            viewGroup!!.setBackgroundColor(Color.parseColor("#10000000"))
+            viewGroup.setBackgroundColor(Color.parseColor("#10000000"))
             textView.setTextColor(Color.WHITE)
             toast.show()
         }
-
-
     }
 
     private fun setupView() {
@@ -145,33 +120,33 @@ class MainActivity : FragmentActivity() {
 
         navController.graph = navGraph
 
-        loadStartingPage();
+        loadStartingPage()
     }
 
     // Ping the server, return false if not found
-    private fun pingServer(server:String) : Boolean {
+    private fun pingServer(server: String): Boolean {
         try {
-            Settings.SERVER_IP = server;
+            Settings.SERVER_IP = server
             val response = serverService.ping().execute()
-            Settings.SERVER = "http://"+Settings.SERVER_IP+":8000"
+            Settings.SERVER = "http://" + Settings.SERVER_IP + ":8000"
             return true
-        }catch( e:Exception) {
-            Timber.tag(Settings.TAG).d("Ping failed "+e.message)
+        } catch (e: Exception) {
+            Timber.tag(Settings.TAG).d("Ping failed " + e.message)
             Settings.SERVER = ""
-            return false;
+            return false
         }
     }
 
-    fun init()  {
+    fun init() {
         GlobalScope.launch {
             getServer()
         }
 
     }
 
-    private fun loadHomePageMovies(type:String) {
-        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading "+type }
-        MovieLoaders.reloadMovies(type,null)
+    private fun loadHomePageMovies(type: String) {
+        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading " + type }
+        MovieLoaders.reloadMovies(type, null)
     }
 
     private fun startup() {
@@ -183,26 +158,26 @@ class MainActivity : FragmentActivity() {
         loadHomePageMovies("Recommended")
         loadHomePageMovies("Boxoffice")
         loadHomePageMovies("In Progress")
-        for(genre in Settings.MOVIE_GENRES) {
+        for (genre in Settings.MOVIE_GENRES) {
             loadHomePageMovies(genre)
         }
-        runOnUiThread { setupView()}
+        runOnUiThread { setupView() }
     }
 
     // Try to retrieve the server address
     private fun getServer() {
         runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Finding server" }
         // First see if we have a saved server and that it works
-        var preferences = getSharedPreferences("myflix",MODE_PRIVATE)
-        var server = preferences.getString("server",null);
+        var preferences = getSharedPreferences("myflix", MODE_PRIVATE)
+        var server = preferences.getString("server", null)
 
-        if(server is String && pingServer(server)) {
+        if (server is String && pingServer(server)) {
             startup()
-            return;
+            return
         }
 
         // If we're running on emulator, hardcode ip
-        if(isEmulator() && pingServer("192.168.1.121")) {
+        if (isEmulator() && pingServer("192.168.1.121")) {
             startup()
             return
         }
@@ -211,8 +186,8 @@ class MainActivity : FragmentActivity() {
         mServerFoundReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
                 var server = p1!!.getStringExtra("server")
-                Timber.tag(Settings.TAG).d("Got server "+server)
-                if(server != null && pingServer(server)) {
+                Timber.tag(Settings.TAG).d("Got server " + server)
+                if (server != null && pingServer(server)) {
                     Timber.tag(Settings.TAG).d("Yay")
                     startup()
                 } else {
@@ -224,7 +199,7 @@ class MainActivity : FragmentActivity() {
         filter.addAction("server_found")
         applicationContext.registerReceiver(mServerFoundReceiver, filter)
         mBonjour = NetworkDiscoveryService(applicationContext)
-     }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Start by showing the splash screen
@@ -238,7 +213,7 @@ class MainActivity : FragmentActivity() {
         Settings.HEIGHT = displayMetrics.heightPixels.toFloat()
 
         setContentView(R.layout.splash)
-        mInstance = this;
+        mInstance = this
         contentHasLoaded = true
         init()
         Timber.tag(Settings.TAG).d("onCreate done")
