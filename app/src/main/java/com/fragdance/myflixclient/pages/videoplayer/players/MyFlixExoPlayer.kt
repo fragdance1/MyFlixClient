@@ -168,6 +168,7 @@ class MyFlixExoPlayer:IVideoPlayer {
         mExoplayer?.let {
             // Pause the player to notify listeners before it is released.
             it.pause()
+            it.stop()
             it.release()
             mExoplayer = null
         }
@@ -186,11 +187,8 @@ class MyFlixExoPlayer:IVideoPlayer {
     override fun selectInternalSubtitle(lang:String):Boolean {
         if (mExoplayer!!.currentTracks.containsType(C.TRACK_TYPE_TEXT)) {
             val formatBuilder: Format.Builder = TEXT_FORMAT.buildUpon()
-            val noRoleFlags = formatBuilder.build()
             val lessRoleFlags = formatBuilder.setRoleFlags(C.ROLE_FLAG_CAPTION).build()
-            val moreRoleFlags = formatBuilder
-                .setRoleFlags(C.ROLE_FLAG_CAPTION or C.ROLE_FLAG_COMMENTARY or C.ROLE_FLAG_DUB)
-                .build()
+
 
             val trackGroups = arrayOf<TrackGroup>(TrackGroup(lessRoleFlags))
             val trackGroupArray = TrackGroupArray(*trackGroups)

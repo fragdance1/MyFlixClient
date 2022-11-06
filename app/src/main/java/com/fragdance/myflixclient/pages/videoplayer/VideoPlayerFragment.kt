@@ -1,32 +1,16 @@
 package com.fragdance.myflixclient.pages.videoplayer
 
-import android.content.Context
-import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
-import android.support.v4.media.session.MediaSessionCompat
-import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.*
-import androidx.fragment.app.FragmentTransaction.*
 import androidx.leanback.app.VideoSupportFragment
-import androidx.leanback.app.VideoSupportFragmentGlueHost
-import androidx.leanback.media.MediaPlayerAdapter
-import androidx.leanback.media.PlaybackGlue
-import androidx.leanback.media.PlaybackTransportControlGlue
-import androidx.navigation.Navigation
 import androidx.navigation.Navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.components.side_menu.SideMenu
 import com.fragdance.myflixclient.models.IPlayList
 import com.fragdance.myflixclient.models.IStatus
 import com.fragdance.myflixclient.models.ISubtitle
@@ -37,26 +21,17 @@ import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixMediaPlayer
 import com.fragdance.myflixclient.pages.videoplayer.tracks.TrackSelectionMenu
 import com.fragdance.myflixclient.services.*
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.source.*
 import com.google.android.exoplayer2.text.Cue
 import com.google.android.exoplayer2.text.Subtitle
 import com.google.android.exoplayer2.text.subrip.OpenSubtitleDecoder
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.SubtitleView
-import com.google.android.exoplayer2.upstream.*
-import com.google.common.collect.ImmutableSet
-import org.cometd.bayeux.Message
 import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-
 import java.lang.Exception
-import java.net.URI
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -267,13 +242,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
         })
     }
 
-    // 1. See if there are internal subtitles
-    // 2. See if there are external subtitles
-    // 3. Disable subtitles
-    private fun enableSubtitle() {
-
-    }
-
     private fun addTorrent(video:IVideo) {
         activity?.findViewById<View>(R.id.loading_progress)?.visibility = VISIBLE;
         activity?.findViewById<TextView>(R.id.loadingStatus)?.text = "Preparing torrent"
@@ -302,7 +270,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
         // See if we have a torrent (ie hash != null)
         if(video.hash != null) {
-            var ready = false
             // Fire up faye
             FayeService.subscribe("/torrent/"+video.hash) { message ->
                 run {
@@ -325,7 +292,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                             }
                         }
                         if(event == "TORRENT_READY") {
-                            ready = true
+
                             try {
                                 activity?.runOnUiThread {
 
@@ -370,20 +337,14 @@ class VideoPlayerFragment : VideoSupportFragment() {
                                 obj["msg"].toString(),
                                 prepareSrt(obj["msg"].toString())
                             )
-
                             video.subtitles.add(subtitle)
                         }
                 }
             }
-            // Add torrent
-
-            Timber.tag(Settings.TAG).d("Got a torrent video")
             addTorrent(video)
-
         } else {
             startVideo(video)
         }
-
     }
 
     fun next() {
@@ -449,20 +410,17 @@ class VideoPlayerFragment : VideoSupportFragment() {
             mSubtitle = mExternalSubtitles[index].subtitle
             mVideoPlayer!!.play()
         }
-
     }
 
     fun downloadSubtitle(subtitle: ISubtitle,videoId:Long?,hash:String?) {
         val url: String = subtitle.url
         val requestCall = subtitleStringService.downloadSubtitle(url,videoId,hash)
-        Timber.tag(Settings.TAG).d("Downloading subtitle for "+videoId)
         requestCall.enqueue(object : Callback<String> {
             override fun onResponse(
                 call: Call<String>,
                 response: Response<String>
             ) {
                 if (response.isSuccessful) {
-                    Timber.tag(Settings.TAG).d("Subtitle downloaded");
                     val sub = response.body() as String
 
                     val decoder = OpenSubtitleDecoder()
@@ -478,7 +436,6 @@ class VideoPlayerFragment : VideoSupportFragment() {
                             mSubtitle
                         )
                     )
-                    //Timber.tag(Settings.TAG).d("Got my subtitle")
                 }
             }
 
