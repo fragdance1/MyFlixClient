@@ -11,8 +11,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.findFragment
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.fragment.NavHostFragment
+
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.menu.MenuIconView
@@ -54,12 +55,15 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
     }
 
     private fun activateMenuItem(index:Int) {
+        val navHostFragment =
+            (context as FragmentActivity).supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+
         when(index) {
-            0 -> findNavController(findFragment()).navigate(R.id.action_global_home)
-            1 -> findNavController(findFragment()).navigate(R.id.action_global_movies);
-            2 -> findNavController(findFragment()).navigate(R.id.action_global_tvshows);
-            4-> findNavController(findFragment()).navigate(R.id.action_global_settings);
-            5 -> findNavController(findFragment()).navigate(R.id.action_global_search);
+            0 -> navHostFragment.navController.navigate(R.id.action_global_home)
+            1 -> navHostFragment.navController.navigate(R.id.action_global_movies);
+            2 -> navHostFragment.navController.navigate(R.id.action_global_tvshows);
+            4-> navHostFragment.navController.navigate(R.id.action_global_settings);
+            5 -> navHostFragment.navController.navigate(R.id.action_global_search);
         }
         closeSidePanel()
     }

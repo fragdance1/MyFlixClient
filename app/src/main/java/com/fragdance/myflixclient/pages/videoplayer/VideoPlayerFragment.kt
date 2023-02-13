@@ -11,10 +11,7 @@ import androidx.leanback.app.VideoSupportFragment
 import androidx.navigation.Navigation.findNavController
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
-import com.fragdance.myflixclient.models.IPlayList
-import com.fragdance.myflixclient.models.IStatus
-import com.fragdance.myflixclient.models.ISubtitle
-import com.fragdance.myflixclient.models.IVideo
+import com.fragdance.myflixclient.models.*
 import com.fragdance.myflixclient.pages.videoplayer.players.IVideoPlayer
 import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixExoPlayer
 import com.fragdance.myflixclient.pages.videoplayer.players.MyFlixMediaPlayer
@@ -72,6 +69,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     // Update listener for syncing external subtitles
     val onProgressUpdate: () -> Unit = {
         if (mSubtitle != null && mVideoPlayer != null) {
+
             val cue = mSubtitle!!.getCues(mVideoPlayer!!.currentMs())
             mSubtitleView.setCues(cue)
         }
@@ -127,6 +125,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     override fun onStart() {
+
         super.onStart()
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         addVideo(mPlaylist.videos[mPlaylist.position.toInt()])
@@ -154,7 +153,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
             trakttvService.setMovieWatched(access_token,tmdbId,date)
         else
             trakttvService.setEpisodeWatched(access_token,tmdbId,date)
-            watchedCall.enqueue(object:Callback<Unit> {
+        watchedCall.enqueue(object:Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 Timber.tag(Settings.TAG).d("TraktTV started")
             }
@@ -167,10 +166,11 @@ class VideoPlayerFragment : VideoSupportFragment() {
         mPlaylist.position++;
 
         if(mPlaylist.videos.size > mPlaylist.position) {
+            mPlaylist.videos[mPlaylist.position.toInt()].progress = 0.0f;
             addVideo(mPlaylist.videos[mPlaylist.position.toInt()])
         } else {
             try {
-                val navController = findNavController(this.view!!)
+                val navController = findNavController(this.requireView())
                 activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 navController.currentDestination?.id?.let {
                     navController.popBackStack(it, true)
@@ -219,6 +219,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
             initializeExoPlayer()
         }
         mExternalSubtitles.clear()
+
         if(video?.subtitles != null) {
             mExternalSubtitles.addAll(0, video.subtitles)
         }
@@ -300,7 +301,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                             try {
                                 activity?.runOnUiThread {
 
-                                        activity?.findViewById<View>(R.id.loading_progress)?.visibility = View.INVISIBLE;
+                                    activity?.findViewById<View>(R.id.loading_progress)?.visibility = View.INVISIBLE;
 
                                     var url = "/api/video/torrent/" + video.hash
                                     val video = IVideo(
@@ -333,11 +334,19 @@ class VideoPlayerFragment : VideoSupportFragment() {
                                 activity?.findViewById<TextView>(R.id.loadingStatus)?.text =
                                     "Subtitle downloaded"
                             }
+                            var language = ILanguage (
+                                -1,
+                                "und",
+                                "und",
+                            "und"
+
+                            )
                             var subtitle = ISubtitle(
                                 -1,
                                 "Sven",
-                                "und",
+                                language,
                                 "",
+
                                 obj["msg"].toString(),
                                 prepareSrt(obj["msg"].toString())
                             )
@@ -417,44 +426,47 @@ class VideoPlayerFragment : VideoSupportFragment() {
     }
 
     fun downloadSubtitle(subtitle: ISubtitle,videoId:Long?,hash:String?) {
-        val url: String = subtitle.url
-        val requestCall = subtitleStringService.downloadSubtitle(url,videoId,hash)
-        requestCall.enqueue(object : Callback<String> {
-            override fun onResponse(
-                call: Call<String>,
-                response: Response<String>
-            ) {
-                if (response.isSuccessful) {
-                    val sub = response.body() as String
 
-                    val decoder = OpenSubtitleDecoder()
-                    mSubtitle = decoder.my_decode(sub.toByteArray(), sub.length, true)
+        if(subtitle.url != null) {
+            val url: String = subtitle.url
+            val requestCall = subtitleStringService.downloadSubtitle(url,"en", videoId, hash)
+            requestCall.enqueue(object : Callback<String> {
+                override fun onResponse(
+                    call: Call<String>,
+                    response: Response<String>
+                ) {
+                    if (response.isSuccessful) {
+                        val sub = response.body() as String
 
-                    mExternalSubtitles.add(
-                        ISubtitle(
-                            -1,
-                            subtitle.url,
-                            subtitle.language,
-                            subtitle.filename,
-                            sub,
-                            mSubtitle
+                        val decoder = OpenSubtitleDecoder()
+                        mSubtitle = decoder.my_decode(sub.toByteArray(), sub.length, true)
+
+                        mExternalSubtitles.add(
+                            ISubtitle(
+                                -1,
+                                subtitle.url,
+                                subtitle.language,
+                                subtitle.filename,
+
+                                sub,
+                                mSubtitle
+                            )
                         )
-                    )
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Timber.tag(Settings.TAG).d(t)
-            }
-        })
-
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    Timber.tag(Settings.TAG).d(t)
+                }
+            })
+        }
 
     }
 
     fun selectExternalSubtitle(lang:String): Boolean {
         if(mExternalSubtitles.size > 0) {
             for ((index, value) in mExternalSubtitles.withIndex()) {
-                if(value.language == lang) {
+                if(value.language?.code== lang) {
                     selectExternalSubtitle(index);
                     return true;
                 }

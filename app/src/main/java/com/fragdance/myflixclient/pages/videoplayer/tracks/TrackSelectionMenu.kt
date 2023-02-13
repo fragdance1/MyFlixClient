@@ -26,6 +26,8 @@ import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.common.collect.ImmutableSet
 import timber.log.Timber
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListener {
@@ -128,7 +130,7 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
         }
 
         for((index, sub) in mPlayerFragment!!.mExternalSubtitles.withIndex()) {
-            subtitles.add(ITrackMenuItem(sub.language, EXTERNAL_SUBTITLE,index,null,null))
+            subtitles.add(ITrackMenuItem(sub.language!!.english, EXTERNAL_SUBTITLE,index,null,null))
         }
         val items: ArrayList<ITrackMenuItem> = arrayListOf()
             items.add(ITrackMenuItem("Subtitles", HEADER, null, null, null))

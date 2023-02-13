@@ -43,8 +43,8 @@ fun castToMovieCard(cast: ICast): IMovieCardData {
         cast.character,
         cast.movie?.poster,
         cast.movie?.progress,
-        cast.movie?.disc == true || (cast.movie?.discs != null && cast.movie?.discs?.size > 0),
-        cast.movie?.videofile == true ||(cast.movie?.video_files != null && cast.movie?.discs.isNotEmpty()),
+        cast.movie?.disc == true || (cast.movie?.discs?.isNotEmpty() == true),
+        cast.movie?.videofile == true ||(cast.movie?.video_files?.isNotEmpty()==true),
         cast.movie?.watched
     )
 }

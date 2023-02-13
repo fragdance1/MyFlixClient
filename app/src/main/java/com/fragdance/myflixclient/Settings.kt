@@ -12,7 +12,7 @@ class Settings {
         var SERVER_IP: String = ""
 
         // Just for debug logs
-        const val TAG: String = "MyFlix"
+        const val TAG: String = "MyFlixTag"
 
         // Width/height of the screent
         var WIDTH: Float = 1920.0f

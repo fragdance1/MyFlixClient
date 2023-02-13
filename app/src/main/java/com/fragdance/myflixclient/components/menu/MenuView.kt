@@ -39,10 +39,14 @@ class MenuItemPresenter: Presenter() {
 
     override fun onBindViewHolder(viewHolder: ViewHolder?, item: Any?) {
         checkNotNull(viewHolder)
-        var label = viewHolder.view as MenuLabelView;
-        label.setText((item as ISubtitle).filename)
-        label.focusable = FOCUSABLE
-        label.isFocusableInTouchMode = true;
+        if(item is ISubtitle) {
+            var name = "[" + item.language?.english+"] "+item.filename
+
+            var label = viewHolder.view as MenuLabelView;
+            label.setText(name)
+            label.focusable = FOCUSABLE
+            label.isFocusableInTouchMode = true;
+        }
 
     }
 

@@ -8,13 +8,13 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SubtitleService {
-
     @GET("api/subtitle/search")
     fun searchSubtitle(@Query("url") url:String?,@Query("name") name:String?,@Query("imdb") imdb:String?):Call<List<ISubtitle>>
 }
+
 interface SubtitleStringService {
     @GET("api/subtitle/download")
-    fun downloadSubtitle(@Query("url") url:String,@Query("video_id") video_id:Long?,@Query("hash") hash:String?):Call<String>
+    fun downloadSubtitle(@Query("url") url:String,@Query("lang") lang:String?,@Query("video_id") video_id:Long?,@Query("hash") hash:String?):Call<String>
     @GET("api/subtitle/{id}")
     fun get(@Path("id") id:Int):Call<String>
 }

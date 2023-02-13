@@ -59,7 +59,7 @@ class PersonDetailsPage: Fragment() {
             val rowsAdapter = ArrayObjectAdapter(createPresenterSelector(mDetails!!))
             rowsAdapter.add(mDetails)
 
-            if(mDetails?.cast?.size>0) {
+            if( mDetails?.cast?.isNotEmpty() == true) {
                 // Add row of cast members
                 val castAdapter = ArrayObjectAdapter(MovieCardPresenter()).apply {
                     for (cast in mDetails!!.cast) {
@@ -74,7 +74,7 @@ class PersonDetailsPage: Fragment() {
                 rowsAdapter.add(castRow)
             }
             // Add row of crew members
-            if(mDetails?.crew?.size > 0) {
+            if(mDetails?.crew?.isNotEmpty() == true) {
                 val crewAdapter = ArrayObjectAdapter(MovieCardPresenter()).apply {
                     for (crew in mDetails!!.crew) {
                         add(crewToMovieCard(crew))
@@ -84,7 +84,7 @@ class PersonDetailsPage: Fragment() {
             }
             val actionsAdapter = ArrayObjectAdapter(ActionBarButtonPresenter())
             var actionsRow = ListRow(actionsAdapter)
-            actionsAdapter.add(IPersonAction("More", mDetails?.id));
+            actionsAdapter.add(IPersonAction("More", mDetails.id));
             rowsAdapter.add(actionsRow)
             var bridgeAdapter = ItemBridgeAdapter()
             bridgeAdapter.setAdapter(rowsAdapter)

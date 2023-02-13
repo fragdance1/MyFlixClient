@@ -18,12 +18,14 @@ package com.google.android.exoplayer2.text.subrip
 import android.text.Html
 import android.text.Spanned
 import android.text.TextUtils
+import com.fragdance.myflixclient.Settings
 import com.google.android.exoplayer2.text.Cue
 import com.google.android.exoplayer2.text.SimpleSubtitleDecoder
 import com.google.android.exoplayer2.text.Subtitle
 import com.google.android.exoplayer2.util.Assertions
 import com.google.android.exoplayer2.util.Log
 import com.google.android.exoplayer2.util.ParsableByteArray
+import timber.log.Timber
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import java.lang.StringBuilder
@@ -39,10 +41,13 @@ class OpenSubtitleDecoder : SimpleSubtitleDecoder("SubtitleDecoder") {
     fun my_decode(bytes: ByteArray, length: Int, reset: Boolean): Subtitle {
         val cues = ArrayList<Cue>()
         val cueTimesUs = arrayListOf<Long>()
-        val subripData = ParsableByteArray(bytes, length)
+
+        val subripData = ParsableByteArray(bytes, bytes.size)
         var currentLine: String?
+        Timber.tag(Settings.TAG).d("Allocate space for subtitle "+bytes.size)
         while (subripData.readLine().also { currentLine = it } != null) {
-            if (currentLine!!.length == 0) {
+
+            if (currentLine!!.isEmpty()) {
                 // Skip blank lines.
                 continue
             }
@@ -78,6 +83,7 @@ class OpenSubtitleDecoder : SimpleSubtitleDecoder("SubtitleDecoder") {
 
             // Read and parse the text and tags.
             textBuilder.setLength(0)
+
             tags.clear()
             currentLine = subripData.readLine()
             while (!TextUtils.isEmpty(currentLine)) {
