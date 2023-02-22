@@ -39,7 +39,8 @@ class MainActivity : FragmentActivity() {
     private fun loadMovies() {
         runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading movies" }
         try {
-            var response = movieService.getLocalMovies().execute()
+            //var response = movieService.getLocalMovies().execute()
+            var response = movieService.getFilteredMovies(5).execute()
             if (response.isSuccessful) {
                 Settings.movies = response.body()!!
                 val intent = Intent()
@@ -59,6 +60,29 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    private fun loadFilters() {
+        runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading filters" }
+        try {
+            //var response = movieService.getLocalMovies().execute()
+            var response = movieService.getMovieFilters().execute()
+            if (response.isSuccessful) {
+                Settings.movieFilters = response.body()!!
+                val intent = Intent()
+                intent.action = "filters_loaded"
+                intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+                sendBroadcast(intent)
+                //loadTVShows()
+            } else {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Something went wrong ${response.message()}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } catch (e: Exception) {
+            Timber.tag(Settings.TAG).d("Failed to load movies")
+        }
+    }
     // Load all the local tv shows into settings
     private fun loadTVShows() {
         runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading TV-shows" }
@@ -152,6 +176,7 @@ class MainActivity : FragmentActivity() {
     private fun startup() {
         FayeService.create()
         loadMovies()
+        loadFilters()
         loadTVShows()
         checkRunTimePermission()
         loadHomePageMovies("Latest")
@@ -282,6 +307,36 @@ class MainActivity : FragmentActivity() {
         lateinit var mInstance: MainActivity
         fun showToast(message: String): Unit {
             mInstance.showToast(message)
+        }
+        fun filterMovies(filterId:Int):Unit {
+            val navHostFragment =
+                (mInstance as FragmentActivity).supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+
+            try {
+                //var response = movieService.getLocalMovies().execute()
+                Timber.tag(Settings.TAG).d("Filter id "+filterId)
+                var response = movieService.getFilteredMovies(filterId).execute()
+                if (response.isSuccessful) {
+                    Settings.movies = response.body()!!
+                    navHostFragment.navController.navigate(R.id.action_global_movies);
+                    /*
+                    val intent = Intent()
+                    intent.action = "movies_loaded"
+                    intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+                    mInstance.sendBroadcast(intent)
+
+                     */
+                    //loadTVShows()
+                } else {
+                    Toast.makeText(
+                        mInstance,
+                        "Something went wrong ${response.message()}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Timber.tag(Settings.TAG).d("Failed to load movies")
+            }
         }
     }
 }

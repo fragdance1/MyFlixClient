@@ -7,31 +7,13 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface TraktTVService {
-    @GET("api/trakttv/start_movie")
-    fun startMovie(@Query("access_token") access_token:String,
-    @Query("id") id:String,
-    @Query("progress") progress:String):Call<Unit>
 
-    @GET("api/trakttv/stop_movie")
-    fun stopMovie(@Query("access_token") access_token:String,
-    @Query("id") id:String,
-    @Query("progress") progress:Float):Call<Unit>
 
     @GET("api/trakttv/set_movie_watched")
     fun setMovieWatched(@Query("access_token") access_token:String,
     @Query("id") id:String,
     @Query("watched_at") watched_at:String):Call<Unit>
-
-    @GET("api/trakttv/start_episode")
-    fun startEpisode(@Query("access_token") access_token:String,
-        @Query("id") id:String,
-        @Query("progress") progress:String): Call<Unit>
-
-    @GET("api/trakttv/stop_episode")
-    fun stopEpisode(@Query("access_token") access_token:String,
-         @Query("id") id:String,
-         @Query("progress") progress:Float): Call<Unit>
-
+    /* These needs to be renames (url) */
     @GET("api/trakttv/set_episode_watched")
     fun setEpisodeWatched(@Query("access_token") access_token:String,
                           @Query("id") id:String,

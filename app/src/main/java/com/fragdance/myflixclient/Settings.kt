@@ -1,5 +1,6 @@
 package com.fragdance.myflixclient
 
+import com.fragdance.myflixclient.models.IFilter
 import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.models.ITVShow
 import com.fragdance.myflixclient.models.IVideo
@@ -21,6 +22,8 @@ class Settings {
         /* All the local movies */
         var movies: List<IMovie> = listOf()
 
+        // All the movie filters
+        var movieFilters:List<IFilter> = listOf()
         /* All the local tv-shows */
         var tvshows: List<ITVShow> = listOf()
 

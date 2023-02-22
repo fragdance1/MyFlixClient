@@ -111,7 +111,6 @@ class MovieDetailsPage : Fragment() {
                         setupView()
                     }
                 }
-
                 override fun onFailure(call: Call<IMovieDetails>, t: Throwable) {
                     MainActivity.showToast("Error: Failed to download movie details")
                 }

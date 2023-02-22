@@ -25,6 +25,7 @@ open class MovieGridFragment : VerticalGridSupportFragment(){
         super.onCreate(savedInstanceState)
 
         setupFragment()
+
         setOnItemViewClickedListener { _, item, _, _ ->
             when (item) {
                 is IMovie -> {

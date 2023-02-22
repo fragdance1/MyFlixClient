@@ -17,7 +17,7 @@ import com.fragdance.myflixclient.components.subtitlemodal.OnMenuItemViewClicked
 import com.fragdance.myflixclient.models.*
 
 import com.fragdance.myflixclient.presenters.*
-import com.fragdance.myflixclient.services.sonarrService
+
 import com.fragdance.myflixclient.services.tvShowService
 import retrofit2.Call
 import retrofit2.Callback

@@ -13,6 +13,7 @@ import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
+import com.fragdance.myflixclient.MainActivity
 
 import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
@@ -62,8 +63,11 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
             0 -> navHostFragment.navController.navigate(R.id.action_global_home)
             1 -> navHostFragment.navController.navigate(R.id.action_global_movies);
             2 -> navHostFragment.navController.navigate(R.id.action_global_tvshows);
-            4-> navHostFragment.navController.navigate(R.id.action_global_settings);
-            5 -> navHostFragment.navController.navigate(R.id.action_global_search);
+            3 -> navHostFragment.navController.navigate(R.id.action_global_search);
+            else -> {
+                MainActivity.filterMovies(Settings.movieFilters[index-4].id)
+
+            }
         }
         closeSidePanel()
     }
@@ -101,12 +105,12 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
         iconsView.addView(createIconView(R.drawable.ic_movie))
         labelsView.addView(createMenuItem("TV-series"))
         iconsView.addView(createIconView(R.drawable.ic_tv))
-        labelsView.addView(createMenuItem("Search"))
-        iconsView.addView(createIconView(R.drawable.ic_search_solid))
-        labelsView.addView(createMenuItem("Settings"))
-        iconsView.addView(createIconView(R.drawable.ic_settings));
+
         labelsView.addView(createMenuItem("Search"));
         iconsView.addView(createIconView(R.drawable.ic_search_solid));
+        for (filter in Settings.movieFilters) {
+            labelsView.addView(createMenuItem(filter.name))
+        }
         setActiveMenuItem(0);
         onFocusChangeListener = View.OnFocusChangeListener { view, b ->
             if(b) {

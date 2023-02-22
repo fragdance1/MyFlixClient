@@ -12,7 +12,6 @@ interface VideoService {
     fun start(@Path("type") type:String, @Path("id") id:String, @Body data:ScrobbleData):Call<Unit>
     @POST("api/video/stop/{type}/{id}")
     fun stop(@Path("type") type:String, @Path("id") id:String, @Body data:ScrobbleData):Call<Unit>
-
 }
 
 val videoService  = JSONServiceBuilder.buildService(VideoService::class.java)

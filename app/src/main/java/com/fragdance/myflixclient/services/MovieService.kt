@@ -1,5 +1,6 @@
 package com.fragdance.myflixclient.services
 
+import com.fragdance.myflixclient.models.IFilter
 import com.fragdance.myflixclient.models.IMovie
 import com.fragdance.myflixclient.models.IMovieDetails
 
@@ -12,6 +13,11 @@ interface MovieService {
     @GET("api/movies")
     fun getLocalMovies(): Call<List<IMovie>>
 
+    @GET("api/movie/filter/{id}")
+    fun getFilteredMovies(@Path("id") id:Int):Call<List<IMovie>>
+
+    @GET("api/movie/filters")
+    fun getMovieFilters():Call<List<IFilter>>
     @GET("api/movie/latest")
     fun getLatestMovies(): Call<List<IMovie>>
 
@@ -23,9 +29,6 @@ interface MovieService {
 
     @GET("api/movies/recommended")
     fun getRecommendedMovies():Call<List<IMovie>>
-
-    @GET("api/movies/trending")
-    fun getTrendingMovies():Call<List<IMovie>>
 
     @GET("api/movie/inprogress")
     fun getInProgressMovies():Call<List<IMovie>>

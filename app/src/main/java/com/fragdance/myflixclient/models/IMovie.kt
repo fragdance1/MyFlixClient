@@ -16,6 +16,7 @@ class IMovie(
     var watched:Boolean?
 ):Serializable
 
+data class IFilter(val id:Int,val name:String):Serializable
 data class IMovieCardData(val id:String,val title:String,val subtitle:String?,val poster:String?,val progress:Float?,val disc:Boolean?,val videofile:Boolean?,val watched:Boolean?):Serializable
 
 data class IVideo(

@@ -16,10 +16,6 @@ interface TVShowService {
     fun getLastWatched(@Path("id") id:Long):Call<IEpisode>
     @GET("api/tvshow/playlist/{id}")
     fun getPlaylist(@Path("id") id:Long): Call<List<IVideo>>
-
-    @GET("api/trakttv/start_episode")
-    fun startEpisode(@Query("id") id:Long, @Query("access_token") access_token:String,@Query("progress") progress:Int):Call<Unit>
-
 }
 
 val tvShowService  = JSONServiceBuilder.buildService(TVShowService::class.java)
