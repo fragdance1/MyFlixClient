@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.util.AttributeSet
 import androidx.core.os.bundleOf
 import androidx.leanback.app.VerticalGridSupportFragment
 import androidx.leanback.widget.*
@@ -16,71 +17,13 @@ import androidx.navigation.fragment.findNavController
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.R;
 import com.fragdance.myflixclient.presenters.MyFlixVerticalGridPresenter
+import timber.log.Timber
 
-open class MovieGridFragment : VerticalGridSupportFragment(){
-    private lateinit var mAdapter: ArrayObjectAdapter
-    private var mMoviesLoadedReceiver:BroadcastReceiver? = null
+open class MovieGridFragment(context: Context,attrs: AttributeSet): VerticalGridView(context,attrs){
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        setNumColumns(4);
 
-        setupFragment()
-
-        setOnItemViewClickedListener { _, item, _, _ ->
-            when (item) {
-                is IMovie -> {
-                    val bundle = bundleOf("id" to item.id.toString())
-
-                    findNavController().navigate(
-                        R.id.action_global_movie_details,bundle)
-                }
-            }
-        }
-
-        // See if movies are already loaded
-        if(Settings.movies.isNotEmpty()) {
-            setMovies(Settings.movies)
-        } else {
-            try {
-                // Let us know when the movies are loaded
-                mMoviesLoadedReceiver = object:BroadcastReceiver() {
-                    override fun onReceive(p0: Context?, p1: Intent?) {
-                        setMovies(Settings.movies)
-                    }
-                }
-                val filter = IntentFilter()
-                filter.addAction("movies_loaded")
-
-                requireContext().registerReceiver(mMoviesLoadedReceiver, filter)
-            } catch(e:Exception) {
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if(mMoviesLoadedReceiver != null) {
-            requireContext().unregisterReceiver(mMoviesLoadedReceiver)
-            mMoviesLoadedReceiver = null
-        }
-    }
-
-    fun setMovies(movies: List<IMovie>) {
-        mAdapter.clear()
-        mAdapter.addAll(0, movies)
-        mAdapter.notifyItemRangeChanged(0, movies.size)
-    }
-
-    private fun setupFragment() {
-        view?.setBackgroundColor(Color.parseColor("#00000000"))
-        val gridPresenter = MyFlixVerticalGridPresenter(ZOOM_FACTOR_MEDIUM, false)
-
-        gridPresenter.numberOfColumns = 4
-        gridPresenter.shadowEnabled = false
-        setGridPresenter(gridPresenter)
-
-        mAdapter = ArrayObjectAdapter(MovieCardPresenter())
-        setAdapter(mAdapter)
-        gridPresenter.focusZoomFactor
     }
 }

@@ -40,6 +40,9 @@ class HomePage: RowsSupportFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mRowPresenter.shadowEnabled = false;
+
+        setExpand(true)
+
         rowsAdapter = ArrayObjectAdapter(mRowPresenter)
         loadData()
     }

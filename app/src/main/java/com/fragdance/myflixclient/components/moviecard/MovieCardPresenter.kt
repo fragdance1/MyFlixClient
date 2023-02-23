@@ -14,6 +14,7 @@ import com.squareup.picasso.Picasso
 import timber.log.Timber
 
 class MovieCardPresenter: Presenter() {
+
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
         val card = MovieCard(parent!!.context,null)
         return ViewHolder(card)

@@ -64,10 +64,6 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
             1 -> navHostFragment.navController.navigate(R.id.action_global_movies);
             2 -> navHostFragment.navController.navigate(R.id.action_global_tvshows);
             3 -> navHostFragment.navController.navigate(R.id.action_global_search);
-            else -> {
-                MainActivity.filterMovies(Settings.movieFilters[index-4].id)
-
-            }
         }
         closeSidePanel()
     }
@@ -108,9 +104,7 @@ class SideMenuView(context:Context, attrs: AttributeSet?):LinearLayout(context,a
 
         labelsView.addView(createMenuItem("Search"));
         iconsView.addView(createIconView(R.drawable.ic_search_solid));
-        for (filter in Settings.movieFilters) {
-            labelsView.addView(createMenuItem(filter.name))
-        }
+
         setActiveMenuItem(0);
         onFocusChangeListener = View.OnFocusChangeListener { view, b ->
             if(b) {

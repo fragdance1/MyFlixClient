@@ -32,7 +32,6 @@ class MovieCard(context: Context, attrs: AttributeSet?): BaseCardView(context,at
         val inflater:LayoutInflater = LayoutInflater.from(context)
         inflater.inflate(R.layout.movie_card,this)
 
-
         mProgress = findViewById<ProgressBar>(R.id.progressBar)
         mIcon = findViewById<ImageView>(R.id.icon)
 

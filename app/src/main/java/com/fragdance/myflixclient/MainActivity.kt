@@ -40,9 +40,10 @@ class MainActivity : FragmentActivity() {
         runOnUiThread { findViewById<TextView>(R.id.splashMessage).text = "Loading movies" }
         try {
             //var response = movieService.getLocalMovies().execute()
-            var response = movieService.getFilteredMovies(5).execute()
+            var response = movieService.getLocalMovies().execute()
             if (response.isSuccessful) {
                 Settings.movies = response.body()!!
+                Timber.tag(Settings.TAG).d("Movies "+Settings.movies.size)
                 val intent = Intent()
                 intent.action = "movies_loaded"
                 intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
@@ -56,7 +57,7 @@ class MainActivity : FragmentActivity() {
                 ).show()
             }
         } catch (e: Exception) {
-            Timber.tag(Settings.TAG).d("Failed to load movies")
+            Timber.tag(Settings.TAG).d("Failed to load movies "+e.message)
         }
     }
 
@@ -202,7 +203,7 @@ class MainActivity : FragmentActivity() {
         }
 
         // If we're running on emulator, hardcode ip
-        if (isEmulator() && pingServer("192.168.1.121")) {
+        if (isEmulator() && pingServer("192.168.1.79")) {
             startup()
             return
         }
@@ -273,6 +274,7 @@ class MainActivity : FragmentActivity() {
         mRootView = findViewById(R.id.main_browse_fragment)
         mRootView.onFocusSearchListener =
             BrowseFrameLayout.OnFocusSearchListener { focused, direction ->
+                Timber.tag(Settings.TAG).d("onFocusSearchListener ")
                 if (direction == View.FOCUS_LEFT) {
                     findViewById(R.id.side_menu)
                 } else {
@@ -318,14 +320,14 @@ class MainActivity : FragmentActivity() {
                 var response = movieService.getFilteredMovies(filterId).execute()
                 if (response.isSuccessful) {
                     Settings.movies = response.body()!!
-                    navHostFragment.navController.navigate(R.id.action_global_movies);
-                    /*
+                   // navHostFragment.navController.navigate(R.id.action_global_movies);
+
                     val intent = Intent()
                     intent.action = "movies_loaded"
                     intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
                     mInstance.sendBroadcast(intent)
 
-                     */
+
                     //loadTVShows()
                 } else {
                     Toast.makeText(

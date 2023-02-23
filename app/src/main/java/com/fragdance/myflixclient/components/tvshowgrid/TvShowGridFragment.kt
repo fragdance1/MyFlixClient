@@ -70,6 +70,7 @@ open class TvShowGridFragment : VerticalGridSupportFragment(){
     private fun setupFragment() {
         val gridPresenter = VerticalGridPresenter(ZOOM_FACTOR_SMALL, false)
         gridPresenter.numberOfColumns = 4
+        gridPresenter.shadowEnabled = false;
         setGridPresenter(gridPresenter)
 
         mAdapter = ArrayObjectAdapter(MovieCardPresenter())

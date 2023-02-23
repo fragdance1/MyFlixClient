@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/movies_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="50dp"
+
+    android:background="#000000"
+
+    android:orientation="vertical">
+
+    <androidx.leanback.widget.HorizontalGridView
+        android:id="@+id/movie_filters"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:padding="10dp"
+        android:focusable="true"
+        android:nextFocusLeft="@id/side_menu"
+        android:focusableInTouchMode="true"
+        android:descendantFocusability="afterDescendants"
+        app:focusOutEnd="true"
+        app:focusOutFront="true"
+        android:clipToPadding="false"
+    >
+
+    </androidx.leanback.widget.HorizontalGridView>
+    <com.fragdance.myflixclient.components.moviegrid.MovieGridFragment
+        android:id="@+id/movie_grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="100dp"
+        android:paddingLeft="30dp"
+        android:focusable="true"
+
+        android:focusableInTouchMode="true"
+        android:descendantFocusability="afterDescendants"
+        android:nextFocusUp="@id/movie_filters"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        app:focusOutEnd="true"
+        app:focusOutFront="true"
+        />
+    <!--fragment
+        android:id="@+id/movie_list"
+        android:name="com.fragdance.myflixclient.components.moviegrid.MovieGridFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:background="#ff0000" /-->
+</androidx.appcompat.widget.LinearLayoutCompat >
+
+
