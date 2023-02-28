@@ -20,10 +20,9 @@ import com.fragdance.myflixclient.presenters.MyFlixVerticalGridPresenter
 import timber.log.Timber
 
 open class MovieGridFragment(context: Context,attrs: AttributeSet): VerticalGridView(context,attrs){
-
     override fun onFinishInflate() {
         super.onFinishInflate()
         setNumColumns(4);
-
+        verticalSpacing=30
     }
 }

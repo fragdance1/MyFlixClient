@@ -130,7 +130,15 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
         }
 
         for((index, sub) in mPlayerFragment!!.mExternalSubtitles.withIndex()) {
-            subtitles.add(ITrackMenuItem(sub.language!!.english, EXTERNAL_SUBTITLE,index,null,null))
+            if(sub.language != null) {
+                subtitles.add(
+                    ITrackMenuItem(sub.language!!.english,
+                    EXTERNAL_SUBTITLE,
+                    index,
+                    null,
+                    null
+                ))
+            }
         }
         val items: ArrayList<ITrackMenuItem> = arrayListOf()
             items.add(ITrackMenuItem("Subtitles", HEADER, null, null, null))

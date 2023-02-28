@@ -1,6 +1,7 @@
 package com.fragdance.myflixclient.pages.home
 
 import android.os.Bundle
+import android.view.View
 import androidx.leanback.app.RowsSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
@@ -21,6 +22,7 @@ class HomePage: RowsSupportFragment() {
 
         MovieLoaders.loadMovies(type,listRowAdapter)
         val header = HeaderItem(rowsAdapter.size().toLong(), type)
+
         val row = ListRow(header, listRowAdapter)
 
         rowsAdapter.add(row)
@@ -37,9 +39,13 @@ class HomePage: RowsSupportFragment() {
         adapter = rowsAdapter
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        //verticalGridView.verticalSpacing=100;
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mRowPresenter.shadowEnabled = false;
+        mRowPresenter.shadowEnabled = true;
 
         setExpand(true)
 

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.VerticalGridView
 import com.fragdance.myflixclient.R
+import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.menu.MenuItemBridgeAdapter
 import com.fragdance.myflixclient.components.menu.MenuItemPresenter
 import com.fragdance.myflixclient.models.ISubtitle
@@ -18,6 +19,7 @@ import com.fragdance.myflixclient.services.subtitleService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 
 
 interface OnMenuItemViewClickedListener {
@@ -60,9 +62,9 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
                 response: Response<List<ISubtitle>>
             ) {
                 if(response.isSuccessful) {
-
+                    Timber.tag(Settings.TAG).d("Subtitle search successful");
                     val subtitles = response.body() as List<ISubtitle>
-
+                    Timber.tag(Settings.TAG).d("Got some subtitles "+subtitles.size)
                     mAdapter.clear()
                     if(subtitles.size > 0) {
                         mAdapter.addAll(0, subtitles)
@@ -74,7 +76,7 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
             }
 
             override fun onFailure(call: Call<List<ISubtitle>>, t: Throwable) {
-
+                Timber.tag(Settings.TAG).d("Subtitle search failed");
             }
         })
     }

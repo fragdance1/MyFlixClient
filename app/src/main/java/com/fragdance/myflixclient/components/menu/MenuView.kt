@@ -71,7 +71,6 @@ class MenuItemBridgeAdapter(onItemClickListener: OnMenuItemViewClickedListener):
             }
         })
         view.setOnFocusChangeListener { view, b ->
-
             if(view is MenuLabelView) {
                 view.setSelected(b)
             }

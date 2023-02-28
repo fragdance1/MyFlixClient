@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,10 +15,7 @@ import com.fragdance.myflixclient.R
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.filtercard.FilterCardPresenter
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
-import com.fragdance.myflixclient.components.moviegrid.MovieGridFragment
-import com.fragdance.myflixclient.models.IFilter
-import com.fragdance.myflixclient.models.IMovieDetails
-import com.fragdance.myflixclient.presenters.MyFlixListRowPresenter
+import com.fragdance.myflixclient.utils.MyFlixItemBridgeAdapter
 
 class MoviesPage: Fragment() {
     lateinit var mContext: Context
@@ -51,6 +49,7 @@ class MoviesPage: Fragment() {
         // Set up the filters row
         val filters: HorizontalGridView = mRootView.findViewById(R.id.movie_filters);
         filters.setNumRows(1)
+
         filters.horizontalSpacing = 10
 
         val filterAdapter = ArrayObjectAdapter(FilterCardPresenter()).apply {
@@ -59,17 +58,20 @@ class MoviesPage: Fragment() {
             }
         }
 
-        var bridgeAdapter = ItemBridgeAdapter()
+        var bridgeAdapter = MyFlixItemBridgeAdapter()
+
         FocusHighlightHelper.setupBrowseItemFocusHighlight(bridgeAdapter,
             1, false);
 
         bridgeAdapter.setAdapter(filterAdapter)
+
         filters.adapter = bridgeAdapter
 
         // Set up the movies grid
         val movies:VerticalGridView = mRootView.findViewById(R.id.movie_grid_view)
+
         mMovieAdapter = ArrayObjectAdapter(MovieCardPresenter())
-        var movieBridgeAdapter = ItemBridgeAdapter()
+        var movieBridgeAdapter = MyFlixItemBridgeAdapter()
         movieBridgeAdapter.setAdapter(mMovieAdapter)
         movies.adapter = movieBridgeAdapter
         FocusHighlightHelper.setupBrowseItemFocusHighlight(movieBridgeAdapter,

@@ -4,10 +4,19 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="selected_background">@color/colorPrimary</color>
 
-    <color name="gray_10">#121212</color>
-    <color name="gray_20">#2a2a2a</color>
+
     <color name="black_60">#99000000</color>
     <color name="black_80">#CC121212</color>
     <color name="black_90">#E6121212</color>
+    <color name="gray_10">#FE040607</color>
+    <color name="gray_20">#FE080c0f</color>
+    <color name="gray_30">#FE0d1218</color>
+    <color name="gray_40">#FE111820</color>
+    <color name="gray_50">#FE161f28</color>
+    <color name="gray_60">#FE1a2530</color>
+    <color name="gray_70">#FE1e2b38</color>
+    <color name="gray_80">#FE233140</color>
+    <color name="gray_90">#FE273748</color>
+    <color name="gray_100">#FE2C3E50</color>
     <color name="colorAccent">#ffff0000</color>
 </resources>

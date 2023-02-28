@@ -19,6 +19,7 @@ import com.fragdance.myflixclient.models.*
 import com.fragdance.myflixclient.presenters.*
 
 import com.fragdance.myflixclient.services.tvShowService
+import com.fragdance.myflixclient.utils.MyFlixItemBridgeAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -114,7 +115,7 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
 
         })
 
-        var bridgeAdapter = ItemBridgeAdapter()
+        var bridgeAdapter = MyFlixItemBridgeAdapter()
         bridgeAdapter.setAdapter(rowsAdapter)
         mSeasons.adapter = bridgeAdapter
     }
