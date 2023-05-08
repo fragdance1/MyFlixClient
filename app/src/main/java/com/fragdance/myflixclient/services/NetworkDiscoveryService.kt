@@ -27,6 +27,7 @@ class NetworkDiscoveryService(context:Context) {
     }
 
     private fun initializeResolveListener() {
+        Timber.tag(Settings.TAG).d("initializeResolveListener");
         resolveListener = object : NsdManager.ResolveListener {
 
             override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -58,6 +59,7 @@ class NetworkDiscoveryService(context:Context) {
     }
 
     private fun initializeDiscoveryListener() {
+        Timber.tag(Settings.TAG).d("initialzieDiscoveryListener")
         discoveryListener = object : NsdManager.DiscoveryListener {
 
             override fun onDiscoveryStarted(regType: String) {}

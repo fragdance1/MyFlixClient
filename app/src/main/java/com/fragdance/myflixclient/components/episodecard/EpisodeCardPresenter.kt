@@ -37,7 +37,7 @@ class EpisodeCardPresenter : Presenter() {
                 v.mProgress.visibility = View.GONE
             }
             var still =
-                if (item.id != null) (Settings.SERVER + "/api/still/" + item.id) else item.poster
+                if (item.id != null) (Settings.SERVER + "/api/images/still/" + item.id) else item.poster
             Picasso.get()
                 .load(still)
                 .fit()

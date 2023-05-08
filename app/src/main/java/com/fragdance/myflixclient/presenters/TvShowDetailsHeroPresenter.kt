@@ -45,17 +45,17 @@ class TvShowDetailsHeroPresenter:Presenter() {
         when (item) {
             is IMovieDetails -> {
 
-                backdropUrl = Settings.SERVER+"/api/backdrop/tv/"+item.id;
-                posterUrl = Settings.SERVER+"/api/poster/tv/"+item.id;
-                logoUrl = Settings.SERVER+"/api/logo/tv/"+item.id
+                backdropUrl = Settings.SERVER+"/api/images/backdrop/tv/"+item.id;
+                posterUrl = Settings.SERVER+"/api/images/poster/tv/"+item.id;
+                logoUrl = Settings.SERVER+"/api/images/logo/tv/"+item.id
                 summary = item.overview
                 title = item.title + (if (item.year != 0) " ("+item.year+")" else "")
 
             }
             is ITVShow -> {
-                backdropUrl = Settings.SERVER+"/api/backdrop/tv/"+item.id
-                posterUrl = Settings.SERVER+"/api/poster/tv/"+item.id
-                logoUrl = Settings.SERVER+"/api/logo/tv/"+item.id
+                backdropUrl = Settings.SERVER+"/api/images/backdrop/tv/"+item.id
+                posterUrl = Settings.SERVER+"/api/images/poster/tv/"+item.id
+                logoUrl = Settings.SERVER+"/api/images/logo/tv/"+item.id
                 title = item.title
                 summary = item.overview
             }

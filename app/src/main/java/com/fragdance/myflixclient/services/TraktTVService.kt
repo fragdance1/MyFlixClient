@@ -1,6 +1,7 @@
 package com.fragdance.myflixclient.services
 
 import com.fragdance.myflixclient.models.IMovie
+import com.fragdance.myflixclient.models.IMovieSearchResult
 import com.fragdance.myflixclient.models.IVideo
 import retrofit2.Call
 import retrofit2.http.GET
@@ -20,7 +21,7 @@ interface TraktTVService {
         @Query("watched_at") watched_at:String):Call<Unit>
 
     @GET("api/movie/search")
-    fun search(@Query("query") query:String,@Query("count") count:Int = 10,@Query("page") page:Int = 1):Call<List<IMovie>>
+    fun search(@Query("query") query:String):Call<IMovieSearchResult>
 }
 
 val trakttvService  = JSONServiceBuilder.buildService(TraktTVService::class.java)

@@ -49,7 +49,7 @@ class MovieCardPresenter: Presenter() {
         if(item is IMovie) {
 
             var poster =
-                if (item.id != null) (Settings.SERVER + "/api/poster/movie/" + item.id) else item.poster
+                if (item.id != null) (Settings.SERVER + "/api/images/poster/movie/" + item.id) else item.poster
 
             v.mTitle.text = item.title
             var hasDisc = (item.discs != null && item.discs.isNotEmpty()) ||(item.disc != null && item.disc == true)
@@ -80,7 +80,7 @@ class MovieCardPresenter: Presenter() {
                 v.mProgress.visibility = View.VISIBLE
             }
         } else if(item is IMovieCardData) {
-            var poster = if(item.id != null)  (Settings.SERVER+"/api/poster/movie/"+item.id) else item.poster
+            var poster = if(item.id != null)  (Settings.SERVER+"/api/images/poster/movie/"+item.id) else item.poster
             Timber.tag(Settings.TAG).d(poster)
             v.mTitle.text = item.title
             Picasso.get()
@@ -108,7 +108,7 @@ class MovieCardPresenter: Presenter() {
         } else if(item is ITVShow) {
             v.mTitle.text = item.title
             var poster =
-                if (item.id != null) (Settings.SERVER + "/api/poster/tv/" + item.id) else item.poster
+                if (item.id != null) (Settings.SERVER + "/api/images/poster/tv/" + item.id) else item.poster
             Picasso.get()
                 .load(poster)
                 .fit()

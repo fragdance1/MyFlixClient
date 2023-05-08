@@ -13,6 +13,7 @@ import androidx.leanback.widget.*
 import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.moviecard.MovieCardPresenter
 import com.fragdance.myflixclient.models.IMovie
+import com.fragdance.myflixclient.models.IMovieSearchResult
 
 import com.fragdance.myflixclient.services.trakttvService
 import timber.log.Timber
@@ -48,21 +49,21 @@ class SearchPage: SearchSupportFragment(),SearchSupportFragment.SearchResultProv
         return true
     }
 
-    fun loadQuery(query:String?) {
+    private fun loadQuery(query:String?) {
         if(query is String) {
             mAdapter.clear()
             Timber.tag(Settings.TAG).d("Asking TMDB about "+query)
             val requestCall = trakttvService.search(query)
-            requestCall.enqueue(object : Callback<List<IMovie>> {
+            requestCall.enqueue(object : Callback<IMovieSearchResult> {
                 override fun onResponse(
-                    call: Call<List<IMovie>>,
-                    response: Response<List<IMovie>>
+                    call: Call<IMovieSearchResult>,
+                    response: Response<IMovieSearchResult>
                 ) {
                     if (response.isSuccessful) {
 
                         Timber.tag(Settings.TAG).d("Got some movies"+response.body()!!);
                         val listRowAdapter = ArrayObjectAdapter(movieCardPresenter)
-                        listRowAdapter.addAll(0, response.body()!!)
+                        listRowAdapter.addAll(0, response.body()!!.results)
                         val header = HeaderItem(0, "Test")
                         mAdapter.add(ListRow(null, listRowAdapter))
                     } else {
@@ -70,7 +71,7 @@ class SearchPage: SearchSupportFragment(),SearchSupportFragment.SearchResultProv
                     }
                 }
 
-                override fun onFailure(call: Call<List<IMovie>>, t: Throwable) {
+                override fun onFailure(call: Call<IMovieSearchResult>, t: Throwable) {
                     Timber.tag(Settings.TAG).d("Abort, abort")
                 }
 

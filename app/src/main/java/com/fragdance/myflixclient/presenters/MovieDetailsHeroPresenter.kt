@@ -48,16 +48,16 @@ class MovieDetailsHeroPresenter:Presenter() {
         var title:String? = null
         when (item) {
             is IMovieDetails -> {
-                backdropUrl = Settings.SERVER+"/api/backdrop/movie/"+item.id;
-                posterUrl = Settings.SERVER+"/api/poster/movie/"+item.id;
-                logoUrl = Settings.SERVER+"/api/logo/movie/"+item.id
+                backdropUrl = Settings.SERVER+"/api/images/backdrop/movie/"+item.id;
+                posterUrl = Settings.SERVER+"/api/images/poster/movie/"+item.id;
+                logoUrl = Settings.SERVER+"/api/images/logo/movie/"+item.id
                 summary = item.overview
                 title = item.title + (if (item.year != 0) " ("+item.year+")" else "")
 
             }
             is ITVShow -> {
-                backdropUrl = Settings.SERVER+"/api/backdrop/tv/"+item.id
-                posterUrl = Settings.SERVER+"/api/poster/tv/"+item.id
+                backdropUrl = Settings.SERVER+"/api/images/backdrop/tv/"+item.id
+                posterUrl = Settings.SERVER+"/api/images/poster/tv/"+item.id
                 summary = item.overview
             }
         }

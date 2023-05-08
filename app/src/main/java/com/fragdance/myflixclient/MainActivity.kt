@@ -196,21 +196,23 @@ class MainActivity : FragmentActivity() {
         // First see if we have a saved server and that it works
         var preferences = getSharedPreferences("myflix", MODE_PRIVATE)
         var server = preferences.getString("server", null)
-
+        Timber.tag(Settings.TAG).d("Trying "+server);
         if (server is String && pingServer(server)) {
             startup()
             return
         }
 
         // If we're running on emulator, hardcode ip
-        if (isEmulator() && pingServer("192.168.1.79")) {
+        if (pingServer("10.10.10.254")) {
             startup()
             return
         }
         Timber.tag(Settings.TAG).d("Got no server")
         // Testing bonjour
+        Timber.tag(Settings.TAG).d("Testing bonjour");
         mServerFoundReceiver = object : BroadcastReceiver() {
             override fun onReceive(p0: Context?, p1: Intent?) {
+
                 var server = p1!!.getStringExtra("server")
                 Timber.tag(Settings.TAG).d("Got server " + server)
                 if (server != null && pingServer(server)) {

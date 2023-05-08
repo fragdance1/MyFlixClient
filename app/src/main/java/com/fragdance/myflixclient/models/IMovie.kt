@@ -16,6 +16,13 @@ class IMovie(
     var watched:Boolean?
 ):Serializable
 
+class IMovieSearchResult(
+    var page:Int,
+    var results:List<IMovie> = emptyList(),
+    var total_pages:Int,
+    var total_result:Int,
+
+)
 data class IFilter(val id:Int,val name:String):Serializable
 data class IMovieCardData(val id:String,val title:String,val subtitle:String?,val poster:String?,val progress:Float?,val disc:Boolean?,val videofile:Boolean?,val watched:Boolean?):Serializable
 

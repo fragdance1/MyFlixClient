@@ -55,7 +55,7 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
     }
 
     private fun searchSubtitle() {
-        val requestCall = subtitleService.searchSubtitle(mVideo.url,mVideo.title,null)
+        val requestCall = subtitleService.searchSubtitle(mVideo.url,mVideo.title,mVideo.imdbId)
         requestCall.enqueue(object: Callback<List<ISubtitle>>{
             override fun onResponse(
                 call: Call<List<ISubtitle>>,

@@ -38,7 +38,7 @@ class PersonDetailsHeroPresenter:Presenter() {
         Timber.tag(Settings.TAG).d("Person "+item)
         if(item is IPersonDetails) {
             var portrait =
-                if (item.id != null) (Settings.SERVER + "/api/portrait/" + item.id) else item.portrait
+                if (item.id != null) (Settings.SERVER + "/api/images/portrait/" + item.id) else item.portrait
 
             Picasso.get()
                 .load(portrait)

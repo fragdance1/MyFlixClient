@@ -23,7 +23,7 @@ class PersonCardPresenter: Presenter() {
         var person = item as IPersonCardData
 
         val v: PersonCard = viewHolder?.view as PersonCard
-        val portrait = if(person.portrait!=null) person.portrait else Settings.SERVER+"/api/portrait/"+person.id;
+        val portrait = if(person.portrait!=null) person.portrait else Settings.SERVER+"/api/images/portrait/"+person.id;
         Timber.tag(Settings.TAG).d("New portrait "+portrait)
         v.mTitle.text = person.title
         v.mSubtitle.text = person.subtitle
