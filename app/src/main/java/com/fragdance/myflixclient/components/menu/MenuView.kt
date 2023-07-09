@@ -3,6 +3,7 @@ package com.fragdance.myflixclient.components.menu
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import android.view.View.FOCUSABLE
 import android.view.ViewGroup
@@ -10,14 +11,20 @@ import android.widget.FrameLayout
 import androidx.leanback.widget.ItemBridgeAdapter
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.VerticalGridView
+import com.fragdance.myflixclient.Settings
 import com.fragdance.myflixclient.components.subtitlemodal.OnMenuItemViewClickedListener
 import com.fragdance.myflixclient.models.ISubtitle
+import timber.log.Timber
 
 class MenuView(context: Context,attrs: AttributeSet): VerticalGridView(context,attrs) {
 
 }
 
 class MenuItemPresenter: Presenter() {
+    private var index:Int = -1;
+    fun setActive(index:Int) {
+        this.index = index;
+    }
     override fun onCreateViewHolder(parent: ViewGroup?): ViewHolder {
         checkNotNull(parent)
         var label = MenuLabelView(parent.context);
@@ -39,6 +46,7 @@ class MenuItemPresenter: Presenter() {
 
     override fun onBindViewHolder(viewHolder: ViewHolder?, item: Any?) {
         checkNotNull(viewHolder)
+
         if(item is ISubtitle) {
             var name = "[" + item.language?.english+"] "+item.filename
 
@@ -47,24 +55,29 @@ class MenuItemPresenter: Presenter() {
             label.focusable = FOCUSABLE
             label.isFocusableInTouchMode = true;
         }
+        if(item is String) {
+            Timber.tag(Settings.TAG).d("onBindViewHolder string")
+            var label = viewHolder.view as MenuLabelView;
+            label.setPadding(10, 10, 10, 10)
+            label.setText(item)
+            label.focusable = FOCUSABLE
+            label.isFocusableInTouchMode = true;
+        }
 
     }
-
-
     override fun onUnbindViewHolder(viewHolder: ViewHolder?) {
-
     }
 }
 
 class MenuItemBridgeAdapter(onItemClickListener: OnMenuItemViewClickedListener):ItemBridgeAdapter() {
     var mOnItemClickListener = onItemClickListener
-
+    var activeIndex = 0;
     override fun onCreate(viewHolder: ViewHolder?) {
 
     }
 
     override fun onBind(viewHolder: ViewHolder?) {
-        var view = viewHolder!!.itemView
+        var view = viewHolder!!.itemView as MenuLabelView
         view.setOnClickListener(object:View.OnClickListener{
             override fun onClick(p0: View?) {
                 mOnItemClickListener.onMenuItemClicked(viewHolder.item)
@@ -73,14 +86,22 @@ class MenuItemBridgeAdapter(onItemClickListener: OnMenuItemViewClickedListener):
         view.setOnFocusChangeListener { view, b ->
             if(view is MenuLabelView) {
                 view.setSelected(b)
+                mOnItemClickListener.onMenuItemSelected(viewHolder.item)
             }
         }
+        view.setActive(viewHolder.absoluteAdapterPosition == activeIndex)
     }
 
     override fun onUnbind(viewHolder: ViewHolder?) {
         super.onUnbind(viewHolder)
     }
-
+    fun setActive(index:Int) {
+        var oldIndex = activeIndex;
+        //this.notifyItemChanged(activeIndex)
+        activeIndex = index;
+        this.notifyItemChanged(oldIndex)
+        this.notifyItemChanged(activeIndex)
+    }
     override fun onAttachedToWindow(viewHolder: ViewHolder?) {
         viewHolder?.itemView?.isActivated = true
     }

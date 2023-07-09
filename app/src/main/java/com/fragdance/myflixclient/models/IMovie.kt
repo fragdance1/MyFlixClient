@@ -13,7 +13,8 @@ class IMovie(
     var progress:Float?,
     var disc:Boolean?,
     var videofile:Boolean?,
-    var watched:Boolean?
+    var watched:Boolean?,
+    var sorting_title:String
 ):Serializable
 
 class IMovieSearchResult(

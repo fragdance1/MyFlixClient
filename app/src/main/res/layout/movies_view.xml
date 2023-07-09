@@ -24,15 +24,18 @@
     >
 
     </androidx.leanback.widget.HorizontalGridView>
-    <com.fragdance.myflixclient.components.moviegrid.MovieGridFragment
-        android:id="@+id/movie_grid_view"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="100dp"
-        android:paddingLeft="40dp"
-        android:paddingRight="70dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+>
+    <com.fragdance.myflixclient.components.moviegrid.MovieGridFragment
+        android:id="@+id/movie_grid_view"
+        android:layout_width="860dp"
+        android:layout_height="match_parent"
         android:focusable="true"
-
+        android:focusedByDefault="true"
         android:focusableInTouchMode="true"
         android:descendantFocusability="afterDescendants"
         android:nextFocusUp="@id/movie_filters"
@@ -41,6 +44,18 @@
         app:focusOutEnd="true"
         app:focusOutFront="true"
         />
+        <com.fragdance.myflixclient.components.menu.MenuView
+            android:id="@id/menu_view"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:descendantFocusability="afterDescendants"
+            android:nextFocusLeft="@id/movie_grid_view"
+            app:focusOutEnd="true"
+            app:focusOutFront="true"
+            android:background="#191919" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat >
 

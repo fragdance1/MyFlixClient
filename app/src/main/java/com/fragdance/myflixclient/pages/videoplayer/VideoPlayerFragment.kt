@@ -428,6 +428,8 @@ class VideoPlayerFragment : VideoSupportFragment() {
     fun downloadSubtitle(subtitle: ISubtitle,videoId:Long?,hash:String?) {
 
         if(subtitle.url != null) {
+            Timber.tag(Settings.TAG).d("Got subtitle url "+subtitle.url);
+            Timber.tag(Settings.TAG).d("Video id is "+videoId+" hash "+hash)
             val url: String = subtitle.url
             val requestCall = subtitleStringService.downloadSubtitle(url,"en", videoId, hash)
             requestCall.enqueue(object : Callback<String> {
@@ -436,11 +438,13 @@ class VideoPlayerFragment : VideoSupportFragment() {
                     response: Response<String>
                 ) {
                     if (response.isSuccessful) {
+                        Timber.tag(Settings.TAG).d("Subtitle reponse is ok");
                         val sub = response.body() as String
 
                         val decoder = OpenSubtitleDecoder()
                         mSubtitle = decoder.my_decode(sub.toByteArray(), sub.length, true)
-
+                        Timber.tag(Settings.TAG).d("mSubtitle length "+mSubtitle?.eventTimeCount)
+                        if(
                         mExternalSubtitles.add(
                             ISubtitle(
                                 -1,
@@ -451,11 +455,16 @@ class VideoPlayerFragment : VideoSupportFragment() {
                                 sub,
                                 mSubtitle
                             )
-                        )
+                        )) {
+                            selectExternalSubtitle(mExternalSubtitles.size-1);
+                        } else {
+                            Timber.tag(Settings.TAG).d("Failed to add external subtitle")
+                        }
                     }
                 }
 
                 override fun onFailure(call: Call<String>, t: Throwable) {
+                    Timber.tag(Settings.TAG).d("Failed with subtitle")
                     Timber.tag(Settings.TAG).d(t)
                 }
             })

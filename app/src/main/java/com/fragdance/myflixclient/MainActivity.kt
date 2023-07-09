@@ -203,7 +203,7 @@ class MainActivity : FragmentActivity() {
         }
 
         // If we're running on emulator, hardcode ip
-        if (pingServer("10.10.10.254")) {
+        if (pingServer("192.168.1.79")) {
             startup()
             return
         }
@@ -274,15 +274,18 @@ class MainActivity : FragmentActivity() {
 
     private fun loadStartingPage() {
         mRootView = findViewById(R.id.main_browse_fragment)
+
         mRootView.onFocusSearchListener =
             BrowseFrameLayout.OnFocusSearchListener { focused, direction ->
-                Timber.tag(Settings.TAG).d("onFocusSearchListener ")
+                Timber.tag(Settings.TAG).d("Open side menu");
                 if (direction == View.FOCUS_LEFT) {
                     findViewById(R.id.side_menu)
                 } else {
                     null
                 }
             }
+
+
     }
 
     override fun onNewIntent(intent: Intent?) {

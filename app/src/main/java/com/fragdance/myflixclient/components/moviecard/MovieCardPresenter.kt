@@ -49,7 +49,7 @@ class MovieCardPresenter: Presenter() {
         if(item is IMovie) {
 
             var poster =
-                if (item.id != null) (Settings.SERVER + "/api/images/poster/movie/" + item.id) else item.poster
+                if (item.id != null) (Settings.SERVER + "/api/images/poster/movie/" + item.id+"?force=true") else item.poster
 
             v.mTitle.text = item.title
             var hasDisc = (item.discs != null && item.discs.isNotEmpty()) ||(item.disc != null && item.disc == true)

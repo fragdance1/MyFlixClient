@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:background="@drawable/bg_gradient"
+
     tools:deviceIds="tv"
     tools:ignore="MergeRootFrame">
 
@@ -16,6 +17,7 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:nextFocusRight="@+id/side_menu"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph"
         >
@@ -37,7 +39,7 @@
         android:visibility="invisible"
         android:background="#ff0000" />
     <fragment
-        android:id="@+id/side_menu"
+        android:id="@id/side_menu"
         android:name="com.fragdance.myflixclient.components.side_menu.SideMenu"
         android:layout_width="wrap_content"
 

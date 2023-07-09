@@ -24,6 +24,7 @@ import timber.log.Timber
 
 interface OnMenuItemViewClickedListener {
     fun onMenuItemClicked(item:Any)
+    fun onMenuItemSelected(item:Any)
 }
 
 class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedListener {
@@ -85,6 +86,10 @@ class SubtitleModalFragment(video: IVideo): Fragment(),OnMenuItemViewClickedList
         val result = bundleOf("Item" to item)
         this.parentFragmentManager.setFragmentResult("Subtitle",result)
         parentFragmentManager.popBackStack()
+    }
+
+    override fun onMenuItemSelected(item: Any) {
+
     }
 
 }

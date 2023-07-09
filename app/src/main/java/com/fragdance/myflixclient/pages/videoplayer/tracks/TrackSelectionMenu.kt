@@ -188,8 +188,13 @@ class TrackSelectionMenu : VerticalGridSupportFragment(), OnItemViewClickedListe
                 //Timber.tag(Settings.TAG).d("Fragment listener "+result);
                 var receivedData = result.get("Item") as ISubtitle
                 if(receivedData!=null) {
+                    if(mVideo?.hash != null) {
+                        mPlayerFragment?.downloadSubtitle(receivedData!!,null,mVideo!!.hash)
+                    } else {
+                        mPlayerFragment?.downloadSubtitle(receivedData!!,mVideo!!.id,null)
+                    }
                     //Timber.tag(Settings.TAG).d(receivedData.toString())
-                    mPlayerFragment?.downloadSubtitle(receivedData!!,mVideo!!.id,mVideo!!.hash)
+
                 }
                 parentFragmentManager.beginTransaction().remove(modal).commit()
 

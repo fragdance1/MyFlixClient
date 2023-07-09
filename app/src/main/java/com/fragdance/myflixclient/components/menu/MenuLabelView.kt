@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.fragdance.myflixclient.Settings
+import timber.log.Timber
 
 class MenuLabelView : LinearLayout {
     var textView: TextView
@@ -33,7 +34,7 @@ class MenuLabelView : LinearLayout {
     }
 
     override fun setSelected(selected: Boolean) {
-        if (selected) setBackgroundColor(Color.argb(0.1f,1f, 1f, 1f))
+        if (selected) setBackgroundColor(Color.argb(0.2f,1f, 1f, 1f))
         else setBackgroundColor(Color.TRANSPARENT)
     }
 
@@ -42,7 +43,7 @@ class MenuLabelView : LinearLayout {
     }
 
     fun setActive(active: Boolean) {
-        if (active) setBackgroundColor(Color.rgb(0.2f, 0.2f, 0.2f))
+        if (active) setBackgroundColor(Color.argb(0.2f,1f, 1f, 1f))
         else setBackgroundColor(Color.TRANSPARENT)
     }
 

@@ -133,6 +133,10 @@ class TVShowDetailsPage : Fragment(), OnMenuItemViewClickedListener {
         Timber.tag(Settings.TAG).d("onMenuItemClicked " + item);
     }
 
+    override fun onMenuItemSelected(item: Any) {
+
+    }
+
 
 }
 
