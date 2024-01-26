@@ -177,6 +177,7 @@ class MyFlixExoPlayer:IVideoPlayer {
 
     override fun selectInternalSubtitle(lang:String):Boolean {
         if (mExoplayer!!.currentTracks.containsType(C.TRACK_TYPE_TEXT)) {
+            Timber.tag(Settings.TAG).d("selectInternalSubtitle")
             val formatBuilder: Format.Builder = TEXT_FORMAT.buildUpon()
             val lessRoleFlags = formatBuilder.setRoleFlags(C.ROLE_FLAG_CAPTION).build()
 

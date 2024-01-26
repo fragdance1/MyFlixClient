@@ -487,11 +487,15 @@ class VideoPlayerFragment : VideoSupportFragment() {
     inner class PlayerEventListener : Player.Listener {
         override fun onTracksChanged(tracks: Tracks) {
             super.onTracksChanged(tracks)
+            Timber.tag(Settings.TAG).d("onTrackChanged")
+/*
             if(!mVideoPlayer!!.selectInternalSubtitle("en")) {
                 if (!selectExternalSubtitle("en")) {
                     disableSubtitles()
                 }
             }
+
+ */
         }
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
