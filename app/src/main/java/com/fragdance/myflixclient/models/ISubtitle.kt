@@ -15,6 +15,7 @@ data class ISubtitle(
     val url:String?,
     val language:ILanguage?,
     val filename:String,
+    val open_subtitle_id:String?,
     var srt:String?,
     var subtitle: Subtitle?
 ):Serializable

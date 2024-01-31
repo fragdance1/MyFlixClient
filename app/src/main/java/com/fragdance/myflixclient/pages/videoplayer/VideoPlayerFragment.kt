@@ -348,6 +348,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                                 "",
 
                                 obj["msg"].toString(),
+                                null,
                                 prepareSrt(obj["msg"].toString())
                             )
                             video.subtitles.add(subtitle)
@@ -427,11 +428,11 @@ class VideoPlayerFragment : VideoSupportFragment() {
 
     fun downloadSubtitle(subtitle: ISubtitle,videoId:Long?,hash:String?) {
 
-        if(subtitle.url != null) {
+        if(subtitle.url != null || subtitle.open_subtitle_id != null) {
             Timber.tag(Settings.TAG).d("Got subtitle url "+subtitle.url);
             Timber.tag(Settings.TAG).d("Video id is "+videoId+" hash "+hash)
-            val url: String = subtitle.url
-            val requestCall = subtitleStringService.downloadSubtitle(url,"en", videoId, hash)
+
+            val requestCall = subtitleService.downloadSubtitle(videoId, hash, subtitle)
             requestCall.enqueue(object : Callback<String> {
                 override fun onResponse(
                     call: Call<String>,
@@ -453,6 +454,7 @@ class VideoPlayerFragment : VideoSupportFragment() {
                                 subtitle.filename,
 
                                 sub,
+                                null,
                                 mSubtitle
                             )
                         )) {

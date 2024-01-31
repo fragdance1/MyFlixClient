@@ -30,6 +30,7 @@ object JSONServiceBuilder {
     private val okHttp = OkHttpClient.Builder().addInterceptor(HostSelectionInterceptor()).callTimeout(60,TimeUnit.SECONDS).build()
 
     private val builder = Retrofit.Builder().baseUrl(BASE_URL)
+        .addConverterFactory(ScalarsConverterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())
         .client(okHttp)
 

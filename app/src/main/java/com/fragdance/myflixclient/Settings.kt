@@ -8,8 +8,7 @@ import com.fragdance.myflixclient.models.IVideo
 class Settings {
     companion object {
         // Address to the backend server. Should be set in settings later on
-        var SERVER: String =
-            ""//http://192.168.1.79:8000"//"http://192.168.1.79:5001";//"http://10.10.10.233:5001"
+        var SERVER: String = "127.0.0.1:8000"//http://192.168.1.79:8000"//"http://192.168.1.79:5001";//"http://10.10.10.233:5001"
         var SERVER_IP: String = "127.0.0.1"
 
         // Just for debug logs

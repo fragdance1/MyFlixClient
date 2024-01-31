@@ -203,7 +203,7 @@ class MainActivity : FragmentActivity() {
         }
 
         // If we're running on emulator, hardcode ip
-        if (pingServer("192.168.1.79")) {
+        if (pingServer("192.168.1.121")) {
             startup()
             return
         }
